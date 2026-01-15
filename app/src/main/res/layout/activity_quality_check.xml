@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:context=".view.QualityCheckActivity">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- HEADER -->
+            <include
+                android:id="@+id/idLayoutHeader"
+                layout="@layout/action_bar_comman_hedaer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+            <!-- INPUT ROW -->
+            <include
+                android:id="@+id/commanInputRow"
+                layout="@layout/comman_inputrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- TITLE -->
+            <TextView
+                android:id="@+id/tvCoilDetailsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Coil Details fetched from SAP"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/commanInputRow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- CARD CONTAINER -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:layout_marginEnd="10dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
+
+                app:layout_constraintTop_toBottomOf="@id/tvCoilDetailsTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TableLayout
+                    android:id="@+id/tableCoilDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:stretchColumns="1">
+
+                    <!-- COMMON STYLE APPLIED -->
+
+                    <!-- Supplier Batch -->
+                    <TableRow>
+                        <TextView
+                            android:text="Supplier Batch #"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row1"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Supplier Name"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row2"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Net Weight (KG)"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row3"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Grade"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row4"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Thickness"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row5"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Width"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row6"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Length"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row7"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="GRN Number"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row8"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="GRN Date"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row9"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:text="Material Code"
+                            style="@style/QcLabel" />
+                        <TextView
+                            android:id="@+id/column2_row_material_code"
+                            style="@style/QcValue" />
+                    </TableRow>
+
+                    <!-- ACTION BUTTONS -->
+                    <TableRow android:layout_marginTop="12dp">
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/buttonLeft"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Reject"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:background="@drawable/button_clear"
+                            android:layout_marginEnd="8dp" />
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/buttonRight"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Approve"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:background="@drawable/button_generate"
+                            android:layout_marginStart="8dp" />
+                    </TableRow>
+                    <TableRow
+                        android:id="@+id/rowBarcode"
+                        android:visibility="visible"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_vertical">
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/barcodeContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:id="@+id/barcodeImage"
+                                android:layout_width="180dp"
+                                android:layout_height="70dp"
+                                android:contentDescription="Barcode"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"/>
+
+                            <TextView
+                            android:id="@+id/barcodeText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="#000"
+                            android:layout_marginTop="4dp"
+                            app:layout_constraintTop_toBottomOf="@id/barcodeImage"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnReprint"
+                            android:layout_width="120dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
+                            android:text="Reprint"
+                            android:visibility="gone"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:background="@drawable/button_generate"/>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/buttonPrintLabel"
+                            android:layout_width="120dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
+                            android:text="Print"
+                            android:visibility="gone"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:background="@drawable/button_generate"/>
+                    </TableRow>
+                    <!-- REMARK + SUBMIT -->
+                    <TableRow
+                        android:id="@+id/rowRemarkSubmit"
+                        android:visibility="gone"
+                        android:layout_marginTop="12dp">
+
+                        <EditText
+                            android:id="@+id/etRemark"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="2"
+                            android:hint="Enter rejection remark"
+                            android:padding="10dp"
+                            android:background="@drawable/edittext_background" />
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/buttonASubmit"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="Submit"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:background="@drawable/button_generate"
+                            android:layout_marginStart="8dp" />
+                    </TableRow>
+
+                </TableLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

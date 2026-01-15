@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="0dp"
+            android:clipToPadding="false"
+            android:orientation="vertical">
+
+            <!-- 1️⃣ Header: No padding -->
+            <include
+                android:id="@+id/idLayoutHeader"
+                layout="@layout/action_bar_comman_hedaer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- 2️⃣ Content below header with padding -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+            android:clipToPadding="false">
+
+            <!-- Job Status Row -->
+            <LinearLayout
+                android:id="@+id/layoutJobStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/textJobNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Job#12344"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="start" />
+
+                <Button
+                    android:id="@+id/buttonMarkCompleted"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mark as Completed"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/blue"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="#BDBDBD" />
+
+            <!-- Mother Coil + Batch Number Fields -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutMotherCoilBatch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <!-- Mother Coil -->
+                <EditText
+                    android:id="@+id/editMotherCoil"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:hint="Mother Coil"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:background="@drawable/edittext_background"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/editBatchNumber"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintWidth_percent="0.7" />
+
+                <!-- Batch Number -->
+                <EditText
+                    android:id="@+id/editBatchNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:hint="Batch Number"
+                    android:text="B123456"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:background="@drawable/edittext_background"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    app:layout_constraintStart_toEndOf="@id/editMotherCoil"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/editMotherCoil"
+                    app:layout_constraintBottom_toBottomOf="@id/editMotherCoil"
+                    app:layout_constraintWidth_percent="0.3" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Table Below Fields -->
+            <TableLayout
+                android:id="@+id/tableBelowFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:stretchColumns="*">
+
+                <include layout="@layout/joblist" />
+            </TableLayout>
+
+            <!-- Scrap Table -->
+            <include
+                android:id="@+id/layoutScrapTable"
+                layout="@layout/layout_scrap_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:id="@+id/layoutActionButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="20dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnPrintBarcode"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Save"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/button_generate"
+                    android:layout_marginEnd="8dp"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Print Barcode Label"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/button_clear"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+        </LinearLayout> <!-- End of content below header -->
+        </LinearLayout>
+    </ScrollView>
+</layout>
+

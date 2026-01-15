@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Foreground Service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" /> <!-- Bluetooth permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- Android 12+ -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADVERTISE"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        android:required="false"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:required="false"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.symbol.emdk.permission.EMDK" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="true" />
+
+    <queries>
+        <package android:name="com.symbol.emdk.emdkservice" />
+    </queries>
+
+    <application
+        android:name="com.example.aplapollo.helper.AppContextProvider"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Base.Theme.Apolloapl"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+        <activity
+            android:name="com.example.aplapollo.view.Slitting.Slittingplan3Activity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.Slitting.SlittingPlan2Activity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.aplapollo.view.PicklingActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.SlittingStatusActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.PrinterMACAddActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.PrintTestActivity2"
+            android:exported="true" />
+<!--        <activity-->
+<!--            android:name="com.example.aplapollo.view.Slitting.SlittingPlan2Activity"-->
+<!--            android:exported="false" />-->
+        <activity
+            android:name="com.example.aplapollo.view.SlittingActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.QualityCheckActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.example.aplapollo.view.HomeActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.example.aplapollo.view.AdminActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.aplapollo.view.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.example.aplapollo.service.ZebraPrintService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+        <uses-library
+            android:name="com.symbol.emdk"
+            android:required="false" />
+    </application>
+
+</manifest>

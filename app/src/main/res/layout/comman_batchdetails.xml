@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/commanBatchDetails"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*"
+    android:padding="6dp">
+
+    <!-- ROW 1 -->
+    <TableRow>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Item Code : B1234561"
+
+            android:padding="6dp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Grade : S235JR"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+    </TableRow>
+
+    <!-- ROW 2 -->
+    <TableRow>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Width : 500 MM"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Length : 40000 MM"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+    </TableRow>
+
+    <!-- ROW 3 -->
+    <TableRow>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Thickness : 6 MM"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Weight : 7119 KG"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+    </TableRow>
+
+</TableLayout>

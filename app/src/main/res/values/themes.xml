@@ -1,0 +1,58 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme -->
+    <style name="Base.Theme.Apolloapl" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary color -->
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+
+        <!-- Secondary color -->
+        <item name="colorSecondary">@color/orange</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+
+        <!-- Background colors -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@android:color/black</item>
+
+        <!-- AppBar / Toolbar -->
+<!--        <item name="topAppBarStyle">@style/Widget.Apollo.TopAppBar</item>-->
+<!---->
+        <!-- Buttons -->
+        <item name="materialButtonStyle">@style/Widget.Apollo.MaterialButton</item>
+
+        <!-- Text appearances -->
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Apollo.Headline</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Apollo.Body</item>
+    </style>
+
+    <style name="Theme.Apolloapl" parent="Base.Theme.Apolloapl" />
+
+<!--    &lt;!&ndash; Custom TopAppBar &ndash;&gt;-->
+<!--    <style name="Widget.Apollo.TopAppBar" parent="Widget.Material3.TopAppBar">-->
+<!--        <item name="backgroundColor">@color/blue</item>-->
+<!--        <item name="titleTextColor">@android:color/white</item>-->
+<!--        <item name="navigationIconTint">@android:color/white</item>-->
+<!--    </style>-->
+
+    <!-- Custom MaterialButton -->
+    <style name="Widget.Apollo.MaterialButton" parent="Widget.Material3.Button">
+        <item name="cornerRadius">12dp</item>
+        <item name="backgroundTint">@color/blue</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <!-- Text appearances -->
+    <style name="TextAppearance.Apollo.Headline" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="TextAppearance.Apollo.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+</resources>

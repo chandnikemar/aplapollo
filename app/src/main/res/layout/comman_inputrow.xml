@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutInputRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp">
+
+    <!-- INPUT FIELD -->
+    <EditText
+        android:id="@+id/inputField"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:hint="Scan or enter batch number"
+        android:inputType="text"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/grey"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:background="@drawable/rectangle_background"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonGetDetail"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="3"
+        android:layout_marginEnd="10dp" />
+
+    <!-- GET DETAIL BUTTON -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonGetDetail"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Get Detail"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:background="@drawable/button_blue_rounded"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/inputField"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

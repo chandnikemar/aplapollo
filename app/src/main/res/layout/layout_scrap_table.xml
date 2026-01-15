@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    android:background="@drawable/outer_border">
+
+    <!-- Scrap Weight Header -->
+    <TextView
+        android:id="@+id/tvScrapTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Scrap Weight"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="#333"
+        android:padding="10dp"
+        android:background="#EEF2F5"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvIronTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.5"/>
+
+    <!-- Iron Loss Header -->
+    <TextView
+        android:id="@+id/tvIronTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Iron Loss"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="#333"
+        android:padding="10dp"
+        android:background="#EEF2F5"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/tvScrapTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.5"/>
+
+    <!-- Scrap Weight Input -->
+    <EditText
+        android:id="@+id/etScrapWeight"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:hint="Enter weight"
+        android:inputType="numberDecimal"
+        android:padding="10dp"
+        android:background="@drawable/inner_border"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvScrapTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/etIronLoss"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.5"/>
+
+    <!-- Iron Loss Input -->
+    <EditText
+        android:id="@+id/etIronLoss"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:hint="Enter weight"
+        android:inputType="numberDecimal"
+        android:padding="10dp"
+        android:background="@drawable/inner_border"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvIronTitle"
+        app:layout_constraintStart_toEndOf="@id/etScrapWeight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.5"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

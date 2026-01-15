@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <include
+        android:id="@+id/idLayoutHeader"
+        layout="@layout/action_bar_comman_hedaer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Select Plan -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSelectPlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:endIconMode="dropdown_menu"
+
+            app:hintTextColor="@android:color/white"
+
+            app:boxStrokeColor="@android:color/white"
+            app:endIconTint="@android:color/white"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/spinnerSelectPlan"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+
+                android:padding="12dp"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"
+                android:background="@drawable/bg_dropdown_plan"
+                android:inputType="none"
+                android:focusable="false"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutInputRequirement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="16dp">
+
+            <!-- Input Requirement Title -->
+            <TextView
+                android:id="@+id/tvInputTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Input requirement"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/viewDivider"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:background="#155E7C"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toBottomOf="@id/tvInputTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- Item & Grade -->
+            <LinearLayout
+                android:id="@+id/layoutItemGrade"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/viewDivider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/Tvitem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Item: HRC001 ABCD"/>
+
+                <TextView
+                    android:id="@+id/tvGrade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Grade: S1212"/>
+            </LinearLayout>
+
+            <!-- Width & Thickness -->
+            <LinearLayout
+                android:id="@+id/layoutWidthThickness"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutItemGrade"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvWidth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Width: 1200 MM"/>
+
+                <TextView
+                    android:id="@+id/tvthickness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thickness: 6.0 MM"/>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutSlittingPlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/tvSlittingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Slitting Plan"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/viewSlittingDivider"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                android:background="#155E7C"
+                app:layout_constraintTop_toBottomOf="@id/tvSlittingTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- Horizontal RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSlittingWidths"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@id/viewSlittingDivider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:listitem="@layout/item_slitting_width"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <!--            &lt;!&ndash; Slitting Boxes &ndash;&gt;-->
+<!--            <LinearLayout-->
+<!--                android:id="@+id/layoutSlittingBoxes"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/viewSlittingDivider"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="400"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:background="#155E7C"/>-->
+
+<!--                <View-->
+<!--                    android:layout_width="8dp"-->
+<!--                    android:layout_height="0dp"/>-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="400"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:background="#155E7C"/>-->
+
+<!--                <View-->
+<!--                    android:layout_width="8dp"-->
+<!--                    android:layout_height="0dp"/>-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="400"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:background="#155E7C"/>-->
+<!--            </LinearLayout>-->
+
+
+
+        <!-- Scan Coil & View Stock -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutScanCoil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="visible">
+
+            <!-- Scan Coil & View Stock -->
+            <LinearLayout
+                android:id="@+id/layoutScanRow"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+               >
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Scan a coil"
+                    app:boxBackgroundMode="none">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etScanCoil"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:imeOptions="actionDone"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View Stock"
+                    android:textStyle="bold"
+                    android:textColor="#155E7C"/>
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/viewScanDivider"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="8dp"
+                android:background="#155E7C"
+                app:layout_constraintTop_toBottomOf="@id/layoutScanRow"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Details -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutBatchDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <TableLayout
+                android:id="@+id/tableBatchDetailsTable"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- Row 1 -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/tvscBatch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="6dp"
+                        android:text="Batch: B123131313" />
+
+                    <TextView
+                        android:id="@+id/tvscQcDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="QC Date: 12/12/2025"/>
+
+                    <TextView
+                        android:id="@+id/tvscRow1Empty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"/>
+                </TableRow>
+
+                <!-- Row 2 -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/tvscSupplier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="Supplier: JSW Steel Ltd"/>
+
+                    <TextView
+                        android:id="@+id/tvscGrnDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="GRN Date: 12/12/2025"/>
+
+                    <TextView
+                        android:id="@+id/tvscRow2Empty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"/>
+                </TableRow>
+
+                <!-- Row 3 -->
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/tvscWeight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="Weight: 23900 Kg"/>
+
+                    <TextView
+                        android:id="@+id/tvscWidth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="W: 1200"/>
+
+                    <TextView
+                        android:id="@+id/tvscThickness"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="Thickness: 6.00"/>
+                </TableRow>
+
+            </TableLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Buttons -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnClear"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="Clear"
+                android:background="@drawable/button_clear"
+                android:textColor="@android:color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnSubmit"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                android:layout_marginEnd="8dp" /> <!-- Space to right -->
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSubmit"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="Submit"
+                android:background="@drawable/button_generate"
+                android:textColor="@android:color/white"
+                app:layout_constraintStart_toEndOf="@id/btnClear"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                android:layout_marginStart="8dp" /> <!-- Space to left -->
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </LinearLayout></LinearLayout>
+</layout>

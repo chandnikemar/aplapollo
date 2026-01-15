@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@color/blue"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:elevation="6dp">
+
+    <!-- Back / Logo -->
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_arrow_back_white"
+        android:contentDescription="Back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Title (Always Centered) -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Page Title"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+<!--    &lt;!&ndash; Right Action with status indicator &ndash;&gt;-->
+<!--    <FrameLayout-->
+<!--        android:id="@+id/printerStatusContainer"-->
+<!--        android:layout_width="40dp"-->
+<!--        android:layout_height="40dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent">-->
+
+<!--        &lt;!&ndash; Printer Icon (UNCHANGED) &ndash;&gt;-->
+<!--        <ImageView-->
+<!--            android:id="@+id/ivRightAction"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:padding="8dp"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:src="@drawable/printer_white_on"-->
+<!--            android:contentDescription="Printer"-->
+<!--            android:background="?attr/selectableItemBackgroundBorderless" />-->
+
+<!--        &lt;!&ndash; Status Dot &ndash;&gt;-->
+<!--        <View-->
+<!--            android:id="@+id/viewPrinterStatus"-->
+<!--            android:layout_width="8dp"-->
+<!--            android:layout_height="8dp"-->
+<!--            android:layout_gravity="top|end"-->
+<!--            android:layout_marginTop="6dp"-->
+<!--            android:layout_marginEnd="6dp"-->
+<!--            android:background="@drawable/bg_status_red" />-->
+
+<!--    </FrameLayout>-->
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

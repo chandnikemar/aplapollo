@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/commanBatchDetails"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*"
+    android:layout_margin="8dp"
+    android:layout_marginTop="16dp">
+
+    <TableRow>
+        <TextView
+            android:text="Batch#"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text=":"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="B1234561"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="Grade"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text=":"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="S235JR"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:text="Width"
+            android:gravity="center"
+            android:background="#F5F5F5"
+            android:padding="8dp" />
+
+        <TextView
+            android:text=":"
+            android:gravity="center"
+            android:background="#F5F5F5"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="500MM"
+            android:gravity="center"
+            android:background="#F5F5F5"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="Length"
+            android:gravity="center"
+            android:background="#F5F5F5"
+            android:padding="8dp" />
+
+        <TextView
+            android:text=":"
+            android:gravity="center"
+            android:background="#F5F5F5"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="40000mm"
+            android:gravity="center"
+            android:background="#F5F5F5"
+            android:padding="8dp" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:text="Thickness"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text=":"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="6mm"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="Weight"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text=":"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+
+        <TextView
+            android:text="7119 Kg"
+            android:gravity="center"
+            android:background="#E0E0E0"
+            android:padding="8dp" />
+    </TableRow>
+
+</TableLayout>
