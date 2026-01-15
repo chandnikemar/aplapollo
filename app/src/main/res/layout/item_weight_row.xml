@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="8dp">
+
+    <!-- Weight Input -->
+    <EditText
+        android:id="@+id/etWeight"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:hint="Weight"
+        android:inputType="numberDecimal"
+        android:enabled="true"
+        android:background="@drawable/edittext_bg"
+        android:padding="8dp" />
+
+    <!-- EDIT ICON -->
+    <ImageButton
+        android:id="@+id/btnEdit"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="6dp"
+        android:src="@drawable/ic_edit"
+        android:background="@android:color/transparent"
+        android:contentDescription="Edit" />
+
+    <!-- PLUS ICON -->
+    <ImageButton
+        android:id="@+id/btnAddMore"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="6dp"
+        android:src="@android:drawable/ic_input_add"
+        android:background="@android:color/transparent"
+        android:contentDescription="Add More" />
+
+</LinearLayout>
+
+
+
+
+
+<!--    android:src="@android:drawable/ic_input_add"-->

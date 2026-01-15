@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutInputRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="14dp">
+
+    <!-- INPUT FIELD -->
+    <EditText
+        android:id="@+id/inputField"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:hint="Scan or enter batch number"
+        android:inputType="text"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/grey"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:background="@drawable/rectangle_background"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnSearch"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp" />
+
+    <!-- SEARCH BUTTON -->
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnSearch"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/button_blue_rounded"
+        android:src="@drawable/ic_search"
+        android:contentDescription="Search"
+        app:layout_constraintStart_toEndOf="@id/inputField"
+        app:layout_constraintEnd_toStartOf="@id/btnClear"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="6dp"
+        app:tint="@android:color/white" />
+
+    <!-- CLEAR BUTTON -->
+    <ImageButton
+        android:id="@+id/btnClear"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/button_grey_rounded"
+        android:src="@drawable/ic_clear"
+        android:contentDescription="Clear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@android:color/white" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

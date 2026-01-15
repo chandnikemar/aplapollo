@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/commanBatchDetails"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*"
+    >
+
+    <!-- ROW 1 -->
+    <TableRow>
+
+        <TextView
+            android:id="@+id/tvItemCode"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Item Code : B1234561"
+
+            android:padding="6dp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/tvGrade"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Grade : S235JR"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+    </TableRow>
+
+    <!-- ROW 2 -->
+    <TableRow>
+
+        <TextView
+            android:id="@+id/tvWidth"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Width : 500 MM"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/tvLength"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Length : 40000 MM"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+    </TableRow>
+
+    <!-- ROW 3 -->
+    <TableRow>
+
+        <TextView
+            android:id="@+id/tvThickness"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Thickness : 6 MM"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/tvWeight"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Weight : 7119 KG"
+
+            android:padding="6dp"
+            android:maxLines="1"/>
+    </TableRow>
+
+</TableLayout>
