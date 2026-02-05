@@ -15,7 +15,6 @@
     import com.example.aplapollo.helper.Constants.POST_InitiateSlitting_WithoutPlan
     import com.example.aplapollo.helper.Constants.Print_PRN
     import com.example.aplapollo.helper.Constants.QC_StatusSubmission
-    import com.example.aplapollo.helper.Constants.REFRESH_TOKEN_DATA
     import com.example.aplapollo.model.ApiCommonResponse
     import com.example.aplapollo.model.LocationPaginationRequest
     import com.example.aplapollo.model.LocationResponse
@@ -25,7 +24,6 @@
     import com.example.aplapollo.model.QualityCheck.QCFetchResponse
     import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
     import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionResponse
-    import com.example.aplapollo.model.RefreshTokenResponse
     import com.example.aplapollo.model.Slitting.ApiResponse
     import com.example.aplapollo.model.Slitting.HrSlittingDetailsResponse
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
@@ -40,7 +38,6 @@
     import com.example.aplapollo.model.Slitting.StockBarcodeWithoutplanResponse
     import com.example.aplapollo.model.login.LoginRequest
     import com.example.aplapollo.model.login.LoginResponse
-    import retrofit2.Call
     import retrofit2.Response
     import retrofit2.http.Body
     import retrofit2.http.GET
@@ -53,18 +50,13 @@
             @Body
             loginRequest: LoginRequest
         ): Response<LoginResponse>
-        @POST(REFRESH_TOKEN_DATA)
-         fun refreshToken(
-            @Body body: Map<String, String>
-        ): Call<RefreshTokenResponse>
+
 
         @POST(Get_GRNData)
         suspend fun getQCFetch(
 
             @Body request: QCFetchRequest
         ): Response<QCFetchResponse>
-
-
 
         @POST(QC_StatusSubmission)
         suspend fun qcStatusSubmission(

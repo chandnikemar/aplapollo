@@ -13,13 +13,13 @@
     import androidx.lifecycle.ViewModelProvider
     import androidx.recyclerview.widget.LinearLayoutManager
     import com.example.aplapollo.adapter.Slitting.OngoingJobAdapter
+    import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
     import com.example.aplapollo.helper.LogoutHelper
     import com.example.aplapollo.helper.Resource
     import com.example.aplapollo.helper.SessionExpiredEvent
     import com.example.aplapollo.helper.SessionManager
     import com.example.aplapollo.model.LocationPaginationRequest
-    import com.example.aplapollo.repository.APLRepository
     import com.example.aplapollo.viewmodel.location.LocationViewModel
     import com.example.aplapollo.viewmodel.location.LocationViewModelFactory
     import com.example.aplapollo.viewmodel.slitting.SlittingViewModel
@@ -57,10 +57,11 @@
             supportActionBar?.hide()
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
-            val aplRepository = APLRepository()
-            val viewModelProviderFactory = LocationViewModelFactory(application, aplRepository)
+            val retrofitInstance =
+                RetrofitInstance.getInstance(applicationContext)
+            val viewModelProviderFactory = LocationViewModelFactory(application, retrofitInstance)
             locationViewModel = ViewModelProvider(this, viewModelProviderFactory)[LocationViewModel::class.java]
-            val viewModelProviderFactorySlitting = SlittingViewModelfactory(application, aplRepository)
+            val viewModelProviderFactorySlitting = SlittingViewModelfactory(application, retrofitInstance)
             slittingViewModel = ViewModelProvider(this, viewModelProviderFactorySlitting)[SlittingViewModel::class.java]
             session = SessionManager(this)
             userDetail = session.getUserDetails()
@@ -109,8 +110,8 @@
                 currentPage = 1
             )
             binding.rvOngoingJobs.layoutManager = LinearLayoutManager(this)
-            locationViewModel.getLocations(baseUrl, locationRequest)
-            slittingViewModel.getOngoingSlittingJobs(baseUrl)
+            locationViewModel.getLocations( locationRequest)
+            slittingViewModel.getOngoingSlittingJobs()
             ongoingJobAdapter = OngoingJobAdapter(emptyList()) { selectedJob ->
                 val intent = Intent(this, SlittingStatusActivity::class.java)
                 intent.putExtra("JOB_ID", selectedJob.jobNumber)
@@ -135,6 +136,7 @@
                 when (resource) {
 
                     is Resource.Loading -> {
+                        progress.show()
 
                     }
 
@@ -249,6 +251,10 @@
                 ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white))
             )
 
+        }
+        override fun onResume() {
+            super.onResume()
+            slittingViewModel.getOngoingSlittingJobs()
         }
 
 

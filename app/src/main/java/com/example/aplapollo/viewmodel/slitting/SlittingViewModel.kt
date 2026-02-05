@@ -46,16 +46,16 @@ class SlittingViewModel(
         MutableLiveData()
 
     fun getHrSlittingPlannedList(
-        baseUrl: String,
+
 
     ) {
         viewModelScope.launch {
-            safeApiCallHrSlittingPlan(baseUrl)
+            safeApiCallHrSlittingPlan()
         }
     }
-    fun getHrSlittingPlanById(baseUrl: String, hrSlittingPlanId: Int) {
+    fun getHrSlittingPlanById( hrSlittingPlanId: Int) {
         viewModelScope.launch {
-            safeApiCallHrSlittingPlanById(baseUrl, hrSlittingPlanId)
+            safeApiCallHrSlittingPlanById(hrSlittingPlanId)
         }
     }
     fun getHrSlittingScan(
@@ -64,36 +64,36 @@ class SlittingViewModel(
         hrSlittingPlanId: Int
     ) {
         viewModelScope.launch {
-            safeApiCallHrSlittingScan(baseUrl, barcode,hrSlittingPlanId)
+            safeApiCallHrSlittingScan( barcode,hrSlittingPlanId)
         }
     }
     fun getAllItemAgainstPlan(
-        baseUrl: String,
+
         request: HrSlittingItemAgainstPlanRequest
     ) {
         viewModelScope.launch {
-            safeApiCallItemAgainstPlan(baseUrl, request)
+            safeApiCallItemAgainstPlan( request)
         }
     }
     fun initiateHrSlitting(
-        baseUrl: String,
+
         request: InitiateSlittingRequest
     ) {
         viewModelScope.launch {
-            safeApiCallInitiateSlitting(baseUrl, request)
+            safeApiCallInitiateSlitting( request)
         }
     }
 
-    fun getOngoingSlittingJobs(baseUrl: String) {
+    fun getOngoingSlittingJobs() {
         viewModelScope.launch {
-            safeApiCallOngoingJobs(baseUrl)
+            safeApiCallOngoingJobs()
         }
     }
 
 
 
     private suspend fun safeApiCallHrSlittingPlan(
-        baseUrl: String,
+
 
     ) {
         hrSlittingPlanMutableLiveData.postValue(Resource.Loading())
@@ -102,7 +102,7 @@ class SlittingViewModel(
             if (Utils.hasInternetConnection(getApplication())) {
 
                 val response =
-                    aplRepository.getHrPlannedList( baseUrl)
+                    aplRepository.getHrPlannedList( )
 
                 hrSlittingPlanMutableLiveData.postValue(
                     handleHrSlittingPlanResponse(response)
@@ -144,12 +144,12 @@ class SlittingViewModel(
         return Resource.Error(errorMessage)
     }
   //  ==============================================================================
-  private suspend fun safeApiCallHrSlittingPlanById(baseUrl: String, hrSlittingPlanId: Int) {
+  private suspend fun safeApiCallHrSlittingPlanById( hrSlittingPlanId: Int) {
       hrSlittingPlanDetailLiveData.postValue(Resource.Loading())
 
       try {
           if (Utils.hasInternetConnection(getApplication())) {
-              val response = aplRepository.getHrSlittingPlanById(baseUrl, hrSlittingPlanId)
+              val response = aplRepository.getHrSlittingPlanById( hrSlittingPlanId)
               hrSlittingPlanDetailLiveData.postValue(handleHrSlittingPlanByIdResponse(response))
           } else {
               hrSlittingPlanDetailLiveData.postValue(Resource.Error(Constants.NO_INTERNET))
@@ -177,7 +177,7 @@ class SlittingViewModel(
     }
    // =====================================================================================================
    private suspend fun safeApiCallHrSlittingScan(
-       baseUrl: String,
+
        barcode: String,
        hrSlittingPlanId: Int
    ) {
@@ -187,7 +187,7 @@ class SlittingViewModel(
            if (Utils.hasInternetConnection(getApplication())) {
 
                val response =
-                   aplRepository.getHrSlittingScan(baseUrl, barcode,hrSlittingPlanId)
+                   aplRepository.getHrSlittingScan( barcode,hrSlittingPlanId)
 
                hrSlittingScanLiveData.postValue(
                    handleHrSlittingScanResponse(response)
@@ -231,7 +231,7 @@ class SlittingViewModel(
     //==============================================================================================
 
     private suspend fun safeApiCallItemAgainstPlan(
-        baseUrl: String,
+
        request: HrSlittingItemAgainstPlanRequest
     ) {
         hrItemAgainstPlanLiveData.postValue(Resource.Loading())
@@ -240,7 +240,7 @@ class SlittingViewModel(
             if (Utils.hasInternetConnection(getApplication())) {
 
                 val response = aplRepository.getAllItemAgainstPlan(
-                    baseUrl,
+
                  request
                 )
 
@@ -286,7 +286,7 @@ class SlittingViewModel(
     }
 //    ==================================================================================
 private suspend fun safeApiCallInitiateSlitting(
-    baseUrl: String,
+
     request: InitiateSlittingRequest
 ) {
     initiateSlittingLiveData.postValue(Resource.Loading())
@@ -295,7 +295,7 @@ private suspend fun safeApiCallInitiateSlitting(
         if (Utils.hasInternetConnection(getApplication())) {
 
             val response = aplRepository.initiateHrSlitting(
-                baseUrl,
+
                 request
             )
 
@@ -339,13 +339,13 @@ private suspend fun safeApiCallInitiateSlitting(
         return Resource.Error(errorMessage)
     }
     //=========================================================================================
-    private suspend fun safeApiCallOngoingJobs(baseUrl: String) {
+    private suspend fun safeApiCallOngoingJobs() {
         ongoingJobsLiveData.postValue(Resource.Loading())
 
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response = aplRepository.getOngoingJobs(baseUrl)
+                val response = aplRepository.getOngoingJobs()
 
                 ongoingJobsLiveData.postValue(
                     handleOngoingJobsResponse(response)

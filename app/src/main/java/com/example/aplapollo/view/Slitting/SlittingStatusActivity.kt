@@ -9,13 +9,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aplapollo.adapter.Slitting.SlittingStatusAdapter
+import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.LogoutHelper
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionExpiredEvent
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.Slitting.HrSlittingTransactionRequest
-import com.example.aplapollo.repository.APLRepository
 import com.example.aplapollo.viewmodel.slittingstatus.SlittingStatusViewModel
 import com.example.aplapollo.viewmodel.slittingstatus.SlittingStatusViewModelfactory
 import com.example.apolloapl.R
@@ -42,6 +42,8 @@ class SlittingStatusActivity : AppCompatActivity() {
     private var sourceStockId:Int=0
 
     private var motherWeight:Double=0.00
+    private var scrapWeight: Double = 0.0
+    private var ironLossWeight: Double = 0.0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -54,8 +56,9 @@ class SlittingStatusActivity : AppCompatActivity() {
         session = SessionManager(this)
         userDetail = session.getUserDetails()
 
-        val aplRepository = APLRepository()
-        val viewModelProviderFactory = SlittingStatusViewModelfactory(application, aplRepository)
+        val retrofitInstance =
+            RetrofitInstance.getInstance(applicationContext)
+        val viewModelProviderFactory = SlittingStatusViewModelfactory(application, retrofitInstance)
         slittingStatusViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingStatusViewModel::class.java]
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -81,8 +84,8 @@ class SlittingStatusActivity : AppCompatActivity() {
         jobId = intent.getIntExtra("JOB_ID", 0)
         barcode = intent.getStringExtra("BARCODE") ?: ""
          motherWeight = intent.getStringExtra("Mother_Weight")?.toDoubleOrNull()!!
+        binding.layoutScrapTable.tvIronLossValue.isEnabled = false
 
-        binding.layoutScrapTable.etIronLoss.isEnabled = false
 
 
         // If supplier no is different key, replace accordingly
@@ -102,7 +105,10 @@ class SlittingStatusActivity : AppCompatActivity() {
         val jobId = intent.getStringExtra("JOB_ID") ?: "--"
         val barcode = intent.getStringExtra("BARCODE") ?: "--"
 //        val supplierNo = intent.getStringExtra("SupplierNo") ?: "--"
-        val motherWeight =intent.getStringExtra("Mother_Weight")?:"--"
+        motherWeight = intent.getStringExtra("Mother_Weight")
+            ?.toDoubleOrNull() ?: 0.0
+
+
         binding.textJobNumber.text = "Job #$jobId"
 
 
@@ -110,7 +116,20 @@ class SlittingStatusActivity : AppCompatActivity() {
         binding.tvBatchNumber.setText("${motherWeight} Kg")
 
 
-        slittingStatusViewModel.getHrSlittingDetailsById(baseUrl, tranPlanId)
+        slittingStatusViewModel.getHrSlittingDetailsById( tranPlanId)
+        binding.layoutScrapTable.etScrapWeight.addTextChangedListener(
+            object : android.text.TextWatcher {
+
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    calculateAndShowIronLoss()
+                }
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            }
+        )
+
+
         slittingStatusViewModel.hrSlittingDetailsLiveData.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
@@ -168,7 +187,8 @@ class SlittingStatusActivity : AppCompatActivity() {
     }
     private fun submitCompleteSlitting() {
 
-        val adapter = binding.recyclerSlitting.adapter as SlittingStatusAdapter
+        val adapter = binding.recyclerSlitting.adapter as? SlittingStatusAdapter
+            ?: return
         val detailsList = adapter.getUpdatedTransactionDetails()
         if (detailsList.isEmpty()) {
             Toasty.warning(this, "Please select at least one coil").show()
@@ -177,27 +197,27 @@ class SlittingStatusActivity : AppCompatActivity() {
         // Mother coil weight (already received via intent)
         val motherCoilWeight = motherWeight
 
-// Scrap weight from UI
-        val scrapWeight = binding.layoutScrapTable.etScrapWeight
-            .text.toString()
-            .toDoubleOrNull() ?: 0.0
-
-// Total child coil weight
-        val totalChildWeight = detailsList.sumOf {
-            it.weighAfterSlitting ?: 0.0
-        }
-
-// Iron Loss calculation
-        val calculatedIronLoss =
-            motherCoilWeight - (totalChildWeight + scrapWeight)
-
-// Avoid negative value
-        val ironLossWeight = if (calculatedIronLoss < 0) 0.0 else calculatedIronLoss
-
-
-        binding.layoutScrapTable.etIronLoss.setText(
-            String.format("%.2f", ironLossWeight)
-        )
+//// Scrap weight from UI
+//        val scrapWeight = binding.layoutScrapTable.etScrapWeight
+//            .text.toString()
+//            .toDoubleOrNull() ?: 0.0
+//
+//// Total child coil weight
+//        val totalChildWeight = detailsList.sumOf {
+//            it.weighAfterSlitting ?: 0.0
+//        }
+//
+//
+//        val calculatedIronLoss =
+//            motherCoilWeight - (totalChildWeight + scrapWeight)
+//
+//
+//        val ironLossWeight = if (calculatedIronLoss < 0) 0.0 else calculatedIronLoss
+//
+//
+//        binding.layoutScrapTable.tvIronLossValue.setText(
+//            String.format("%.2f", ironLossWeight)
+//        )
 
         val request = HrSlittingTransactionRequest(
             hrSlittingTranId = tranPlanId,
@@ -218,7 +238,32 @@ class SlittingStatusActivity : AppCompatActivity() {
             hRSlittingTransactionDetail = detailsList
         )
 
-        slittingStatusViewModel.completeHrSlitting(baseUrl, request)
+        slittingStatusViewModel.completeHrSlitting( request)
+    }
+    private fun calculateAndShowIronLoss() {
+
+        val scrapWeight = binding.layoutScrapTable.etScrapWeight
+            .text.toString()
+            .toDoubleOrNull() ?: 0.0
+
+        val adapter = binding.recyclerSlitting.adapter as? SlittingStatusAdapter
+            ?: return
+
+        val detailsList = adapter.getUpdatedTransactionDetails()
+
+        val totalChildWeight = detailsList.sumOf {
+            it.weighAfterSlitting ?: 0.0
+        }
+
+        val calculatedIronLoss =
+            motherWeight - (totalChildWeight + scrapWeight)
+
+        val ironLossWeight =
+            if (calculatedIronLoss < 0) 0.0 else calculatedIronLoss
+
+        binding.layoutScrapTable.tvIronLossValue.setText(
+            String.format("%.2f", ironLossWeight)
+        )
     }
 
 

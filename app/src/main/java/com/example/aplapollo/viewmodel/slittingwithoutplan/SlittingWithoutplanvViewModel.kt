@@ -30,13 +30,12 @@ class SlittingWithoutplanvViewModel(
             MutableLiveData<Resource<InitiateSlittingResponse>> =
         MutableLiveData()
     fun getStockByBatchOrBarcode(
-        baseUrl: String,
 
         code: String?
     ) {
         viewModelScope.launch {
             safeApiCallGetStockByBatchOrBarcode(
-                baseUrl,
+
 
                 code
             )
@@ -44,16 +43,15 @@ class SlittingWithoutplanvViewModel(
     }
 
     fun initiateSlittingWithoutPlan(
-        baseUrl: String,
+
         request: InitiateSlittingWithoutPlanRequest
     ) {
         viewModelScope.launch {
-            safeApiCallInitiateSlittingWithoutPlan(baseUrl, request)
+            safeApiCallInitiateSlittingWithoutPlan( request)
         }
     }
 
     private suspend fun safeApiCallGetStockByBatchOrBarcode(
-        baseUrl: String,
 
         code: String?
     ) {
@@ -64,7 +62,7 @@ class SlittingWithoutplanvViewModel(
 
                 val response =
                     aplRepository.getStockByBatchOrBarcode(
-                        baseUrl,
+
 
                         code
                     )
@@ -104,7 +102,7 @@ class SlittingWithoutplanvViewModel(
 
     //==================================================================================================
 private suspend fun safeApiCallInitiateSlittingWithoutPlan(
-    baseUrl: String,
+
     request: InitiateSlittingWithoutPlanRequest
 ) {
     initiateSlittingWithoutPlanLiveData.postValue(Resource.Loading())
@@ -113,7 +111,7 @@ private suspend fun safeApiCallInitiateSlittingWithoutPlan(
         if (Utils.hasInternetConnection(getApplication())) {
 
             val response =
-                aplRepository.initiateSlittingWithoutPlan(baseUrl, request)
+                aplRepository.initiateSlittingWithoutPlan( request)
 
             initiateSlittingWithoutPlanLiveData.postValue(
                 handleInitiateSlittingWithoutPlanResponse(response)

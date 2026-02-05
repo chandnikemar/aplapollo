@@ -11,6 +11,7 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.helper.ZebraPrinterHelper
+import com.example.aplapollo.view.Pickling.PicklingActivity
 import com.example.aplapollo.view.Slitting.SlittingActivity
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityHomeBinding
@@ -44,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this@HomeActivity, SlittingActivity::class.java))
         }
         binding.card3.setOnClickListener {
-            startActivity(Intent(this@HomeActivity,PicklingActivity ::class.java))
+            startActivity(Intent(this@HomeActivity, PicklingActivity ::class.java))
         }
         binding.card5.setOnClickListener {
             startActivity(Intent(this@HomeActivity, PrinterMACAddActivity::class.java))

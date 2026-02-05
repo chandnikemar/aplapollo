@@ -24,17 +24,17 @@ class LocationViewModel(
         MutableLiveData()
 
     fun getLocations(
-        baseUrl: String,
+
       request: LocationPaginationRequest
     ) {
         viewModelScope.launch {
-            safeApiCallGetLocations(baseUrl, request)
+            safeApiCallGetLocations( request)
         }
     }
 
     // ==============================================================================
     private suspend fun safeApiCallGetLocations(
-        baseUrl: String,
+
        request: LocationPaginationRequest
     ) {
         locationListMutableLiveData.postValue(Resource.Loading())
@@ -45,7 +45,7 @@ class LocationViewModel(
 
 
                 val response =
-                    aplRepository.getLocations(baseUrl, request)
+                    aplRepository.getLocations( request)
 
                 locationListMutableLiveData.postValue(
                     handleLocationResponse(response)

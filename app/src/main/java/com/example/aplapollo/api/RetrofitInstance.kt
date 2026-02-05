@@ -1,112 +1,100 @@
 package com.example.aplapollo.api
 
-import com.example.aplapollo.helper.AppContextProvider
+import android.content.Context
 import com.example.aplapollo.helper.Constants
-import com.example.aplapollo.helper.SessionManager
-import com.example.aplapollo.helper.TokenAuthenticator
+import com.example.aplapollo.helper.TokenInterceptor
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
-import javax.net.ssl.SSLSocketFactory
-import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-object RetrofitInstance {
+class RetrofitInstance private constructor(private val context: Context) {
 
-    // ===================== SSL (same as yours) =====================
-    private fun sslSocketFactory(): Pair<SSLSocketFactory, X509TrustManager> {
+    companion object {
+        @Volatile
+        private var INSTANCE: RetrofitInstance? = null
 
-        val trustManager = object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
-            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
-            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+        fun getInstance(context: Context): RetrofitInstance {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: RetrofitInstance(context.applicationContext)
+                    .also { INSTANCE = it }
+            }
         }
-
-        val sslContext = SSLContext.getInstance("SSL")
-        sslContext.init(null, arrayOf<TrustManager>(trustManager), SecureRandom())
-
-        return sslContext.socketFactory to trustManager
     }
 
-    private fun logging(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor().apply {
+    // 🔹 Common OkHttpClient
+    private val okHttpClient: OkHttpClient by lazy {
+
+        val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-    // ===================== LOGIN (NO JWT, NO AUTHENTICATOR) =====================
-    fun loginApi(baseUrl: String): APLAPOLLOAPI {
+        val tokenInterceptor = TokenInterceptor(context)
 
-        val (sslFactory, trustManager) = sslSocketFactory()
+        val trustAllCerts = arrayOf<X509TrustManager>(
+            object : X509TrustManager {
+                override fun checkClientTrusted(
+                    chain: Array<java.security.cert.X509Certificate>,
+                    authType: String
+                ) {}
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor(logging())
-            .sslSocketFactory(sslFactory, trustManager)
+                override fun checkServerTrusted(
+                    chain: Array<java.security.cert.X509Certificate>,
+                    authType: String
+                ) {}
+
+                override fun getAcceptedIssuers():
+                        Array<java.security.cert.X509Certificate> = arrayOf()
+            }
+        )
+
+        val sslContext = javax.net.ssl.SSLContext.getInstance("SSL")
+        sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+
+        OkHttpClient.Builder()
+            .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0])
             .hostnameVerifier { _, _ -> true }
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(baseUrl + Constants.tgsAPi)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(APLAPOLLOAPI::class.java)
-    }
-
-    // ===================== SERVICE API (JWT + REFRESH) =====================
-    fun serviceApi(baseUrl: String): APLAPOLLOAPI {
-
-        val sessionManager = SessionManager(AppContextProvider.context)
-        val (sslFactory, trustManager) = sslSocketFactory()
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(logging())
-            .addInterceptor(AuthInterceptor(sessionManager)) // ✅ JWT
-            .authenticator(
-                TokenAuthenticator(
-                    sessionManager = sessionManager,
-                    baseUrl = baseUrl
-                )
-            )
-            .sslSocketFactory(sslFactory, trustManager)
-            .hostnameVerifier { _, _ -> true }
+            .protocols(listOf(Protocol.HTTP_1_1))
+            .addInterceptor(logging)
+            .addInterceptor(tokenInterceptor)
             .connectTimeout(100, TimeUnit.SECONDS)
             .readTimeout(100, TimeUnit.SECONDS)
             .writeTimeout(100, TimeUnit.SECONDS)
             .build()
-
-        return Retrofit.Builder()
-            .baseUrl(baseUrl + Constants.serviceAPi)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(APLAPOLLOAPI::class.java)
     }
 
-    // ===================== REFRESH TOKEN (NO JWT, NO AUTHENTICATOR) =====================
-    fun refreshTokenApi(baseUrl: String): APLAPOLLOAPI {
-
-        val (sslFactory, trustManager) = sslSocketFactory()
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(logging())
-            .sslSocketFactory(sslFactory, trustManager)
-            .hostnameVerifier { _, _ -> true }
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl(baseUrl + Constants.serviceAPi)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(APLAPOLLOAPI::class.java)
+    // 🔹 Base URL from SharedPrefs
+    private val baseUrl: String by lazy {
+        val prefs =
+            context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
+        prefs.getString(Constants.BASE_URL, "") ?: ""
     }
+
+    // 🔹 TGS Retrofit (Login / Refresh)
+    private val tgsRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl("$baseUrl/Tgs/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    // 🔹 Service Retrofit (JWT protected)
+    private val serviceRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl("$baseUrl/Service/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
+    // 🔹 API providers
+    fun tgsApi(): APLAPOLLOAPI =
+        tgsRetrofit.create(APLAPOLLOAPI::class.java)
+
+    fun serviceApi(): APLAPOLLOAPI =
+        serviceRetrofit.create(APLAPOLLOAPI::class.java)
 }

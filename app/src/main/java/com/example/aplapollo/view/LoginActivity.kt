@@ -8,12 +8,12 @@ import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.login.LoginRequest
-import com.example.aplapollo.repository.APLRepository
 import com.example.aplapollo.viewmodel.login.LoginViewModel
 import com.example.aplapollo.viewmodel.login.LoginViewModelFactory
 import com.example.apolloapl.R
@@ -22,7 +22,7 @@ import es.dmoral.toasty.Toasty
 
 
 class LoginActivity : AppCompatActivity() {
-lateinit var binding: ActivityLoginBinding
+    lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
     private lateinit var progress: ProgressDialog
     private lateinit var session:   SessionManager
@@ -47,17 +47,22 @@ lateinit var binding: ActivityLoginBinding
         serverHttpPrefText = userDetails!![Constants.KEY_HTTP].toString()
         baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
 
-        val aplRepository = APLRepository()
-        val viewModelProviderFactory = LoginViewModelFactory(application, aplRepository)
+        val retrofitInstance =
+            RetrofitInstance.getInstance(applicationContext)
+        val viewModelProviderFactory = LoginViewModelFactory(application, retrofitInstance  )
         viewModel = ViewModelProvider(this, viewModelProviderFactory)[LoginViewModel::class.java]
+        Utils.setSharedPrefs(
+            this,
+            Constants.BASE_URL,
+            baseUrl
+        )
 
-
-        if (Utils.getSharedPrefsBoolean(this@LoginActivity, Constants.KEY_ISLOGGEDIN, false)) {
-            if (Utils.getSharedPrefsBoolean(this@LoginActivity, Constants.KEY_ISLOGGEDIN, true)) {
-                startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
-                finish()
-            }
-        }
+        //        if (Utils.getSharedPrefsBoolean(this@LoginActivity, Constants.KEY_ISLOGGEDIN, false)) {
+        //            if (Utils.getSharedPrefsBoolean(this@LoginActivity, Constants.KEY_ISLOGGEDIN, true)) {
+        //                startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+        //                finish()
+        //            }
+        //        }
 
         binding.buttonLogin.setOnClickListener {
             login()
@@ -76,24 +81,24 @@ lateinit var binding: ActivityLoginBinding
                         try {
 
 
-                                session.createLoginSession(
-                                    resultResponse.firstName,
-                                    resultResponse.lastName,
-                                    resultResponse.email,
-                                    resultResponse.mobileNumber.toString(),
-                                    resultResponse.isVerified.toString(),
-                                    resultResponse.userName,
-                                    resultResponse.jwtToken,
-                                    resultResponse.refreshToken,
-                                    resultResponse.defaultTenantCode,
-                                    resultResponse.roleName,
-                                )
-                                Utils.setSharedPrefsBoolean(
-                                    this@LoginActivity,
-                                    Constants.LOGGEDIN,
-                                    true
-                                )
-                                startActivity()  // Redirect to the HomeActivity if login is successful
+                            session.createLoginSession(
+                                resultResponse.firstName,
+                                resultResponse.lastName,
+                                resultResponse.email,
+                                resultResponse.mobileNumber.toString(),
+                                resultResponse.isVerified.toString(),
+                                resultResponse.userName,
+                                resultResponse.jwtToken,
+                                resultResponse.refreshToken,
+                                resultResponse.defaultTenantCode,
+                                resultResponse.roleName,
+                            )
+                            Utils.setSharedPrefsBoolean(
+                                this@LoginActivity,
+                                Constants.LOGGEDIN,
+                                true
+                            )
+                            startActivity()  // Redirect to the HomeActivity if login is successful
 
                         } catch (e: Exception) {
                             Toasty.warning(
@@ -136,7 +141,7 @@ lateinit var binding: ActivityLoginBinding
                 val validationMessage = validateInput(username, password)
                 if (validationMessage == null) {
                     val loginRequest = LoginRequest( username,password)
-                    viewModel.login(baseUrl, loginRequest)  // Make the API call with the user credentials
+                    viewModel.login( loginRequest)  // Make the API call with the user credentials
                 } else {
                     showErrorMessage(validationMessage)  // Show error message if input is invalid
                 }

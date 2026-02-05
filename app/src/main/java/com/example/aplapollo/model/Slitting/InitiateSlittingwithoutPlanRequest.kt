@@ -15,6 +15,8 @@
     val CompletedDate: String? = null, // ISO format date
     val Status: String, // Draft, Planned, InProgress, Completed
     val Remarks: String? = null,
+        val IsPlanned:Boolean,
+        val IsActive: Boolean,
     val hrSlittingTransactionDetail: List<HRSlittingTransactionDetailRequest> =
         emptyList()
     )

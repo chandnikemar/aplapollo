@@ -33,9 +33,9 @@ class QCViewModel(
     /* ----------------------------------------------------------------------
      *                        FETCH QC DATA
      * ---------------------------------------------------------------------- */
-    fun fetchQCData(baseUrl: String,  request: QCFetchRequest) {
+    fun fetchQCData( request: QCFetchRequest) {
         viewModelScope.launch {
-            safeAPICallFetchQC(baseUrl, request)
+            safeAPICallFetchQC( request)
         }
     }
 
@@ -58,7 +58,7 @@ class QCViewModel(
     }
 
     private suspend fun safeAPICallFetchQC(
-        baseUrl: String,
+
 
         request: QCFetchRequest
     ) {
@@ -67,7 +67,7 @@ class QCViewModel(
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response = aplRepository.fetchQCData( baseUrl, request)
+                val response = aplRepository.fetchQCData(  request)
                 qcFetchLiveData.postValue(handleQCFetchResponse(response))
 
             } else qcFetchLiveData.postValue(Resource.Error(Constants.NO_INTERNET))
@@ -85,12 +85,12 @@ class QCViewModel(
      *                        QC SUBMISSION
      * ---------------------------------------------------------------------- */
     fun submitQCStatus(
-        baseUrl: String,
+
 
         request: QCStatusSubmissionRequest
     ) {
         viewModelScope.launch {
-            safeAPICallSubmit(baseUrl,  request)
+            safeAPICallSubmit( request)
         }
     }
 
@@ -123,7 +123,7 @@ class QCViewModel(
 
 
     private suspend fun safeAPICallSubmit(
-        baseUrl: String,
+   
         request: QCStatusSubmissionRequest
     ) {
         qcStatusLiveData.postValue(Resource.Loading())
@@ -131,7 +131,7 @@ class QCViewModel(
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response = aplRepository.submitQCStatus(baseUrl, request)
+                val response = aplRepository.submitQCStatus( request)
                 qcStatusLiveData.postValue(handleSubmitResponse(response))
 
             } else {

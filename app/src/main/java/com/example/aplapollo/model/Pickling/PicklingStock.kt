@@ -1,0 +1,37 @@
+package com.example.aplapollo.model.Pickling
+
+
+
+data class PicklingStockResponse(
+    val responseObject: PicklingStock?,
+    val errorMessage: String?,
+    val exception: String?,
+    val responseMessage: String?,
+    val statusCode: Int
+)
+
+data class PicklingStock(
+    val stockId: Int,
+    val tenantCode: String,
+    val materialTypeId: Int,
+    val materialType: String,
+    val materialCode: String,
+    val actionTypeId: Int,
+    val actionType: String,
+    val supplierName: String?,
+    val supplierBatchNo: String?,
+    val transactionId: Int?,
+    val parentStockId: Int?,
+    val grade: String?,
+    val barcode: String,
+    val weight: Double,          // 🔥 Mother coil weight
+    val thickness: Double,
+    val length: Double,
+    val width: Double,
+    val remarks: String?,
+    val lastActionDoneBy: String?,
+    val lastActionDoneDate: String?,
+    val isActive: Boolean,
+    val status: String,
+    val totalRecord: Int
+)

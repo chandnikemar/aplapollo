@@ -27,24 +27,24 @@ class SlittingStatusViewModel(
         MutableLiveData()
 
     fun getHrSlittingDetailsById(
-        baseUrl: String,
+
         tranId: Int
     ) {
         viewModelScope.launch {
-            safeApiCallHrSlittingDetailsById(baseUrl, tranId)
+            safeApiCallHrSlittingDetailsById( tranId)
         }
     }
     fun completeHrSlitting(
-        baseUrl: String,
+
         request: HrSlittingTransactionRequest
     ) {
         viewModelScope.launch {
-            safeApiCallCompleteHrSlitting(baseUrl, request)
+            safeApiCallCompleteHrSlitting( request)
         }
     }
 
     private suspend fun safeApiCallHrSlittingDetailsById(
-        baseUrl: String,
+
         tranId: Int
     ) {
         hrSlittingDetailsLiveData.postValue(Resource.Loading())
@@ -53,7 +53,7 @@ class SlittingStatusViewModel(
             if (Utils.hasInternetConnection(getApplication())) {
 
                 val response: Response<HrSlittingDetailsResponse> =
-                    aplRepository.getHrSlittingDetailsById(baseUrl, tranId)
+                    aplRepository.getHrSlittingDetailsById( tranId)
 
                 hrSlittingDetailsLiveData.postValue(
                     handleHrSlittingDetailsResponse(response)
@@ -97,7 +97,7 @@ class SlittingStatusViewModel(
     }
   //  ==================================================Slitting complte APi
   private suspend fun safeApiCallCompleteHrSlitting(
-      baseUrl: String,
+
       request: HrSlittingTransactionRequest
   ) {
       completeHrSlittingLiveData.postValue(Resource.Loading())
@@ -106,7 +106,7 @@ class SlittingStatusViewModel(
           if (Utils.hasInternetConnection(getApplication())) {
 
               val response =
-                  aplRepository.completeHRSlitting(baseUrl, request)
+                  aplRepository.completeHRSlitting( request)
 
               completeHrSlittingLiveData.postValue(
                   handleCompleteHrSlittingResponse(response)

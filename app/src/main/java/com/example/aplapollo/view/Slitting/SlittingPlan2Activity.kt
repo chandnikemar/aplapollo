@@ -1,7 +1,6 @@
     package com.example.aplapollo.view.Slitting
 
     import android.app.ProgressDialog
-    import android.content.Intent
     import android.content.res.ColorStateList
     import android.os.Bundle
     import android.util.Log
@@ -17,6 +16,7 @@
     import androidx.lifecycle.ViewModelProvider
     import androidx.recyclerview.widget.LinearLayoutManager
     import com.example.aplapollo.adapter.Slitting.SlittingWidthAdapter
+    import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
     import com.example.aplapollo.helper.LogoutHelper
     import com.example.aplapollo.helper.Resource
@@ -26,8 +26,6 @@
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
     import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
     import com.example.aplapollo.model.Slitting.InitiateSlittingRequest
-    import com.example.aplapollo.repository.APLRepository
-    import com.example.aplapollo.view.LoginActivity
     import com.example.aplapollo.viewmodel.slitting.SlittingViewModel
     import com.example.aplapollo.viewmodel.slitting.SlittingViewModelfactory
     import com.example.apolloapl.R
@@ -55,6 +53,9 @@
         private var scannedStockId: Int? = null
         private var locationId: Int = 0
         private var locationName: String = ""
+        private var scanBuffer = StringBuilder()
+        private var lastKeyTime = 0L
+        private val SCAN_TIMEOUT = 300L
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
@@ -64,8 +65,9 @@
             supportActionBar?.hide()
                 progress = ProgressDialog(this)
                 progress.setMessage("Please Wait...")
-                val aplRepository = APLRepository()
-            val viewModelProviderFactory = SlittingViewModelfactory(application, aplRepository)
+            val retrofitInstance =
+                RetrofitInstance.getInstance(applicationContext)
+            val viewModelProviderFactory = SlittingViewModelfactory(application, retrofitInstance)
             slittingViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingViewModel::class.java]
             slittingWidthAdapter = SlittingWidthAdapter()
             session = SessionManager(this)
@@ -97,6 +99,7 @@
             var lastScanTime = 0L
             val SCAN_DELAY = 300L
 
+            binding.etScanCoil.requestFocus()
 
             SessionExpiredEvent.logoutLiveData.observe(this) { shouldLogout ->
                 if (shouldLogout == true) {
@@ -104,7 +107,7 @@
                     LogoutHelper.handleLogout(this, session)
                 }
             }
-            slittingViewModel.getHrSlittingPlannedList(baseUrl)
+            slittingViewModel.getHrSlittingPlannedList()
 
 
 
@@ -204,6 +207,7 @@
                         scannedStockId = stock.stockId
                         binding.layoutScanDetails.visibility = View.GONE
                         binding.layoutBatchDetails.visibility = View.VISIBLE
+                        refocusScanner()
                         binding.layoutButtons.visibility = View.VISIBLE
 
                         binding.tvscBatch.text = "Barcode: ${stock.barcode}"
@@ -321,7 +325,7 @@
 
                 selectedPlan?.let { plan ->
 
-                    slittingViewModel.getHrSlittingPlanById(baseUrl,selectedPlan.hrSlittingPlanId)
+                    slittingViewModel.getHrSlittingPlanById(selectedPlan.hrSlittingPlanId)
                 }
 
             }
@@ -337,7 +341,7 @@
                     width = plan.width ?: 0.0,
                     thickness = plan.thickness ?: 0.0
                 )
-                slittingViewModel.getAllItemAgainstPlan(baseUrl, request)
+                slittingViewModel.getAllItemAgainstPlan( request)
 
             }
 
@@ -422,6 +426,7 @@
                     SourceStockId = scannedStockId?:0,       // 🔁 replace if dynamic
                     IsActive = true,
                     Status = "Draft",
+                    IsPlanned=true,
                     Remarks = "Draft"
                 )
                 Log.d(
@@ -439,7 +444,7 @@
         """.trimIndent()
                 )
                 // ✅ API CALL
-                slittingViewModel.initiateHrSlitting(baseUrl, request)
+                slittingViewModel.initiateHrSlitting( request)
             }
 
 
@@ -498,24 +503,58 @@
                 .setPositiveButton("Close") { dialog, _ -> dialog.dismiss() }
                 .show()
         }
-
-        private fun showLogoutPopup() {
-            AlertDialog.Builder(this)
-                .setTitle("Logout")
-                .setMessage("Are you sure you want to log out?")
-                .setPositiveButton("Yes") { _, _ ->
-                    logout()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setCancelable(false)
-                .show()
+        private fun refocusScanner() {
+            binding.etScanCoil.text?.clear()
+            binding.etScanCoil.requestFocus()
         }
 
-        private fun logout() {
-            session.logoutKeepAdminConfig()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+        override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+
+            if (event.action == android.view.KeyEvent.ACTION_DOWN) {
+                val now = System.currentTimeMillis()
+
+                // reset buffer if typing delay is big (manual typing)
+                if (now - lastKeyTime > SCAN_TIMEOUT) {
+                    scanBuffer.clear()
+                }
+                lastKeyTime = now
+
+                val char = event.unicodeChar.toChar()
+                if (char.code > 0) {
+                    scanBuffer.append(char)
+                }
+
+                // Most scanners send ENTER at end
+                if (event.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+                    val barcode = scanBuffer.toString().trim()
+                    scanBuffer.clear()
+
+                    if (barcode.isNotEmpty()) {
+                        handleScannedBarcode(barcode)
+                    }
+                    return true
+                }
+            }
+            return super.dispatchKeyEvent(event)
         }
+        private fun handleScannedBarcode(barcode: String) {
+
+            Log.d("SCANNER", "Barcode = $barcode")
+
+            // show instantly in field
+            binding.etScanCoil.setText(barcode)
+
+            if (selectedPlanDetail == null) {
+                Toasty.warning(this, "Please select plan first").show()
+                refocusScanner()
+                return
+            }
+
+            slittingViewModel.getHrSlittingScan(
+                baseUrl,
+                barcode,
+                selectedPlanDetail!!.hrSlittingPlanId
+            )
+        }
+
     }

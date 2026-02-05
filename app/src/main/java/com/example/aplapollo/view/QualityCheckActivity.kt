@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.LogoutHelper
 import com.example.aplapollo.helper.Resource
@@ -23,7 +24,6 @@ import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchData
 import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
-import com.example.aplapollo.repository.APLRepository
 import com.example.aplapollo.viewmodel.printlabel.QcPrintlabelViewModel
 import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.aplapollo.viewmodel.qualitycheck.QCViewModel
@@ -54,6 +54,9 @@ class QualityCheckActivity : AppCompatActivity() {
     private var serverHttpPrefText: String? = null
     private var selectedMaterialTypeId: Int = 0
     private var qcStatus: String = ""
+    private var scanBuffer = StringBuilder()
+    private var lastKeyTime = 0L
+    private val SCAN_TIMEOUT = 300L
 
 
 
@@ -71,10 +74,11 @@ class QualityCheckActivity : AppCompatActivity() {
             supportActionBar?.hide()
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
-            val aplRepository = APLRepository()
-            val viewModelProviderFactory = QcViewModelFactory(application, aplRepository)
+        val retrofitInstance =
+            RetrofitInstance.getInstance(applicationContext)
+            val viewModelProviderFactory = QcViewModelFactory(application, retrofitInstance)
             qcviewModel = ViewModelProvider(this, viewModelProviderFactory)[QCViewModel::class.java]
-        val printlabelviewModelProviderFactory=QcprintlabelViewModelFactory(application,aplRepository)
+        val printlabelviewModelProviderFactory=QcprintlabelViewModelFactory(application,retrofitInstance)
         qcPrintLabelViewModel =ViewModelProvider(this,printlabelviewModelProviderFactory)[QcPrintlabelViewModel::class.java]
         session = SessionManager(this)
         userDetail = session.getUserDetails()
@@ -96,6 +100,9 @@ class QualityCheckActivity : AppCompatActivity() {
             Log.d("JWT_TOKEN_QC", "JWT Token = $token")
             Log.d("Tanent_Code","Tenant Code= $tenantCode")
         }
+        window.setSoftInputMode(
+            android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+        )
         SessionExpiredEvent.logoutLiveData.observe(this) { shouldLogout ->
             if (shouldLogout == true) {
                 SessionExpiredEvent.logoutLiveData.value = false
@@ -113,7 +120,7 @@ class QualityCheckActivity : AppCompatActivity() {
         binding.commanInputRow.btnSearch.setOnClickListener {
 
             val coilNumber = binding.commanInputRow.inputField.text.toString().trim()
-            clearPreviousQCData()
+
             if (coilNumber.isEmpty()) {
                 showErrorMessage("Please enter Coil Batch Number")
                 return@setOnClickListener
@@ -127,11 +134,16 @@ class QualityCheckActivity : AppCompatActivity() {
             val qcfectUrl = baseUrl + Constants.Get_GRNData
             Log.d("QCDATAURL", "QC URL: $qcfectUrl")
 
-            qcviewModel.fetchQCData(baseUrl, request)
+            qcviewModel.fetchQCData( request)
             binding.buttonLeft.visibility = View.VISIBLE
             binding.buttonRight.visibility = View.VISIBLE
 
         }
+        binding.commanInputRow.btnClear.setOnClickListener {
+            clearPreviousQCData()
+            binding.commanInputRow.inputField.text?.clear()
+        }
+
 
         qcviewModel.qcFetchLiveData.observe(this) { response ->
             when (response) {
@@ -388,7 +400,7 @@ class QualityCheckActivity : AppCompatActivity() {
                 CreatedBy = ""
             )
 
-            qcviewModel.submitQCStatus(baseUrl,  request)
+            qcviewModel.submitQCStatus(  request)
         }
 
         binding.buttonLeft.setOnClickListener {
@@ -447,7 +459,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
             binding.buttonRight.visibility = View.GONE
             binding.buttonLeft.visibility=View.GONE
             binding.buttonPrintLabel.visibility=View.GONE
-            qcviewModel.submitQCStatus(baseUrl,  request)
+            qcviewModel.submitQCStatus(  request)
         }
 
         binding.btnReprint.setOnClickListener {
@@ -470,7 +482,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
             Log.d("QC_PRINT", "Print button clicked")
             Log.d("QC_PRINT", "Request = $request")
 
-            qcPrintLabelViewModel.printQcLabel(baseUrl,  request)
+            qcPrintLabelViewModel.printQcLabel(  request)
         }
 
 
@@ -494,7 +506,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
             Log.d("QC_PRINT", "Print button clicked")
             Log.d("QC_PRINT", "Request = $request")
 
-            qcPrintLabelViewModel.printQcLabel(baseUrl,  request)
+            qcPrintLabelViewModel.printQcLabel( request)
 //            ZebraPrinterHelper.printZpl(this,request) { success, message ->
 //                runOnUiThread {
 //                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -592,6 +604,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
         binding.buttonPrintLabel.visibility = View.GONE
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setQCDataToUI(data: QCFetchData?) {
         if (data == null) {
@@ -649,6 +662,58 @@ binding.commanInputRow.btnClear.setOnClickListener {
             Log.e("DATE_FORMAT", "Invalid date: $dateString", e)
             "--"
         }
+    }
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+
+        if (event.action == android.view.KeyEvent.ACTION_DOWN) {
+            val now = System.currentTimeMillis()
+
+            // reset buffer if slow typing (manual input)
+            if (now - lastKeyTime > SCAN_TIMEOUT) {
+                scanBuffer.clear()
+            }
+            lastKeyTime = now
+
+            val char = event.unicodeChar.toChar()
+            if (char.code > 0) {
+                scanBuffer.append(char)
+            }
+
+            // Scanner usually sends ENTER at end
+            if (event.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+                val scannedCode = scanBuffer.toString().trim()
+                scanBuffer.clear()
+
+                if (scannedCode.isNotEmpty()) {
+                    handleScannedCoil(scannedCode)
+                }
+                return true
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    private fun handleScannedCoil(coilNumber: String) {
+
+        Log.d("QC_SCANNER", "Scanned = $coilNumber")
+
+        // ✅ CLEAR OLD DATA FIRST
+        clearPreviousQCData()
+
+        // ✅ THEN show scanned value
+        binding.commanInputRow.inputField.setText(coilNumber)
+        Log.d("QC_INPUT", "Input text = ${binding.commanInputRow.inputField.text}")
+
+
+        val request = QCFetchRequest(
+            RequestId = "1",
+            coilBatchNumber = coilNumber
+        )
+
+        qcviewModel.fetchQCData( request)
+
+        binding.buttonLeft.visibility = View.VISIBLE
+        binding.buttonRight.visibility = View.VISIBLE
     }
 
 

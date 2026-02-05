@@ -8,5 +8,6 @@ data class InitiateSlittingRequest(
     val SourceStockId: Int,
     val IsActive:Boolean,
     val Status: String,
+    val IsPlanned:Boolean,
     val Remarks: String
 )

@@ -1,15 +1,13 @@
-package com.example.aplapollo.view
+package com.example.aplapollo.view.Pickling
 
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
-import com.example.aplapollo.helper.LogoutHelper
-import com.example.aplapollo.helper.SessionExpiredEvent
 import com.example.aplapollo.helper.SessionManager
-import com.example.aplapollo.repository.APLRepository
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityPicklingBinding
 import es.dmoral.toasty.Toasty
@@ -32,7 +30,8 @@ class PicklingActivity : AppCompatActivity() {
                 supportActionBar?.hide()
                 progress = ProgressDialog(this)
                 progress.setMessage("Please Wait...")
-                val aplRepository = APLRepository()
+                val retrofitInstance =
+                    RetrofitInstance.getInstance(applicationContext)
                 session = SessionManager(this)
                 userDetail = session.getUserDetails()
                 binding.idLayoutHeader.ivBack.setOnClickListener {
@@ -56,12 +55,8 @@ class PicklingActivity : AppCompatActivity() {
                     Log.d("JWT_TOKEN_QC", "JWT Token = $token")
                     Log.d("Tanent_Code","Tenant Code= $tenantCode")
                 }
-                SessionExpiredEvent.logoutLiveData.observe(this) { shouldLogout ->
-                    if (shouldLogout == true) {
-                        SessionExpiredEvent.logoutLiveData.value = false
-                        LogoutHelper.handleLogout(this, session)
-                    }
-                }
+
+
 
                 supportActionBar?.hide()
                 progress = ProgressDialog(this)

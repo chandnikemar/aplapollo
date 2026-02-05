@@ -24,17 +24,17 @@ class QcPrintlabelViewModel(
         MutableLiveData()
 
     fun printQcLabel(
-        baseUrl: String,
+
 
         request: PrintLabelRequest
     ) {
         viewModelScope.launch {
-            safeApiCallQcPrintLabel(baseUrl,  request)
+            safeApiCallQcPrintLabel(  request)
         }
     }
 
     private suspend fun safeApiCallQcPrintLabel(
-        baseUrl: String,
+
 
         request: PrintLabelRequest
     ) {
@@ -43,7 +43,7 @@ class QcPrintlabelViewModel(
         try {
             if (Utils.hasInternetConnection(getApplication())) {
                 val response =
-                    aplRepository.printLabelQC( baseUrl, request)
+                    aplRepository.printLabelQC(  request)
 
                 qcPrintMutableLiveData.postValue(
                     handleQcPrintLabelResponse(response)

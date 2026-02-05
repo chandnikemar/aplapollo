@@ -66,7 +66,7 @@ object Constants {
     const val GET_YARD_LOCATION = "LocationMapping/GetYardLocation"
     const val serviceAPi="/Service/api/"
     const val tgsAPi="/Tgs/api/"
-    const val BASE_URL = "http://192.168.1.154:5000/"
+    const val BASE_URL = ""
 // API paths
 //    const val tgsAPi = "api/"
 //    const val serviceAPi = "api/"

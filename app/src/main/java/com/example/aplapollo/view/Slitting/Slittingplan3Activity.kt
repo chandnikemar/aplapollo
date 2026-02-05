@@ -8,15 +8,14 @@
     import androidx.appcompat.app.AppCompatActivity
     import androidx.databinding.DataBindingUtil
     import androidx.lifecycle.ViewModelProvider
+    import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
     import com.example.aplapollo.helper.LogoutHelper
     import com.example.aplapollo.helper.Resource
     import com.example.aplapollo.helper.SessionExpiredEvent
     import com.example.aplapollo.helper.SessionManager
-    import com.example.aplapollo.helper.Utils
     import com.example.aplapollo.model.Slitting.HRSlittingTransactionDetailRequest
     import com.example.aplapollo.model.Slitting.InitiateSlittingWithoutPlanRequest
-    import com.example.aplapollo.repository.APLRepository
     import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanViewModelfactory
     import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanvViewModel
     import com.example.apolloapl.R
@@ -46,8 +45,9 @@
             supportActionBar?.hide()
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
-            val aplRepository = APLRepository()
-            val viewModelProviderFactory = SlittingWithoutplanViewModelfactory(application, aplRepository)
+            val retrofitInstance =
+                RetrofitInstance.getInstance(applicationContext)
+            val viewModelProviderFactory = SlittingWithoutplanViewModelfactory(application, retrofitInstance)
             slittingWithoutplanvViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingWithoutplanvViewModel::class.java]
             binding.idLayoutHeader.tvTitle.text = "WithOut Plan "
             session = SessionManager(this)
@@ -93,7 +93,7 @@
                 }
 
                 slittingWithoutplanvViewModel
-                    .getStockByBatchOrBarcode(baseUrl, barcode)
+                    .getStockByBatchOrBarcode( barcode)
             }
 
             binding.btnAddPlan.setOnClickListener {
@@ -200,7 +200,7 @@
                 }
 
                 val request = InitiateSlittingWithoutPlanRequest(
-                    HRSlittingTranId = transactionId,
+                    HRSlittingTranId = 0,
                     TenantCode = tenantCode ?: "",
                     HRSlittingPlanId = 0,
                     LocationId = locationId,
@@ -209,16 +209,18 @@
                     Barcode = scannedBarcode,         // 🔥 scanned barcode
                     IronLossWeight = null,
                     ScrapWeight = null,
-                    CompletedBy = userName,
-                    CompletedDate = Utils.getCurrentDateTimeISO(),
-                    Status = "Completed",
+                    CompletedBy = "",
+                    CompletedDate = "",
+                    Status = "",
+                    IsActive = true,
                     Remarks = "Slitting without plan",
+                    IsPlanned=false,
                     hrSlittingTransactionDetail =
                     buildTransactionDetails(0)
                 )
-//                Log.d("WITHOUT_PLAN_REQ", request.toString())
+
                 slittingWithoutplanvViewModel
-                    .initiateSlittingWithoutPlan(baseUrl, request)
+                    .initiateSlittingWithoutPlan( request)
             }
             binding.btncClears.setOnClickListener {
 
@@ -293,15 +295,16 @@
                     details.add(
                         HRSlittingTransactionDetailRequest(
                             HRSlittingTranDtlId = 0,
-                            HRSlittingTranId = hrSlittingTranId,
-                            Width = null,
+                            HRSlittingTranId = 0,
+                            Width = weightStr.toDouble(),
                             Barcode = null,
-                            WeighAfterSlitting = weightStr.toDouble(),
-                            WeightTakenBy = userName,
+                            WeighAfterSlitting = null,
+                            WeightTakenBy = null,
                             WeightLocationId = 0,
-                            WeightDatetime = Utils.getCurrentDateTimeISO(),
+                            WeightDatetime = null,
+
                             IsActive = true,
-                            Status = "Completed"
+                            Status = "InProgress"
                         )
                     )
                 }
