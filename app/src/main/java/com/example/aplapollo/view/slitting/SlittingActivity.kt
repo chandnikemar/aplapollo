@@ -1,4 +1,4 @@
-    package com.example.aplapollo.view.Slitting
+    package com.example.aplapollo.view.slitting
 
     import android.app.ProgressDialog
     import android.content.Intent
@@ -15,9 +15,7 @@
     import com.example.aplapollo.adapter.Slitting.OngoingJobAdapter
     import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
-    import com.example.aplapollo.helper.LogoutHelper
     import com.example.aplapollo.helper.Resource
-    import com.example.aplapollo.helper.SessionExpiredEvent
     import com.example.aplapollo.helper.SessionManager
     import com.example.aplapollo.model.LocationPaginationRequest
     import com.example.aplapollo.viewmodel.location.LocationViewModel
@@ -85,12 +83,6 @@
                 // ⭐ PRINT TOKEN HERE
                 Log.d("JWT_TOKEN_QC", "JWT Token = $token")
                 Log.d("Tanent_Code","Tenant Code= $tenantCode")
-            }
-            SessionExpiredEvent.logoutLiveData.observe(this) { shouldLogout ->
-                if (shouldLogout == true) {
-                    SessionExpiredEvent.logoutLiveData.value = false
-                    LogoutHelper.handleLogout(this, session)
-                }
             }
 
             supportActionBar?.hide()

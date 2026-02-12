@@ -46,6 +46,7 @@ class SessionManager(context: Context) {
         user[KEY_SERVER_IP] = sharedPrefer.getString(KEY_SERVER_IP, null)
         user[KEY_HTTP] = sharedPrefer.getString(KEY_HTTP, null)
         user[KEY_PORT] = sharedPrefer.getString(KEY_PORT, null)
+        user[Key_tenantCode] = sharedPrefer.getString(Key_tenantCode, null)
         return user
     }
     fun createLoginSession(
@@ -56,9 +57,9 @@ class SessionManager(context: Context) {
         isVerified: String?,
         userName: String?,
         jwtToken: String?,
-        defaultTenantCode:String?,
         refreshToken: String?,
         roleName:String?,
+        defaultTenantCode:String?,
 
     ) {
         editor.putBoolean(KEY_ISLOGGEDIN, true)
@@ -74,8 +75,9 @@ class SessionManager(context: Context) {
 
         editor.putString(KEY_JWT_TOKEN, jwtToken)
         editor.putString(KEY_REFRESH_TOKEN, refreshToken)
-        editor.putString(Key_tenantCode,defaultTenantCode)
+
         editor.putString(ROLE_NAME, roleName)
+        editor.putString(Key_tenantCode,defaultTenantCode)
 
 
         // commit changes
@@ -94,15 +96,15 @@ class SessionManager(context: Context) {
     fun isLoggedIn(): Boolean {
         return sharedPrefer.getBoolean(KEY_ISLOGGEDIN, false)
     }
-    private val prefs =
-        context.getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
+//    private val prefs =
+//        context.getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
 
     fun savePrinterMac(mac: String) {
-        prefs.edit().putString("PRINTER_MAC", mac).apply()
+        sharedPrefer.edit().putString("PRINTER_MAC", mac).apply()
     }
 
     fun getPrinterMac(): String? {
-        return prefs.getString("PRINTER_MAC", null)
+        return sharedPrefer.getString("PRINTER_MAC", null)
     }
     /**
      * Call this method anywhere in the project to Get the stored session data
@@ -140,17 +142,19 @@ class SessionManager(context: Context) {
         return admin
     }
 
-    fun getJWTToken(): String{
-        val token = sharedPrefer.getString(KEY_JWT_TOKEN, null)
-        return token?:""
+    fun getJWTToken(): String {
+        return sharedPrefer.getString(KEY_JWT_TOKEN, "") ?: ""
     }
+
     fun updateJwtToken(jwtToken: String) {
         editor.putString(KEY_JWT_TOKEN, jwtToken)
         editor.commit()
     }
     fun saveJwtToken(token: String) {
-        return  sharedPrefer.edit().putString("jwt_token", token).apply()
+        editor.putString(KEY_JWT_TOKEN, token)
+        editor.apply()
     }
+
 
     fun getRefreshToken(): String? {
         return sharedPrefer.getString(KEY_REFRESH_TOKEN, null)
@@ -158,7 +162,7 @@ class SessionManager(context: Context) {
 
 
     fun clearSession() {
-        prefs.edit().clear().apply()
+        sharedPrefer.edit().clear().apply()
     }
     fun getRole(): String{
         val role = sharedPrefer.getString(ROLE_NAME, null)
@@ -169,13 +173,18 @@ class SessionManager(context: Context) {
         val userName = sharedPrefer.getString(KEY_USER_NAME, null)
         return userName?:""
     }
-    fun forceLogout() {
-        clearSharedPrefs()
+//    fun forceLogout() {
+//        clearSharedPrefs()
+//
+//        val intent = Intent(context, LoginActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//        context.startActivity(intent)
+//    }
 
-        val intent = Intent(context, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        context.startActivity(intent)
-    }
+//fun getToken(): String? {
+//    val prefs = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
+//    return prefs.getString(Constants.KEY_JWT_TOKEN, null)
+//}
 
     fun saveAdminDetails(serverIp: String?, http: String?) {
         editor.remove(Constants.KEY_SERVER_IP)
@@ -249,6 +258,29 @@ class SessionManager(context: Context) {
         //context.finish()
         context.finishAfterTransition()
     }
+//    private fun logout(context: Activity) {
+//
+//        val serverIp = sharedPrefer.getString(KEY_SERVER_IP, null)
+//        val http = sharedPrefer.getString(KEY_HTTP, null)
+//        val port = sharedPrefer.getString(KEY_PORT, null)
+//
+//        editor.clear()
+//
+//        // Restore Admin config
+//        editor.putString(KEY_SERVER_IP, serverIp)
+//        editor.putString(KEY_HTTP, http)
+//        editor.putString(KEY_PORT, port)
+//
+//        editor.putBoolean(KEY_ISLOGGEDIN, false)
+//        editor.apply()
+//
+//        val intent = Intent(context, LoginActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//        context.startActivity(intent)
+//
+//        context.finish()
+//    }
+
 
     companion object {
         private const val PREF_NAME = "shared_pref"

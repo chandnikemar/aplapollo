@@ -90,8 +90,8 @@ class LoginActivity : AppCompatActivity() {
                                 resultResponse.userName,
                                 resultResponse.jwtToken,
                                 resultResponse.refreshToken,
-                                resultResponse.defaultTenantCode,
                                 resultResponse.roleName,
+                                resultResponse.defaultTenantCode,
                             )
                             Utils.setSharedPrefsBoolean(
                                 this@LoginActivity,

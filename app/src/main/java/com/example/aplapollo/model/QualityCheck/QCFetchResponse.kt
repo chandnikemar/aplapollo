@@ -2,6 +2,7 @@ package com.example.aplapollo.model.QualityCheck
 
 data class QCFetchData(
     val supplierBatchNo: String?,
+    val tenantCode: String = "",
     val supplierName: String?,
     val netWeightKg: Double?,
     val materialCode: String?,

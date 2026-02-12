@@ -1,4 +1,4 @@
-    package com.example.aplapollo.view.Slitting
+    package com.example.aplapollo.view.slitting
 
     import android.app.ProgressDialog
     import android.os.Bundle
@@ -6,13 +6,12 @@
     import android.view.View
     import android.widget.EditText
     import androidx.appcompat.app.AppCompatActivity
+    import androidx.core.widget.addTextChangedListener
     import androidx.databinding.DataBindingUtil
     import androidx.lifecycle.ViewModelProvider
     import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
-    import com.example.aplapollo.helper.LogoutHelper
     import com.example.aplapollo.helper.Resource
-    import com.example.aplapollo.helper.SessionExpiredEvent
     import com.example.aplapollo.helper.SessionManager
     import com.example.aplapollo.model.Slitting.HRSlittingTransactionDetailRequest
     import com.example.aplapollo.model.Slitting.InitiateSlittingWithoutPlanRequest
@@ -39,6 +38,8 @@
         private var scannedBarcode: String? = null
         private  var tenantCode:String?=null
         private var transactionId:Int=0
+        private var maxAllowedWidth: Double = 0.0
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = DataBindingUtil.setContentView(this,R.layout.activity_slittingplan3)
@@ -73,12 +74,7 @@
 
             binding.layoutBatchDetails.visibility = View.GONE
             binding.layoutWeightContainer.removeAllViews()
-            SessionExpiredEvent.logoutLiveData.observe(this) { shouldLogout ->
-                if (shouldLogout == true) {
-                    SessionExpiredEvent.logoutLiveData.value = false
-                    LogoutHelper.handleLogout(this, session)
-                }
-            }
+
             binding.idLayoutHeader.ivBack.setOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
@@ -124,6 +120,9 @@
                         binding.inCommanBatch.tvItemCode.text =
                             "Item Code : ${stock.materialCode}"
 
+                        binding.inCommanBatch.tvLength.text ="Length"
+                            "Length : ${stock.length}"
+
                         binding.inCommanBatch.tvGrade.text =
                             "Grade : ${stock.grade}"
 
@@ -140,6 +139,8 @@
                         scannedBarcode = stock.barcode
                         tenantCode=stock.tenantCode
                         transactionId=stock.transactionId?:0
+                        maxAllowedWidth = stock.width ?: 0.0
+
                         Toasty.success(this, "Stock fetched successfully").show()
                     }
 
@@ -199,6 +200,32 @@
                     return@setOnClickListener
                 }
 
+                weights.forEach {
+
+                    val w = it.toDoubleOrNull() ?: 0.0
+
+                    if (w > maxAllowedWidth) {
+
+                        Toasty.error(
+                            this,
+                            "One of the widths is greater than stock width"
+                        ).show()
+
+                        return@setOnClickListener
+                    }
+                }
+                val totalWidth = getTotalEnteredWidth()
+
+                if (totalWidth > maxAllowedWidth) {
+
+                    Toasty.error(
+                        this,
+                        "Total width cannot exceed $maxAllowedWidth mm"
+                    ).show()
+
+                    return@setOnClickListener
+                }
+
                 val request = InitiateSlittingWithoutPlanRequest(
                     HRSlittingTranId = 0,
                     TenantCode = tenantCode ?: "",
@@ -206,7 +233,7 @@
                     LocationId = locationId,
                     SourceStockId = sourceStockId,
                     JobNumber = null,
-                    Barcode = scannedBarcode,         // 🔥 scanned barcode
+                    Barcode = scannedBarcode,
                     IronLossWeight = null,
                     ScrapWeight = null,
                     CompletedBy = "",
@@ -246,31 +273,101 @@
             val btnEdit = rowView.findViewById<ImageButton>(R.id.btnEdit)
             val btnAddMore = rowView.findViewById<ImageButton>(R.id.btnAddMore)
 
-            etWeight.isEnabled = true
-            btnEdit?.visibility = View.GONE
-            btnAddMore?.visibility = View.VISIBLE
+            // Safety check
+            if (etWeight == null || btnEdit == null || btnAddMore == null) {
+                Log.e("SLITTING", "View not found in item_weight_row.xml")
+                return
+            }
 
-            btnEdit?.setOnClickListener {
+            etWeight.isEnabled = true
+            btnEdit.visibility = View.GONE
+            btnAddMore.visibility = View.VISIBLE
+
+            etWeight.addTextChangedListener {
+
+                val currentValue = it.toString().toDoubleOrNull() ?: 0.0
+
+                // Total including this field
+                val totalWidth = getTotalEnteredWidth()
+
+                // Individual check
+                if (currentValue > maxAllowedWidth) {
+
+                    Toasty.warning(
+                        this,
+                        "Width cannot be greater than $maxAllowedWidth mm"
+                    ).show()
+
+                    etWeight.setText("")
+                    return@addTextChangedListener
+                }
+
+                // ✅ Total check
+                if (totalWidth > maxAllowedWidth) {
+
+                    Toasty.error(
+                        this,
+                        "Total width cannot be greater than $maxAllowedWidth mm"
+                    ).show()
+
+                    etWeight.setText("")
+
+            }
+
+        }
+
+            btnEdit.setOnClickListener {
+
                 etWeight.isEnabled = true
                 etWeight.requestFocus()
                 etWeight.setSelection(etWeight.text.length)
             }
 
-            btnAddMore?.setOnClickListener {
-                if (etWeight.text.isNullOrBlank()) {
-                    Toasty.warning(this, "Enter weight first").show()
+            btnAddMore.setOnClickListener {
+
+                val entered = etWeight.text.toString().toDoubleOrNull()
+
+                if (entered == null) {
+                    Toasty.warning(this, "Enter valid width").show()
+                    return@setOnClickListener
+                }
+
+                val totalWidth = getTotalEnteredWidth()
+
+                // Individual check
+                if (entered > maxAllowedWidth) {
+
+                    Toasty.warning(
+                        this,
+                        "Width cannot be greater than $maxAllowedWidth mm"
+                    ).show()
+
+                    return@setOnClickListener
+                }
+
+                // ✅ Total check
+                if (totalWidth > maxAllowedWidth) {
+
+                    Toasty.error(
+                        this,
+                        "Total width exceeded $maxAllowedWidth mm"
+                    ).show()
+
                     return@setOnClickListener
                 }
 
                 etWeight.isEnabled = false
-                btnAddMore?.visibility = View.GONE
-                btnEdit?.visibility = View.VISIBLE
+                btnAddMore.visibility = View.GONE
+                btnEdit.visibility = View.VISIBLE
 
                 addWeightRow()
             }
 
             binding.layoutWeightContainer.addView(rowView)
         }
+
+
+
 
         private fun getAllWeights(): List<String> {
             val weights = mutableListOf<String>()
@@ -281,6 +378,23 @@
             }
             return weights
         }
+        private fun getTotalEnteredWidth(): Double {
+
+            var total = 0.0
+
+            for (i in 0 until binding.layoutWeightContainer.childCount) {
+
+                val row = binding.layoutWeightContainer.getChildAt(i)
+                val etWeight = row.findViewById<EditText>(R.id.etWeight)
+
+                val value = etWeight.text.toString().toDoubleOrNull() ?: 0.0
+
+                total += value
+            }
+
+            return total
+        }
+
         private fun buildTransactionDetails(
             hrSlittingTranId: Int
         ): List<HRSlittingTransactionDetailRequest> {

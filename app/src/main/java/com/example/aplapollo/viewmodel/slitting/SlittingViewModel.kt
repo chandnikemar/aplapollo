@@ -59,7 +59,7 @@ class SlittingViewModel(
         }
     }
     fun getHrSlittingScan(
-        baseUrl: String,
+
         barcode: String,
         hrSlittingPlanId: Int
     ) {

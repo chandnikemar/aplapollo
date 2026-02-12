@@ -27,6 +27,11 @@ object Constants {
     const val KEY_PRINTER_CONNECTED="KEY_PRINTER_CONNECTED"
 
 
+    const val TGS_BASE = "Tgs/api/"
+    const val SERVICE_BASE = "Service/api/"
+    const val API_BASE = "api/"
+
+
     //const val KEY_USERID = Constants.USER_ID
     const val KEY_IS_ADMIN = "isAdmin"
     const val ISFIRSTTIME = "is_first_time"
@@ -66,7 +71,7 @@ object Constants {
     const val GET_YARD_LOCATION = "LocationMapping/GetYardLocation"
     const val serviceAPi="/Service/api/"
     const val tgsAPi="/Tgs/api/"
-    const val BASE_URL = ""
+    const val BASE_URL = "BASE_URL"
 // API paths
 //    const val tgsAPi = "api/"
 //    const val serviceAPi = "api/"
@@ -97,9 +102,12 @@ object Constants {
     //without plan
     const val POST_InitiateSlitting_WithoutPlan="HRSlitting/initiateSlittingWithoutPlan"
     const val Get_Stock_BYBatchOr_Barcode="StockTransaction/getStockByBatchOrBarcode"
+     // pickling
 
-
-
+    const val GET_Pickling_Product_By_Barcode = "Pickling/getProductToInitiatePicklingProcess"
+    const val POST_Process_Pickling = "Pickling/processPickling"
+    const val GET_Ongoing_Pickl_Jobs = "Pickling/getOngoingPicklingJobs"
+    const val GET_Pickling_By_Id = "Pickling/getPicklingByIdAsync"
 
     //change password
     const val CHANGE_PASSWORD = "UserManagement/change-password"

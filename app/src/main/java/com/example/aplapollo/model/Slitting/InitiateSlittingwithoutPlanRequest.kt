@@ -2,7 +2,6 @@
 
     data class InitiateSlittingWithoutPlanRequest(
         val HRSlittingTranId: Int,
-
     val TenantCode: String,
     val HRSlittingPlanId: Int,
     val LocationId: Int,

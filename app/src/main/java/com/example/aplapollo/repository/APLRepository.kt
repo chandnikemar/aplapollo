@@ -4,6 +4,9 @@ import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.model.ApiCommonResponse
 import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.model.LocationResponse
+import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
+import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
+import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
 import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchResponse
@@ -140,6 +143,37 @@ suspend fun getHrSlittingDetailsById(
         retrofitInstance
             .serviceApi()
             .getLocationsWithPagination(request)
+
+    suspend fun getOngoingPicklingJobs(
+
+    ): Response<List<PicklingJobInProgressResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getOngoingPicklingJobs()
+
+    suspend fun getStockBarcodePicklingdata(
+        code: String?
+    ): Response<ApiResponse<StockBarcodeWithoutplanResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getPicklingBarcodeData(code)
+
+    suspend fun processPickling(
+
+        request: ProcessPicklingRequest
+    ): Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .processPickling(request)
+    suspend fun getPicklingTransactionById(
+        picklingTranId: Int
+    ): Response<PicklingTransactionResponse> {
+
+        return retrofitInstance
+            .serviceApi()
+            .getPicklingTransaction(picklingTranId)
+    }
+
 
 
 }

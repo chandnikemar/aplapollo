@@ -10,6 +10,7 @@ import android.os.Build
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.example.aplapollo.view.LoginActivity
 
 
@@ -177,7 +178,14 @@ object Utils {
             }
             .show()
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentDateTimeISO(): String {
         return java.time.OffsetDateTime.now().toString()
     }
+//    private fun getTenant(): String {
+//        return tenantCode.ifEmpty {
+//            userDetail!!["defaultTenantCode"].toString()
+//        }
+//    }
+
 }

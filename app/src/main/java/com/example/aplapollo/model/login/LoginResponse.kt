@@ -12,8 +12,9 @@ data class LoginResponse(
     val jwtToken: String?,
     val refreshToken: String?,
     val tenantGroup: String?,
-    val defaultTenantCode: String?,
+
     val bpCode: String?,
+    val defaultTenantCode: String?,
     val userAccess: List<Any>?,
 
     val userTenants: List<Any>?

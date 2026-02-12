@@ -14,9 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
-import com.example.aplapollo.helper.LogoutHelper
 import com.example.aplapollo.helper.Resource
-import com.example.aplapollo.helper.SessionExpiredEvent
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.helper.ZebraPrinterHelper
@@ -45,10 +43,11 @@ class QualityCheckActivity : AppCompatActivity() {
     private lateinit var qcPrintLabelViewModel:QcPrintlabelViewModel
     private lateinit var progress: ProgressDialog
     private lateinit var session: SessionManager
+    private lateinit var tenantCode: String
     private var baseUrl: String = ""
     private var userName: String? = ""
     private var token: String? = ""
-    private  var tenantCode:String?=""
+
     private  var userDetail: HashMap<String, Any?>?=null
     private var serverIpSharedPrefText: String? = null
     private var serverHttpPrefText: String? = null
@@ -88,13 +87,15 @@ class QualityCheckActivity : AppCompatActivity() {
 
             token = userDetail!!["jwtToken"].toString()
             userName = userDetail!!["userName"].toString()
-            tenantCode= userDetail!!["defaultTenantCode"].toString()
+            tenantCode = userDetail!![SessionManager.Key_tenantCode]?.toString() ?: ""
+
 
             serverIpSharedPrefText = userDetail!![Constants.KEY_SERVER_IP].toString()
             serverHttpPrefText = userDetail!![Constants.KEY_HTTP].toString()
 
             baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
 
+            Log.d("SESSION_DEBUG", "User Details = $userDetail")
 
             // ⭐ PRINT TOKEN HERE
             Log.d("JWT_TOKEN_QC", "JWT Token = $token")
@@ -103,12 +104,8 @@ class QualityCheckActivity : AppCompatActivity() {
         window.setSoftInputMode(
             android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
         )
-        SessionExpiredEvent.logoutLiveData.observe(this) { shouldLogout ->
-            if (shouldLogout == true) {
-                SessionExpiredEvent.logoutLiveData.value = false
-                LogoutHelper.handleLogout(this, session)
-            }
-        }
+
+
 
 
 //        startService(intent)
@@ -116,6 +113,8 @@ class QualityCheckActivity : AppCompatActivity() {
         binding.buttonRight.visibility = View.GONE
         binding.btnReprint.visibility = View.GONE
         binding.buttonPrintLabel.visibility = View.GONE
+
+        Log.d("Tanent_Code","Tenant Code= $tenantCode")
 
         binding.commanInputRow.btnSearch.setOnClickListener {
 
@@ -127,8 +126,9 @@ class QualityCheckActivity : AppCompatActivity() {
             }
 
             val request = QCFetchRequest(
-                RequestId = "1",
-                coilBatchNumber = coilNumber
+
+                coilBatchNumber = coilNumber,
+                tenantCode = tenantCode ?: ""
             )
 
             val qcfectUrl = baseUrl + Constants.Get_GRNData
@@ -532,6 +532,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
     }
 
     private fun clearPreviousQCData() {
+        binding.commanInputRow.inputField.text.clear()
         // Clear barcode
         binding.rowBarcode.visibility = View.GONE
         binding.barcodeImage.setImageBitmap(null)

@@ -1,6 +1,9 @@
     package com.example.aplapollo.api
 
     import com.example.aplapollo.helper.Constants.GET_Location
+    import com.example.aplapollo.helper.Constants.GET_Ongoing_Pickl_Jobs
+    import com.example.aplapollo.helper.Constants.GET_Pickling_By_Id
+    import com.example.aplapollo.helper.Constants.GET_Pickling_Product_By_Barcode
     import com.example.aplapollo.helper.Constants.Get_AllItemAgainstPlan
     import com.example.aplapollo.helper.Constants.Get_Complete_Hr_Slitting
     import com.example.aplapollo.helper.Constants.Get_GRNData
@@ -13,11 +16,15 @@
     import com.example.aplapollo.helper.Constants.Get_SubmitSlit_From_Plan
     import com.example.aplapollo.helper.Constants.LOGIN_URL
     import com.example.aplapollo.helper.Constants.POST_InitiateSlitting_WithoutPlan
+    import com.example.aplapollo.helper.Constants.POST_Process_Pickling
     import com.example.aplapollo.helper.Constants.Print_PRN
     import com.example.aplapollo.helper.Constants.QC_StatusSubmission
     import com.example.aplapollo.model.ApiCommonResponse
     import com.example.aplapollo.model.LocationPaginationRequest
     import com.example.aplapollo.model.LocationResponse
+    import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
+    import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
+    import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
     import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
     import com.example.aplapollo.model.QualityCheck.PrintZplResponse
     import com.example.aplapollo.model.QualityCheck.QCFetchRequest
@@ -130,6 +137,25 @@
         suspend fun initiateSlittingWithoutPlan(
             @Body request: InitiateSlittingWithoutPlanRequest
         ): Response<InitiateSlittingResponse>
+       //Pickling
+             @GET(GET_Ongoing_Pickl_Jobs)
+          suspend fun getOngoingPicklingJobs(
+                   ): Response<List<PicklingJobInProgressResponse>>
 
+        @GET(GET_Pickling_Product_By_Barcode)
+        suspend fun getPicklingBarcodeData(
+            @Query("barcode") code: String?
+        ): Response<ApiResponse<StockBarcodeWithoutplanResponse>>
+
+        @POST(POST_Process_Pickling)
+        suspend fun processPickling(
+           @Body request: ProcessPicklingRequest
+        ): Response<ApiCommonResponse>
+
+
+        @GET(GET_Pickling_By_Id)
+        suspend fun getPicklingTransaction(
+            @Query("picklingTranId") picklingTranId: Int
+        ): Response<PicklingTransactionResponse>
 
     }

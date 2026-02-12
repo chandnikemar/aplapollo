@@ -14,18 +14,24 @@ class TokenInterceptor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val prefs = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
-        var accessToken = prefs.getString(Constants.KEY_JWT_TOKEN, null)
+
+         fun getToken(): String? {
+            val prefs = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
+            return prefs.getString(Constants.KEY_JWT_TOKEN, null)
+        }
+
+//        val sharedPrefer  = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
+//        var accessToken = sharedPrefer.getString(Constants.KEY_JWT_TOKEN, null)
 
         val originalRequest = chain.request()
         val isLoginEndpoint = originalRequest.url.toString()
-            .contains("UserManagement/authenticate", ignoreCase = true)
-
+            .contains("AuthService/authenticate", ignoreCase = true)
+        var token = getToken()
         val requestWithToken = if (isLoginEndpoint) {
             originalRequest
         } else {
             originalRequest.newBuilder()
-                .header("Authorization", accessToken ?: "")
+                .header("Authorization", token ?: "")
                 .build()
         }
 
@@ -38,18 +44,18 @@ class TokenInterceptor(
         response.close()
 
         runBlocking {
-            val newToken = TokenManager.refreshTokenIfNeeded(context, accessToken)
+            val newToken = TokenManager.refreshTokenIfNeeded(context, token)
             if (newToken != null) {
-                accessToken = newToken
+                token = newToken
             } else {
                 AuthState.isUnauthorized = true
                 return@runBlocking
             }
         }
-
+        token = getToken()
         val newRequest = originalRequest.newBuilder()
             .removeHeader("Authorization")
-            .addHeader("Authorization", accessToken ?: "")
+            .addHeader("Authorization", token ?: "")
             .build()
 
         return chain.proceed(newRequest)

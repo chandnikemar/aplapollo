@@ -12,7 +12,9 @@ import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.helper.ZebraPrinterHelper
 import com.example.aplapollo.view.Pickling.PicklingActivity
-import com.example.aplapollo.view.Slitting.SlittingActivity
+import com.example.aplapollo.view.coldpressing.CRMActivity
+import com.example.aplapollo.view.slitting.SlittingActivity
+
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityHomeBinding
 
@@ -34,7 +36,7 @@ class HomeActivity : AppCompatActivity() {
         val username = Utils.getSharedPrefs(this, Constants.KEY_USER_NAME)
         binding.idLayoutHeader.profileTXt.text = username
 
-        // Printer status indicator
+
         updatePrinterIndicator()
 
         // Navigation
@@ -46,6 +48,9 @@ class HomeActivity : AppCompatActivity() {
         }
         binding.card3.setOnClickListener {
             startActivity(Intent(this@HomeActivity, PicklingActivity ::class.java))
+        }
+        binding.card4.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, CRMActivity ::class.java))
         }
         binding.card5.setOnClickListener {
             startActivity(Intent(this@HomeActivity, PrinterMACAddActivity::class.java))
