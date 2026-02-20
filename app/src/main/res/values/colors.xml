@@ -61,4 +61,22 @@
     <color name="lightest_color">#E1EAED</color>
 
 
+
+    <color name="orange_dark">#FFA726</color>
+
+<color name="primary_light">#2F80ED</color>
+<color name="primary_dark">#0B3C91</color>
+
+<color name="card_blue">#1F3C88</color>
+<color name="card_green">#1FAA59</color>
+<color name="card_orange">#F57C00</color>
+
+<color name="bg_light">#EAF2FB</color>
+<color name="bg_dark">#0A0F1F</color>
+
+<color name="surface_light">#FFFFFF</color>
+<color name="surface_dark">#121A2B</color>
+
+<color name="text_light">#1A1A1A</color>
+<color name="text_dark">#EAEAF0</color>
 </resources>

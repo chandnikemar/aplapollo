@@ -44,7 +44,7 @@ class PicklingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
                 binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling)
-                binding.idLayoutHeader.tvTitle.text = "Hr Pickling"
+                binding.idLayoutHeader.tvTitle.text = "Pickling"
                 supportActionBar?.hide()
                 progress = ProgressDialog(this)
                 progress.setMessage("Please Wait...")

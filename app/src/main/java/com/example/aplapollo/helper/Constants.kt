@@ -59,6 +59,9 @@ object Constants {
     const val HTTP_INTERNAL_SERVER_ERROR = 500
     const val HTTP_ERROR = 400
 
+    const val SlittingSTATUS="InStock"
+    const val CRMPlannedSTATUS="InStock"
+
     const val REFRESH_TOKEN_DATA = "AuthService/refreshtoken"
     const val DASHBOARD_DATA = "VehicleMilestone/GetVehicleMilestoneDashBoardData"
     const val GET_APP_DETAILS = "MobileApp/GetLatestApkVersion"
@@ -91,7 +94,7 @@ object Constants {
     const val Get_HR_SlittingPlannned_List="HRSlittingPlan/getHRSSlittingPlannedList"
     const val  Get_Slitting_planById="HRSlittingPlan/getHRSlittingPlanbyId"
     const val  Get_HRSlitting_Scan="HRSlittingPlan/validateAgainstPlan"
-    const val Get_AllItemAgainstPlan= "HRSlittingPlan/getAllItemAgainstPlan"
+    const val Get_AllItemAgainstPlan= "HRSlittingPlan/getAllItemAgainstPlan"   // come for crm ans slitting
     const val Get_SubmitSlit_From_Plan= "HRSlitting/initiateSlitting"
 
     //on Going
@@ -102,12 +105,25 @@ object Constants {
     //without plan
     const val POST_InitiateSlitting_WithoutPlan="HRSlitting/initiateSlittingWithoutPlan"
     const val Get_Stock_BYBatchOr_Barcode="StockTransaction/getStockByBatchOrBarcode"
-     // pickling
+    // pickling
 
     const val GET_Pickling_Product_By_Barcode = "Pickling/getProductToInitiatePicklingProcess"
     const val POST_Process_Pickling = "Pickling/processPickling"
     const val GET_Ongoing_Pickl_Jobs = "Pickling/getOngoingPicklingJobs"
     const val GET_Pickling_By_Id = "Pickling/getPicklingByIdAsync"
+ 
+
+
+    //CRM
+
+    const val GET_CRM_PlannedList="CRMPlan/getCRMPlannedList"
+    const val Get_CRM_Scan="CRMPlan/validateAgainstCRMPlan"
+    const val  GET_CRM_PlanID="CRMPlan/getCRMPlanbyId"
+    const val PosT_ProcessCRM= "CRM/processCRM"
+    const val GET_going_CRMJob="CRM/getOngoingCRMJobs"
+    const val GET_CRM_BY_Id="CRM/getCRMByIdAsync"
+    const val POST_CRMWithout_Plan="CRM/initiateCRMWithoutPlan"
+
 
     //change password
     const val CHANGE_PASSWORD = "UserManagement/change-password"

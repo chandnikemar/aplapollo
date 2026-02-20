@@ -1,18 +1,19 @@
-package com.example.aplapollo.model.Slitting
+    package com.example.aplapollo.model.Slitting
 
 data class OngoingSlittingJobResponse(
-    val hrSlittingTranId: Int,
+    val crmTranId:Int?,
+    val hrSlittingTranId: Int?,
     val tenantCode: String?,
-    val hrSlittingPlanId: Int,
-    val sourceStockId: Int,
-    val locationId: Int,
+    val hrSlittingPlanId: Int?,
+    val sourceStockId: Int?,
+    val locationId: Int?,
     val jobNumber: String?,
     val ironLossWeight: Double?,
     val scrapWeight: Double?,
     val completedBy: String?,
     val completedDate: String?,
     val status: String?,
-    val isActive: Boolean,
+    val isActive: Boolean?,
     val remarks: String?,
     val stockTransaction: StockTransaction?
 )
@@ -38,5 +39,5 @@ data class StockTransaction(
     val lastActionDoneDate: String?,
     val isActive: Boolean,
     val status: String?,
-    val totalRecord: Int
+    val totalRecord: Int?
 )

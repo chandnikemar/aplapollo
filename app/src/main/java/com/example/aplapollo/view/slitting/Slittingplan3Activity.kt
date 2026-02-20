@@ -120,7 +120,7 @@
                         binding.inCommanBatch.tvItemCode.text =
                             "Item Code : ${stock.materialCode}"
 
-                        binding.inCommanBatch.tvLength.text ="Length"
+                        binding.inCommanBatch.tvLength.text =
                             "Length : ${stock.length}"
 
                         binding.inCommanBatch.tvGrade.text =
@@ -149,6 +149,8 @@
                         Log.e("SLITTING_PLAN_3", "Error = ${resource.message}")
                         Toasty.error(this, resource.message ?: "Error").show()
                     }
+
+                    else -> {}
                 }
             }
 
@@ -234,6 +236,7 @@
                     SourceStockId = sourceStockId,
                     JobNumber = null,
                     Barcode = scannedBarcode,
+                    Weight = null,
                     IronLossWeight = null,
                     ScrapWeight = null,
                     CompletedBy = "",

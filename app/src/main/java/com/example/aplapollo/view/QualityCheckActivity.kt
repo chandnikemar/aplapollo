@@ -33,8 +33,6 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import es.dmoral.toasty.Toasty
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 
 class QualityCheckActivity : AppCompatActivity() {
@@ -70,7 +68,13 @@ class QualityCheckActivity : AppCompatActivity() {
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-            supportActionBar?.hide()
+        val headerBinding = binding.idLayoutHeader
+
+        headerBinding.printerStatusContainer.visibility = View.VISIBLE
+        headerBinding.ivPrinter.setImageResource(R.drawable.printer_white_on)
+
+
+        supportActionBar?.hide()
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
         val retrofitInstance =
@@ -139,10 +143,13 @@ class QualityCheckActivity : AppCompatActivity() {
             binding.buttonRight.visibility = View.VISIBLE
 
         }
-        binding.commanInputRow.btnClear.setOnClickListener {
-            clearPreviousQCData()
-            binding.commanInputRow.inputField.text?.clear()
-        }
+//        binding.commanInputRow.btnClear.setOnClickListener {
+//            clearPreviousQCData()
+//            binding.commanInputRow.inputField.text?.clear()
+//        }
+//        binding.scrollView.post {
+//            binding.scrollView.fullScroll(View.FOCUS_DOWN)
+//        }
 
 
         qcviewModel.qcFetchLiveData.observe(this) { response ->
@@ -295,10 +302,6 @@ class QualityCheckActivity : AppCompatActivity() {
                         // ❌ real error → NO barcode
                         showErrorMessage(response.message ?: "Something went wrong")
                     }
-
-
-
-
                 }
 
                 else -> {}
@@ -426,6 +429,7 @@ class QualityCheckActivity : AppCompatActivity() {
 
 binding.commanInputRow.btnClear.setOnClickListener {
     clearPreviousQCData()
+    binding.commanInputRow.inputField.text?.clear()
 
 }
         binding.buttonASubmit.setOnClickListener {
@@ -460,6 +464,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
             binding.buttonLeft.visibility=View.GONE
             binding.buttonPrintLabel.visibility=View.GONE
             qcviewModel.submitQCStatus(  request)
+
         }
 
         binding.btnReprint.setOnClickListener {
@@ -516,6 +521,20 @@ binding.commanInputRow.btnClear.setOnClickListener {
         }
 
 
+    }
+    fun updatePrinterStatus(isConnected: Boolean) {
+
+        val header = binding.idLayoutHeader
+
+        header.printerStatusContainer.visibility = View.VISIBLE
+
+        if (isConnected) {
+            header.viewPrinterStatus
+                .setBackgroundResource(R.drawable.bg_status_green)
+        } else {
+            header.viewPrinterStatus
+                .setBackgroundResource(R.drawable.bg_status_red)
+        }
     }
 
     private fun resetApproveRejectButtons() {
@@ -629,7 +648,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
             column2Row7.text = data.length?.toString() ?: "--"
             column2Row3.text = data.netWeightKg?.toString() ?: "--"
             column2Row8.text = data.grnNumber?.toString() ?: "--"
-            column2Row9.text = formatGrnDate(data.grnDate) ?: "--"
+            column2Row9.text = data.grnDate ?: "--"
         }
 
         binding.buttonRight.isEnabled = true
@@ -650,20 +669,20 @@ binding.commanInputRow.btnClear.setOnClickListener {
     private fun hideProgressBar() {
         progress.cancel()
     }
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun formatGrnDate(dateString: String?): String {
-        return try {
-            if (dateString.isNullOrEmpty()) return "--"
-
-            val parsed = OffsetDateTime.parse(dateString)
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            parsed.format(formatter)
-
-        } catch (e: Exception) {
-            Log.e("DATE_FORMAT", "Invalid date: $dateString", e)
-            "--"
-        }
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun formatGrnDate(dateString: String?): String {
+//        return try {
+//            if (dateString.isNullOrEmpty()) return "--"
+//
+//            val parsed = OffsetDateTime.parse(dateString)
+//            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+//            parsed.format(formatter)
+//
+//        } catch (e: Exception) {
+//            Log.e("DATE_FORMAT", "Invalid date: $dateString", e)
+//            "--"
+//        }
+//    }
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
 
         if (event.action == android.view.KeyEvent.ACTION_DOWN) {

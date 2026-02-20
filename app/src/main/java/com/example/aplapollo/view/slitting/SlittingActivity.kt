@@ -53,6 +53,7 @@
 
             binding.idLayoutHeader.tvTitle.text = "On Going Job"
             supportActionBar?.hide()
+
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
             val retrofitInstance =
@@ -103,8 +104,13 @@
             )
             binding.rvOngoingJobs.layoutManager = LinearLayoutManager(this)
             locationViewModel.getLocations( locationRequest)
-            slittingViewModel.getOngoingSlittingJobs()
+            selectedLocationId?.let { slittingViewModel.getOngoingSlittingJobs(locationId = it) }
             ongoingJobAdapter = OngoingJobAdapter(emptyList()) { selectedJob ->
+                if (selectedLocationId == null) {
+                    Toasty.warning(this, "Please select a location first").show()
+                    return@OngoingJobAdapter
+                }
+
                 val intent = Intent(this, SlittingStatusActivity::class.java)
                 intent.putExtra("JOB_ID", selectedJob.jobNumber)
                 intent.putExtra("HrSlitting_planID", selectedJob.hrSlittingTranId)
@@ -133,6 +139,7 @@
                     }
 
                     is Resource.Success -> {
+                        progress.dismiss()
                         val locations = resource.data ?: emptyList()
 
 
@@ -246,7 +253,7 @@
         }
         override fun onResume() {
             super.onResume()
-            slittingViewModel.getOngoingSlittingJobs()
+            selectedLocationId?.let { slittingViewModel.getOngoingSlittingJobs(locationId = it) }
         }
 
 

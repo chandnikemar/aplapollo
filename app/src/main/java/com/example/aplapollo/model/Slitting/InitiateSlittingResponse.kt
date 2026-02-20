@@ -8,7 +8,7 @@ data class InitiateSlittingResponse(
     val statusCode: Int?
 )
 data class HrSlittingResponseObject(
-    val hrSlittingTranId: Int?,
+    val     hrSlittingTranId: Int?,
     val tenantCode: String?,
     val hrSlittingPlanId: Int?,
     val locationId: Int?,

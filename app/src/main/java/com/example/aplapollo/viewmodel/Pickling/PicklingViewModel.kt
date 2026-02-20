@@ -169,30 +169,46 @@ class PicklingViewModel(
         response: Response<ApiResponse<StockBarcodeWithoutplanResponse>>
     ): Resource<ApiResponse<StockBarcodeWithoutplanResponse>> {
 
-        var errorMessage = ""
+        return try {
 
-        if (response.isSuccessful) {
+            if (response.isSuccessful) {
 
-            response.body()?.let {
-                return Resource.Success(it)
+                response.body()?.let {
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody = response.errorBody()?.string()
+
+                val errorMessage = if (!errorBody.isNullOrEmpty()) {
+
+                    val jsonObject = JSONObject(errorBody)
+
+                    // Try different possible keys
+                    jsonObject.optString("message",
+                        jsonObject.optString("error",
+                            jsonObject.optString("statusMessage",
+                                "Barcode not found"
+                            )
+                        )
+                    )
+
+                } else {
+                    "Server error : ${response.code()}"
+                }
+
+                Resource.Error(errorMessage)
             }
 
-        } else if (response.errorBody() != null) {
+        } catch (e: Exception) {
 
-            val errorObject = JSONObject(
-                response.errorBody()!!
-                    .charStream()
-                    .readText()
-            )
-
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                "Failed to fetch barcode data"
-            )
+            Resource.Error("Something went wrong : ${e.localizedMessage}")
         }
-
-        return Resource.Error(errorMessage)
     }
+
     private suspend fun safeSubmitPickling(
         request: ProcessPicklingRequest
     ) {

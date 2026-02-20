@@ -97,6 +97,8 @@ class PicklingInwardActivity : AppCompatActivity() {
 
                     binding.inCommanBatch.tvGrade.text =
                         "Grade : ${data?.grade}"
+                    binding.inCommanBatch.tvLength.text =
+                        "Length : ${data?.length}"
 
                     binding.inCommanBatch.tvWidth.text =
                         "Width : ${data?.width} MM"
@@ -117,7 +119,12 @@ class PicklingInwardActivity : AppCompatActivity() {
                 is Resource.Error -> {
                     progress.dismiss()
 
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    Toasty.error(
+                        this,
+                        result.message ?: "Invalid barcode",
+                        Toasty.LENGTH_SHORT
+                    ).show()
+
                 }
 
                 else -> {}

@@ -180,8 +180,15 @@ object Utils {
     }
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentDateTimeISO(): String {
-        return java.time.OffsetDateTime.now().toString()
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'00:00:00")
+        return java.time.LocalDate.now().format(formatter)
     }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatGrnDate(dateStr: String): String {
+        val dateTime = java.time.LocalDateTime.parse(dateStr)
+        return dateTime.toString()
+    }
+
 //    private fun getTenant(): String {
 //        return tenantCode.ifEmpty {
 //            userDetail!!["defaultTenantCode"].toString()
@@ -189,3 +196,38 @@ object Utils {
 //    }
 
 }
+object WeightValidationUtils {
+
+    fun validateWeight(
+        motherWeight: Double,
+        totalChildWeight: Double,
+        scrapWeight: Double
+    ): WeightResult {
+
+        if (totalChildWeight <= 0) {
+            return WeightResult.Error("Enter valid Child Weight")
+        }
+
+        if (scrapWeight <= 0) {
+            return WeightResult.Error("Enter Scrap Weight")
+        }
+
+        if (totalChildWeight + scrapWeight > motherWeight) {
+            return WeightResult.Error("Total weight exceeds Mother Coil")
+        }
+
+        val ironLoss =
+            motherWeight - (totalChildWeight + scrapWeight)
+
+        return WeightResult.Success(
+            if (ironLoss < 0) 0.0 else ironLoss
+        )
+    }
+}
+sealed class WeightResult {
+
+    data class Success(val ironLoss: Double) : WeightResult()
+
+    data class Error(val message: String) : WeightResult()
+}
+

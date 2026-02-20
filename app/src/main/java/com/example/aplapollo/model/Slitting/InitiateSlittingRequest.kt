@@ -6,6 +6,7 @@ data class InitiateSlittingRequest(
     val HRSlittingPlanId: Int,
     val LocationId: Int,
     val SourceStockId: Int,
+    val weight:Double,
     val IsActive:Boolean,
     val Status: String,
     val IsPlanned:Boolean,

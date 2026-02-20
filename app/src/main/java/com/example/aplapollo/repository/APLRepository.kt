@@ -2,6 +2,10 @@ package com.example.aplapollo.repository
 
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.model.ApiCommonResponse
+import com.example.aplapollo.model.CRM.CRMPlanResponse
+import com.example.aplapollo.model.CRM.CRMTransactionRequest
+import com.example.aplapollo.model.CRM.CRMTransactionResponse
+import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
 import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.model.LocationResponse
 import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -103,11 +107,11 @@ suspend fun initiateHrSlitting(
         .initiateSlitting(request)
 
     suspend fun getOngoingJobs(
-
+        locationId: Int
     ): Response<List<OngoingSlittingJobResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingJobs()
+            .getOngoingJobs(locationId)
 
 suspend fun getHrSlittingDetailsById(
     tranId: Int
@@ -174,6 +178,61 @@ suspend fun getHrSlittingDetailsById(
             .getPicklingTransaction(picklingTranId)
     }
 
+    suspend fun getCRMPlannedList(
 
+    ): Response<List<CRMPlanResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getCRMPlannedList()
+
+    suspend fun getCRMScan(
+
+        barcode: String,
+        crmPlanId: Int
+    ): Response<HrSlittingscanReponse> =
+        retrofitInstance
+            .serviceApi()
+            .getCRMScanByBarcode(barcode, crmPlanId )
+    suspend fun getCrmPlanById(
+
+        crmPlanId: Int
+    ): Response<CRMPlanResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getCRMPlanById(crmPlanId)
+
+
+    suspend fun processCRM(
+
+        request: CRMTransactionRequest
+    ): Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .processCRM(request)
+
+
+    suspend fun getOngoingCRMJobs(
+
+    ): Response<List<OngoingCRMJobResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getOngoingCRMJobs()
+
+
+    suspend fun getCrmPlanTranById(
+
+        crmTranId: Int
+    ): Response<CRMTransactionResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getCRMPlanTranById(crmTranId)
+
+
+    suspend fun initiateCRMWithoutPlan(
+        request: CRMTransactionRequest
+    ): Response<CRMTransactionResponse> =
+        retrofitInstance
+            .serviceApi()
+            .initiateCRMWithoutPlan(request)
 
 }

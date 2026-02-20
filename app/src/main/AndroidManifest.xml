@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Foreground Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" /> <!-- Bluetooth permissions -->
@@ -39,7 +39,10 @@
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Apolloapl"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31" >
+        tools:targetApi="31">
+        <activity
+            android:name="com.example.aplapollo.view.coldpressing.CRMPlanOutwardActivity"
+            android:exported="false" />
         <activity
             android:name="com.example.aplapollo.view.BaseScanActivity"
             android:exported="false" />
@@ -90,14 +93,14 @@
             android:exported="false" />
         <activity
             android:name="com.example.aplapollo.view.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name="com.example.aplapollo.view.LoginActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

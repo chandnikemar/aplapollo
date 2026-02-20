@@ -1,10 +1,15 @@
     package com.example.aplapollo.api
 
+    import com.example.aplapollo.helper.Constants.GET_CRM_BY_Id
+    import com.example.aplapollo.helper.Constants.GET_CRM_PlanID
+    import com.example.aplapollo.helper.Constants.GET_CRM_PlannedList
     import com.example.aplapollo.helper.Constants.GET_Location
     import com.example.aplapollo.helper.Constants.GET_Ongoing_Pickl_Jobs
     import com.example.aplapollo.helper.Constants.GET_Pickling_By_Id
     import com.example.aplapollo.helper.Constants.GET_Pickling_Product_By_Barcode
+    import com.example.aplapollo.helper.Constants.GET_going_CRMJob
     import com.example.aplapollo.helper.Constants.Get_AllItemAgainstPlan
+    import com.example.aplapollo.helper.Constants.Get_CRM_Scan
     import com.example.aplapollo.helper.Constants.Get_Complete_Hr_Slitting
     import com.example.aplapollo.helper.Constants.Get_GRNData
     import com.example.aplapollo.helper.Constants.Get_HRSlitting_Scan
@@ -15,11 +20,17 @@
     import com.example.aplapollo.helper.Constants.Get_Stock_BYBatchOr_Barcode
     import com.example.aplapollo.helper.Constants.Get_SubmitSlit_From_Plan
     import com.example.aplapollo.helper.Constants.LOGIN_URL
+    import com.example.aplapollo.helper.Constants.POST_CRMWithout_Plan
     import com.example.aplapollo.helper.Constants.POST_InitiateSlitting_WithoutPlan
     import com.example.aplapollo.helper.Constants.POST_Process_Pickling
+    import com.example.aplapollo.helper.Constants.PosT_ProcessCRM
     import com.example.aplapollo.helper.Constants.Print_PRN
     import com.example.aplapollo.helper.Constants.QC_StatusSubmission
     import com.example.aplapollo.model.ApiCommonResponse
+    import com.example.aplapollo.model.CRM.CRMPlanResponse
+    import com.example.aplapollo.model.CRM.CRMTransactionRequest
+    import com.example.aplapollo.model.CRM.CRMTransactionResponse
+    import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
     import com.example.aplapollo.model.LocationPaginationRequest
     import com.example.aplapollo.model.LocationResponse
     import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -57,20 +68,15 @@
             @Body
             loginRequest: LoginRequest
         ): Response<LoginResponse>
-
-
         @POST(Get_GRNData)
         suspend fun getQCFetch(
-
             @Body request: QCFetchRequest
         ): Response<QCFetchResponse>
-
         @POST(QC_StatusSubmission)
         suspend fun qcStatusSubmission(
 
             @Body request: QCStatusSubmissionRequest
         ): Response<QCStatusSubmissionResponse>
-
             @POST(Print_PRN)
             suspend fun qcPrintLabel(
 
@@ -108,7 +114,9 @@
 
         @GET(Get_OnGoing)
         suspend fun getOngoingJobs(
+            @Query("locationId") locationId: Int
         ): Response<List<OngoingSlittingJobResponse>>
+
 
 
         @GET(Get_Hr_Slitting_Detail)
@@ -116,23 +124,18 @@
             @Query("hrSlittingTranId") hrSlittingTranId: Int
         ): Response<HrSlittingDetailsResponse>
 
-
         @POST(GET_Location)
         suspend fun getLocationsWithPagination(
             @Body request: LocationPaginationRequest
         ): Response<List<LocationResponse>>
-
         @POST(Get_Complete_Hr_Slitting)
         suspend fun completeHRSlitting(
             @Body request: HrSlittingTransactionRequest
         ): Response<ApiCommonResponse>
-
         @GET(Get_Stock_BYBatchOr_Barcode)
         suspend fun getStockByBatchOrBarcode(
             @Query("code") code: String?
         ): Response<ApiResponse<StockBarcodeWithoutplanResponse>>
-
-
         @POST(POST_InitiateSlitting_WithoutPlan)
         suspend fun initiateSlittingWithoutPlan(
             @Body request: InitiateSlittingWithoutPlanRequest
@@ -141,21 +144,48 @@
              @GET(GET_Ongoing_Pickl_Jobs)
           suspend fun getOngoingPicklingJobs(
                    ): Response<List<PicklingJobInProgressResponse>>
-
         @GET(GET_Pickling_Product_By_Barcode)
         suspend fun getPicklingBarcodeData(
             @Query("barcode") code: String?
         ): Response<ApiResponse<StockBarcodeWithoutplanResponse>>
-
         @POST(POST_Process_Pickling)
         suspend fun processPickling(
            @Body request: ProcessPicklingRequest
         ): Response<ApiCommonResponse>
-
-
         @GET(GET_Pickling_By_Id)
         suspend fun getPicklingTransaction(
             @Query("picklingTranId") picklingTranId: Int
         ): Response<PicklingTransactionResponse>
+
+        //CRM
+        @GET(GET_CRM_PlannedList)
+        suspend fun getCRMPlannedList(
+        ): Response<List<CRMPlanResponse>>
+        @GET(Get_CRM_Scan)
+        suspend fun getCRMScanByBarcode(
+            @Query("barcode") barcode: String?,
+            @Query("crmPlanId")crmPlanId:Int?
+        ): Response<HrSlittingscanReponse>
+        @GET(GET_CRM_PlanID)
+        suspend fun getCRMPlanById(
+            @Query("crmPlanId") crmPlanId: Int?
+        ): Response<CRMPlanResponse>
+        @POST(PosT_ProcessCRM)
+        suspend fun processCRM(
+            @Body request: CRMTransactionRequest
+        ): Response<ApiCommonResponse>
+        @GET(GET_going_CRMJob)
+        suspend fun getOngoingCRMJobs(
+
+        ): Response<List<OngoingCRMJobResponse>>
+        @GET(GET_CRM_BY_Id)
+        suspend fun getCRMPlanTranById(
+            @Query("crmTranId") crmTranId: Int?
+        ): Response<CRMTransactionResponse>
+
+        @POST(POST_CRMWithout_Plan)
+        suspend fun initiateCRMWithoutPlan(
+            @Body request: CRMTransactionRequest
+        ): Response<CRMTransactionResponse>
 
     }

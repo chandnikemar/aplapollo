@@ -84,9 +84,10 @@ class SlittingViewModel(
         }
     }
 
-    fun getOngoingSlittingJobs() {
+    fun getOngoingSlittingJobs(locationId: Int) {
+
         viewModelScope.launch {
-            safeApiCallOngoingJobs()
+            safeApiCallOngoingJobs(locationId)
         }
     }
 
@@ -339,13 +340,14 @@ private suspend fun safeApiCallInitiateSlitting(
         return Resource.Error(errorMessage)
     }
     //=========================================================================================
-    private suspend fun safeApiCallOngoingJobs() {
+    private suspend fun safeApiCallOngoingJobs(locationId: Int) {
+
         ongoingJobsLiveData.postValue(Resource.Loading())
 
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response = aplRepository.getOngoingJobs()
+                val response = aplRepository.getOngoingJobs(locationId)  // ✅ PASS HERE
 
                 ongoingJobsLiveData.postValue(
                     handleOngoingJobsResponse(response)
@@ -356,6 +358,7 @@ private suspend fun safeApiCallInitiateSlitting(
                     Resource.Error(Constants.NO_INTERNET)
                 )
             }
+
         } catch (t: Throwable) {
             ongoingJobsLiveData.postValue(
                 Resource.Error(t.message ?: Constants.CONFIG_ERROR)

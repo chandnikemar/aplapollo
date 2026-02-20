@@ -1,21 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base Light Theme -->
+    <!-- Base Dark Theme -->
     <style name="Base.Theme.Apolloapl"
         parent="Theme.Material3.DayNight.NoActionBar">
 
         <!-- Primary -->
-        <item name="colorPrimary">@color/primary_light</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorOnPrimary">@android:color/black</item>
 
         <!-- Secondary -->
-        <item name="colorSecondary">@color/orange</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorSecondary">@color/orange_dark</item>
+        <item name="colorOnSecondary">@android:color/black</item>
 
         <!-- Background -->
-        <item name="android:windowBackground">@color/bg_light</item>
-        <item name="colorSurface">@color/bg_light</item>
-        <item name="colorOnSurface">@color/text_light</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="colorSurface">@color/bg_dark</item>
+        <item name="colorOnSurface">@color/text_dark</item>
 
         <!-- Button -->
         <item name="materialButtonStyle">
@@ -41,7 +41,7 @@
         parent="Widget.Material3.Button">
 
         <item name="cornerRadius">12dp</item>
-        <item name="backgroundTint">@color/primary_light</item>
+        <item name="backgroundTint">@color/primary_dark</item>
         <item name="android:textColor">@android:color/white</item>
 
     </style>
@@ -50,14 +50,14 @@
     <style name="TextAppearance.Apollo.Headline"
         parent="TextAppearance.Material3.HeadlineSmall">
 
-        <item name="android:textColor">@color/primary_light</item>
+        <item name="android:textColor">@color/primary_dark</item>
 
     </style>
 
     <style name="TextAppearance.Apollo.Body"
         parent="TextAppearance.Material3.BodyMedium">
 
-        <item name="android:textColor">@color/text_light</item>
+        <item name="android:textColor">@color/text_dark</item>
 
     </style>
 

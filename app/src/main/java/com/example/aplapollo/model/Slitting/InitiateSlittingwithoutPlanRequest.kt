@@ -8,6 +8,7 @@
     val SourceStockId: Int,
     val JobNumber: String? = null,
     val Barcode: String? = null,
+        val Weight:Double?=null,
     val IronLossWeight: Double? = null,
     val ScrapWeight: Double? = null,
     val CompletedBy: String? = null,

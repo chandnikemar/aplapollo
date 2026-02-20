@@ -44,6 +44,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
     private var barcode: String = ""
     private var motherWeight: Double = 0.0
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_outward)

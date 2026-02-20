@@ -172,7 +172,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                tools:listitem="@layout/item_slitting_width"/>
+                tools:listitem="@layout/item_width_row"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -254,30 +254,34 @@
                 android:id="@+id/tilScanCoil"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Scan Coil Barcode"
-                app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/white"
-                app:hintTextColor="@color/white"
-                app:boxStrokeWidth="1dp"
-                app:boxStrokeWidthFocused="2dp"
+                android:hint="Scan Barcode Here"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeWidthFocused="3dp"
+
+                app:boxStrokeColor="@color/gray"
+
+
+                app:endIconMode="clear_text"
+
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
+
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etScanCoil"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
-
-                    android:maxLines="1"
                     android:singleLine="true"
-                    android:importantForAutofill="no"
-                    android:focusable="true"
-
-                    android:focusableInTouchMode="true" />
+                    android:inputType="textNoSuggestions"
+                    android:imeOptions="actionDone"
+                    android:importantForAutofill="no"/>
 
             </com.google.android.material.textfield.TextInputLayout>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
