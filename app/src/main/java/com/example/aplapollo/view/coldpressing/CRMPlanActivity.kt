@@ -51,7 +51,7 @@ class CRMPlanActivity : AppCompatActivity() {
     private var planList = listOf<CRMPlanResponse>()
     private lateinit var planAdapter: ArrayAdapter<String>
     private var selectedPlanDetail: CRMPlanResponse? = null
-
+private  var weight:Double=0.0
     private var locationName: String = ""
     private var scanBuffer = StringBuilder()
     private var lastKeyTime = 0L
@@ -214,7 +214,7 @@ class CRMPlanActivity : AppCompatActivity() {
                     // Hide scan, show data
                     hideScanBox()
                     showBatchDetails()
-
+                    weight = stock.weight ?: 0.0
                     // Green border
                     binding.tilScanCoil.boxStrokeColor =
                         ContextCompat.getColor(this, android.R.color.holo_green_dark)
@@ -449,6 +449,7 @@ class CRMPlanActivity : AppCompatActivity() {
                 locationId=locationId,
                 sourceStockId=scannedStockId?:0,
                 desiredThickness=desiredThickness,
+                Weight=weight,
                 jobNumber="",
                 barcode="",
                 ironLossWeight=null,

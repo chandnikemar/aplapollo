@@ -5,7 +5,7 @@
         parent="Theme.Material3.DayNight.NoActionBar">
 
         <!-- Primary -->
-        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorPrimary">@color/rippleColor</item>
         <item name="colorOnPrimary">@android:color/white</item>
 
         <!-- Secondary -->
@@ -13,8 +13,8 @@
         <item name="colorOnSecondary">@android:color/white</item>
 
         <!-- Background -->
-        <item name="android:windowBackground">@color/bg_light</item>
-        <item name="colorSurface">@color/bg_light</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/text_light</item>
 
         <!-- Button -->
@@ -33,8 +33,8 @@
 
     </style>
 
-    <!-- Main Theme -->
-    <style name="Theme.Apolloapl" parent="Base.Theme.Apolloapl" />
+<!--    &lt;!&ndash; Main Theme &ndash;&gt;-->
+<!--    <style name="Theme.Apolloapl" parent="Base.Theme.Apolloapl" />-->
 
     <!-- Button -->
     <style name="Widget.Apollo.MaterialButton"

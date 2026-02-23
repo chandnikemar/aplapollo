@@ -12,7 +12,7 @@ data class CRMTransactionRequest(
     val sourceStockId: Int,
 
     val desiredThickness: Double?,   // decimal? → Double?
-
+val Weight:Double?,
     val jobNumber: String,
 
         val barcode: String?,

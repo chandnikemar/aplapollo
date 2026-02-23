@@ -43,9 +43,9 @@ class PicklingViewModel(
 
 
 
-    fun getOngoingPicklingJobs() {
+    fun getOngoingPicklingJobs(locationId: Int) {
         viewModelScope.launch {
-            safeApiCallOngoingPicklingJobs()
+            safeApiCallOngoingPicklingJobs(locationId)
         }
     }
     fun fetchPicklingBarcodeData(code: String?) {
@@ -70,7 +70,7 @@ class PicklingViewModel(
 
 
 
-    private suspend fun safeApiCallOngoingPicklingJobs() {
+    private suspend fun safeApiCallOngoingPicklingJobs(locationId:Int) {
 
         ongoingJobsLiveData.postValue(Resource.Loading())
 
@@ -79,7 +79,7 @@ class PicklingViewModel(
             if (Utils.hasInternetConnection(getApplication())) {
 
                 val response =
-                    aplRepository.getOngoingPicklingJobs()
+                    aplRepository.getOngoingPicklingJobs(locationId)
 
                 ongoingJobsLiveData.postValue(
                     handleOngoingJobsResponse(response)

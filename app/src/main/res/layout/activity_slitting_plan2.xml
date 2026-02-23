@@ -5,7 +5,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/bgcolor"
+        >
     <include
         android:id="@+id/idLayoutHeader"
         layout="@layout/action_bar_comman_hedaer_layout"
@@ -16,7 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@color/bgcolor">
 
         <!-- Select Plan -->
         <com.google.android.material.textfield.TextInputLayout
@@ -52,7 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:background="@color/bgcolor">
 
             <!-- Input Requirement Title -->
             <TextView

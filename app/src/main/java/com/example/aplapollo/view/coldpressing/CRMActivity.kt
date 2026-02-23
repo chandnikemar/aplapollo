@@ -104,7 +104,7 @@ class CRMActivity : AppCompatActivity() {
 
         binding.rvOngoingJobs.layoutManager = LinearLayoutManager(this)
         locationViewModel.getLocations( locationRequest)
-        crmViewModel.getOngoingCRMJobs()
+        selectedLocationId?.let { crmViewModel.getOngoingCRMJobs(it) }
         ongoingJobAdapter = OngoingCRMJobAdapter(emptyList()) { selectedJob ->
             if (selectedLocationId == null) {
                 Toasty.warning(this, "Please select a location first").show()
@@ -240,7 +240,7 @@ class CRMActivity : AppCompatActivity() {
         }
     override fun onResume() {
         super.onResume()
-        crmViewModel.getOngoingCRMJobs()
+        selectedLocationId?.let { crmViewModel.getOngoingCRMJobs(it) }
     }
 
 

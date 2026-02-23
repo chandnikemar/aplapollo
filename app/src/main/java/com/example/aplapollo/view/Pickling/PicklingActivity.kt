@@ -93,7 +93,7 @@ class PicklingActivity : AppCompatActivity() {
                 )
         binding.rvOngoingJobs.layoutManager = LinearLayoutManager(this)
         locationViewModel.getLocations( locationRequest)
-        picklingViewModel.getOngoingPicklingJobs()
+        selectedLocationId?.let { picklingViewModel.getOngoingPicklingJobs(it) }
         ongoingJobAdapter = OngoingJobPicklingAdapter(emptyList()) { selectedJob ->
 
             if (selectedLocationId == null) {
@@ -129,6 +129,7 @@ class PicklingActivity : AppCompatActivity() {
                         selectedLocationId = it.locationId
                         selectedLocationName = it.locationName
                         selectedLocationId = selectedLocation.locationId
+                        picklingViewModel.getOngoingPicklingJobs(it.locationId)
                         Log.d(
                             "STATION_SELECTED",
                             "ID=$selectedLocationId, NAME=$selectedLocationName"
@@ -161,6 +162,7 @@ class PicklingActivity : AppCompatActivity() {
                         }
 
                         is Resource.Success -> {
+                            progress.dismiss()
                             val locations = resource.data ?: emptyList()
 
 
@@ -190,6 +192,9 @@ class PicklingActivity : AppCompatActivity() {
                 is Resource.Loading -> progress.show()
                 is Resource.Success -> {
                     progress.dismiss()
+                    selectedLocationName?.let {
+                        binding.includeShiftStation.dropdownFields.setText(it, false)
+                    }
                     val jobs = resource.data ?: emptyList()
 
                     if (jobs.isEmpty()) {
@@ -212,7 +217,7 @@ class PicklingActivity : AppCompatActivity() {
             }
     override fun onResume() {
         super.onResume()
-        picklingViewModel.getOngoingPicklingJobs()
+        selectedLocationId?.let { picklingViewModel.getOngoingPicklingJobs(locationId = it) }
     }
 
 }

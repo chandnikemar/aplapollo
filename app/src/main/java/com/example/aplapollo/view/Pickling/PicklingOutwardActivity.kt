@@ -14,6 +14,8 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils.getCurrentDateTimeISO
+import com.example.aplapollo.helper.WeightResult
+import com.example.aplapollo.helper.WeightValidationUtils
 import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModel
@@ -43,6 +45,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
     private var tranPlanId: Int = 0
     private var barcode: String = ""
     private var motherWeight: Double = 0.0
+    private var isWeightErrorShown = false
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,11 +91,15 @@ class PicklingOutwardActivity : AppCompatActivity() {
             finish()
             return
         }
+        binding.jobTable.editC4.isEnabled = false
+        binding.layoutScrapTable.etScrapWeight.isEnabled = false
 
         // Disable Iron Loss field
         binding.layoutScrapTable.tvIronLossValue.isEnabled = false
         binding.btnSave.isEnabled = false
+        binding.layoutScrapTable.etScrapWeight.addTextChangedListener(weightWatcher)
 
+        binding.jobTable.editC4.addTextChangedListener(weightWatcher)
         picklingViewModel.fetchPicklingTransactionById(transactionId)
 
         picklingViewModel.picklingTransactionLiveData.observe(this) { resource ->
@@ -134,11 +141,11 @@ class PicklingOutwardActivity : AppCompatActivity() {
         }
 
 
-        binding.layoutScrapTable.etScrapWeight.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) { calculateAndShowIronLoss() }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+//        binding.layoutScrapTable.etScrapWeight.addTextChangedListener(object : android.text.TextWatcher {
+//            override fun afterTextChanged(s: android.text.Editable?) { calculateAndShowIronLoss() }
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+//        })
 
         // Save button
         binding.btnSave.setOnClickListener { submitPickling() }
@@ -160,27 +167,98 @@ class PicklingOutwardActivity : AppCompatActivity() {
         calculateAndShowIronLoss()
     }
 
+    private val weightWatcher = object : android.text.TextWatcher {
 
-    private fun calculateAndShowIronLoss() {
-        val scrapWeight = binding.layoutScrapTable.etScrapWeight?.text.toString().toDoubleOrNull() ?: 0.0
-        val childWeight = binding.jobTable.editC4?.text.toString().toDoubleOrNull() ?: 0.0
+        override fun afterTextChanged(s: android.text.Editable?) {
+            calculateAndShowIronLoss()
+        }
 
-        val calculatedIronLoss = motherWeight - (childWeight + scrapWeight)
-        val ironLoss = if (calculatedIronLoss < 0) 0.0 else calculatedIronLoss
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-        binding.layoutScrapTable.tvIronLossValue?.setText(String.format("%.2f", ironLoss))
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
 
+    private fun calculateAndShowIronLoss() {
+
+        // Wait until API loads
+        if (motherWeight <= 0) {
+            binding.layoutScrapTable.tvIronLossValue?.setText("0.00")
+            return
+        }
+
+        val scrapWeight = binding.layoutScrapTable.etScrapWeight
+            ?.text.toString().toDoubleOrNull() ?: 0.0
+
+        val childWeight = binding.jobTable.editC4
+            ?.text.toString().toDoubleOrNull() ?: 0.0
+
+
+        val totalUsedWeight = scrapWeight + childWeight
+
+        // Validation
+        if (totalUsedWeight > motherWeight) {
+
+            if (!isWeightErrorShown) {
+                Toasty.error(
+                    this,
+                    "Child + Scrap weight cannot exceed Mother weight"
+                ).show()
+
+                isWeightErrorShown = true
+            }
+
+            binding.layoutScrapTable.tvIronLossValue?.setText("0.00")
+            binding.btnSave.isEnabled = false
+            return
+        }
+
+        // Reset error
+        isWeightErrorShown = false
+
+
+        // ✅ Calculate remaining (Iron Loss)
+        val ironLoss = motherWeight - totalUsedWeight
+
+        binding.layoutScrapTable.tvIronLossValue?.setText(
+            String.format("%.2f", ironLoss)
+        )
+
+        // Enable save only if valid
+        binding.btnSave.isEnabled = true
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun submitPickling() {
-        val scrapWeight = binding.layoutScrapTable.etScrapWeight?.text.toString().toDoubleOrNull() ?: 0.0
+        val scrapWeight =
+            binding.layoutScrapTable.etScrapWeight
+                ?.text.toString().toDoubleOrNull() ?: 0.0
+
+        val enteredWeight =
+            binding.jobTable.editC4
+                ?.text.toString().toDoubleOrNull() ?: 0.0
 
 
-        val enteredWeight = binding.jobTable.editC4?.text.toString().toDoubleOrNull() ?: 0.0
+        val result = WeightValidationUtils.validateWeight(
+            motherWeight = motherWeight,
+            totalChildWeight = enteredWeight,
+            scrapWeight = scrapWeight
+        )
+
+        if (result is WeightResult.Error) {
+            Toasty.error(this, result.message).show()
+            return
+        }
+
+        val ironLoss = (result as WeightResult.Success).ironLoss
+
+
+
+
+
+
 
         val calculatedIronLoss = motherWeight - (enteredWeight + scrapWeight)
-        val ironLoss = if (calculatedIronLoss < 0) 0.0 else calculatedIronLoss
+
 
         val request = ProcessPicklingRequest(
             picklingTranId = tranPlanId,
@@ -209,7 +287,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
         if (!progress.isShowing) progress.show()
     }
 
-    /** Dismiss ProgressDialog safely */
+    
     private fun dismissProgress() {
         if (::progress.isInitialized && progress.isShowing) progress.dismiss()
     }

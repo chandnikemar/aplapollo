@@ -41,6 +41,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
     private  var tenantCode:String?=null
     private var transactionId:Int=0
     private var maxAllowedWidth: Double = 0.0
+    private  var weight:Double=0.0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,12 +135,13 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
 
                     binding.inCommanBatch.tvWeight.text =
                         "Weight : ${stock.weight} KG"
-
                     sourceStockId = stock.stockId
                     scannedBarcode = stock.barcode
                     tenantCode=stock.tenantCode
                     transactionId=stock.transactionId?:0
                     maxAllowedWidth = stock.width ?: 0.0
+                    weight=stock.weight?:0.0
+
 
                     Toasty.success(this, "Stock fetched successfully").show()
                 }
@@ -220,6 +222,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
                 locationId=locationId,
                 sourceStockId=sourceStockId,
                 desiredThickness=enteredWidth,
+                Weight = null,
                 jobNumber="",
                 barcode="",
                 ironLossWeight=null,

@@ -149,11 +149,12 @@ suspend fun getHrSlittingDetailsById(
             .getLocationsWithPagination(request)
 
     suspend fun getOngoingPicklingJobs(
+        locationId: Int
 
     ): Response<List<PicklingJobInProgressResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingPicklingJobs()
+            .getOngoingPicklingJobs(locationId)
 
     suspend fun getStockBarcodePicklingdata(
         code: String?
@@ -212,11 +213,11 @@ suspend fun getHrSlittingDetailsById(
 
 
     suspend fun getOngoingCRMJobs(
-
+        locationId: Int
     ): Response<List<OngoingCRMJobResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingCRMJobs()
+            .getOngoingCRMJobs(locationId)
 
 
     suspend fun getCrmPlanTranById(

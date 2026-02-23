@@ -143,6 +143,7 @@
        //Pickling
              @GET(GET_Ongoing_Pickl_Jobs)
           suspend fun getOngoingPicklingJobs(
+           @Query("locationId") locationId: Int
                    ): Response<List<PicklingJobInProgressResponse>>
         @GET(GET_Pickling_Product_By_Barcode)
         suspend fun getPicklingBarcodeData(
@@ -176,6 +177,7 @@
         ): Response<ApiCommonResponse>
         @GET(GET_going_CRMJob)
         suspend fun getOngoingCRMJobs(
+            @Query("locationId") locationId: Int
 
         ): Response<List<OngoingCRMJobResponse>>
         @GET(GET_CRM_BY_Id)

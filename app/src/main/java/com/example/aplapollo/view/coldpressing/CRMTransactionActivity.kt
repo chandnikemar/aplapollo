@@ -189,6 +189,7 @@ private var sourceStockId:Int=0
         sourceStockId = transaction.sourceStockId
         jobNumber = transaction.jobNumber
 
+
         // ✅ Enable inputs after load
         binding.jobTable.editC4.isEnabled = true
         binding.layoutScrapTable.etScrapWeight.isEnabled = true
@@ -292,6 +293,7 @@ private var sourceStockId:Int=0
             locationId = locationId,
             sourceStockId = sourceStockId ?: 0,
             desiredThickness=enteredWeight,
+            Weight=null,
             jobNumber = jobNumber,
             barcode = barcode,
 

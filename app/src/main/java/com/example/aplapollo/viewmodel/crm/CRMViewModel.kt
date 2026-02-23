@@ -68,9 +68,9 @@ class CRMViewModel(
             safeApiCallInitiateSlitting( request)
         }
     }
-    fun getOngoingCRMJobs() {
+    fun getOngoingCRMJobs( locationId: Int) {
         viewModelScope.launch {
-            safeApiCallOngoingCRMJobs()
+            safeApiCallOngoingCRMJobs(locationId)
         }
     }
 
@@ -412,7 +412,7 @@ class CRMViewModel(
         return Resource.Error(errorMessage)
     }
    // =========================
-   private suspend fun safeApiCallOngoingCRMJobs() {
+   private suspend fun safeApiCallOngoingCRMJobs( locationId: Int) {
 
        ongoingJobsLiveData.postValue(Resource.Loading())
 
@@ -421,7 +421,7 @@ class CRMViewModel(
            if (Utils.hasInternetConnection(getApplication())) {
 
                val response =
-                   aplRepository.getOngoingCRMJobs()
+                   aplRepository.getOngoingCRMJobs(locationId)
 
                ongoingJobsLiveData.postValue(
                    handleOngoingJobsResponse(response)
