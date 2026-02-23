@@ -163,7 +163,9 @@ class CRMActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     progress.dismiss()
                     val jobs = resource.data ?: emptyList()
-
+                    selectedLocationName?.let {
+                        binding.includeShiftStation.dropdownFields.setText(it, false)
+                    }
                     if (jobs.isEmpty()) {
                         Toasty.info(this, "No ongoing jobs found").show()
                         ongoingJobAdapter.updateList(emptyList())
@@ -191,7 +193,7 @@ class CRMActivity : AppCompatActivity() {
             selectedLocation?.let {
                 selectedLocationId = it.locationId
                 selectedLocationName = it.locationName
-
+                crmViewModel.getOngoingCRMJobs(it.locationId)
                 Log.d(
                     "STATION_SELECTED",
                     "ID=$selectedLocationId, NAME=$selectedLocationName"

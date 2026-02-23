@@ -648,7 +648,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
             column2Row7.text = data.length?.toString() ?: "--"
             column2Row3.text = data.netWeightKg?.toString() ?: "--"
             column2Row8.text = data.grnNumber?.toString() ?: "--"
-            column2Row9.text = data.grnDate ?: "--"
+            column2Row9.text = data.grnDate?.substringBefore("T") ?: "--"
         }
 
         binding.buttonRight.isEnabled = true
@@ -669,26 +669,13 @@ binding.commanInputRow.btnClear.setOnClickListener {
     private fun hideProgressBar() {
         progress.cancel()
     }
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun formatGrnDate(dateString: String?): String {
-//        return try {
-//            if (dateString.isNullOrEmpty()) return "--"
-//
-//            val parsed = OffsetDateTime.parse(dateString)
-//            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-//            parsed.format(formatter)
-//
-//        } catch (e: Exception) {
-//            Log.e("DATE_FORMAT", "Invalid date: $dateString", e)
-//            "--"
-//        }
-//    }
+
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
 
         if (event.action == android.view.KeyEvent.ACTION_DOWN) {
             val now = System.currentTimeMillis()
 
-            // reset buffer if slow typing (manual input)
+
             if (now - lastKeyTime > SCAN_TIMEOUT) {
                 scanBuffer.clear()
             }

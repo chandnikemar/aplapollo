@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
@@ -42,6 +43,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
     private var transactionId:Int=0
     private var maxAllowedWidth: Double = 0.0
     private  var weight:Double=0.0
+    private var coilThickness: Double = 0.0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,7 +100,20 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
                 .getStockByBatchOrBarcode( barcode)
         }
 
+        binding.etDesiredThickness.addTextChangedListener {
 
+            val entered = it.toString().toDoubleOrNull() ?: return@addTextChangedListener
+
+            if (entered >= coilThickness) {
+
+                Toasty.error(
+                    this,
+                    "Thickness must be less than $coilThickness mm"
+                ).show()
+
+                binding.etDesiredThickness.setText("")
+            }
+        }
 
         slittingWithoutplanvViewModel.stockByBarcodeLiveData.observe(this) { resource ->
 
@@ -141,6 +156,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
                     transactionId=stock.transactionId?:0
                     maxAllowedWidth = stock.width ?: 0.0
                     weight=stock.weight?:0.0
+                    coilThickness = stock.thickness ?: 0.0
 
 
                     Toasty.success(this, "Stock fetched successfully").show()
@@ -200,7 +216,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
             }
 
             val enteredWidth =
-                binding.etDesiredWeight.text.toString().toDoubleOrNull()
+                binding.etDesiredThickness.text.toString().toDoubleOrNull()
 
             if (enteredWidth == null || enteredWidth <= 0) {
                 Toasty.warning(this, "Please enter valid Thickness").show()
@@ -239,12 +255,48 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
 
             crmViewModel.initiateCRMWithoutPlan(request)
         }
+        binding.commanInputRow.btnClear.setOnClickListener {
 
+            binding.commanInputRow.inputField.text?.clear()
+            binding.layoutBatchDetails.removeAllViews()
+            binding.etDesiredThickness.text?.clear()
+
+            // Hide batch details
+            binding.layoutBatchDetails.visibility = View.GONE
+
+//            // Remove all dynamic weight rows
+//            binding.layoutWeightContainer.removeAllViews()
+
+            // Reset variables
+            sourceStockId = 0
+            scannedBarcode = null
+            tenantCode = null
+            transactionId = 0
+            maxAllowedWidth = 0.0
+            coilThickness = 0.0
+
+            sourceStockId = 0
+            scannedBarcode = null
+        }
         binding.btncClears.setOnClickListener {
 
             binding.commanInputRow.inputField.text?.clear()
+            binding.layoutBatchDetails.removeAllViews()
+            binding.etDesiredThickness.text?.clear()
+
+            // Hide batch details
             binding.layoutBatchDetails.visibility = View.GONE
 
+//            // Remove all dynamic weight rows
+//            binding.layoutWeightContainer.removeAllViews()
+
+            // Reset variables
+            sourceStockId = 0
+            scannedBarcode = null
+            tenantCode = null
+            transactionId = 0
+            maxAllowedWidth = 0.0
+            coilThickness = 0.0
 
             sourceStockId = 0
             scannedBarcode = null

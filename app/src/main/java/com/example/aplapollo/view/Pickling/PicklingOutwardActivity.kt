@@ -51,7 +51,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_outward)
-        binding.idLayoutHeader.tvTitle.text = "Hr Pickling Inward"
+        binding.idLayoutHeader.tvTitle.text = "Hr Pickling Onward"
         supportActionBar?.hide()
 
         progress = ProgressDialog(this).apply { setMessage("Please Wait...") }
@@ -91,12 +91,12 @@ class PicklingOutwardActivity : AppCompatActivity() {
             finish()
             return
         }
-        binding.jobTable.editC4.isEnabled = false
-        binding.layoutScrapTable.etScrapWeight.isEnabled = false
+//        binding.jobTable.editC4.isEnabled = false
+//        binding.layoutScrapTable.etScrapWeight.isEnabled = false
 
         // Disable Iron Loss field
         binding.layoutScrapTable.tvIronLossValue.isEnabled = false
-        binding.btnSave.isEnabled = false
+//        binding.btnSave.isEnabled = false
         binding.layoutScrapTable.etScrapWeight.addTextChangedListener(weightWatcher)
 
         binding.jobTable.editC4.addTextChangedListener(weightWatcher)
