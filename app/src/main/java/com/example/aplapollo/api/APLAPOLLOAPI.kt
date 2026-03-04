@@ -7,6 +7,7 @@
     import com.example.aplapollo.helper.Constants.GET_Ongoing_Pickl_Jobs
     import com.example.aplapollo.helper.Constants.GET_Pickling_By_Id
     import com.example.aplapollo.helper.Constants.GET_Pickling_Product_By_Barcode
+    import com.example.aplapollo.helper.Constants.GET_PrintLabel
     import com.example.aplapollo.helper.Constants.GET_going_CRMJob
     import com.example.aplapollo.helper.Constants.Get_AllItemAgainstPlan
     import com.example.aplapollo.helper.Constants.Get_CRM_Scan
@@ -36,6 +37,7 @@
     import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
     import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
     import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
+    import com.example.aplapollo.model.PrintLabelBarcodeRequest
     import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
     import com.example.aplapollo.model.QualityCheck.PrintZplResponse
     import com.example.aplapollo.model.QualityCheck.QCFetchRequest
@@ -189,5 +191,8 @@
         suspend fun initiateCRMWithoutPlan(
             @Body request: CRMTransactionRequest
         ): Response<CRMTransactionResponse>
-
+        @POST(GET_PrintLabel)
+        suspend fun printLabelBarcode(
+            @Body request:List<PrintLabelBarcodeRequest>
+        ): Response<ApiCommonResponse>
     }

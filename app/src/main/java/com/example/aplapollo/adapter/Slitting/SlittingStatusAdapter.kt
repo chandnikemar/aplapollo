@@ -9,7 +9,7 @@
 
     class SlittingStatusAdapter(
         private val list: List<HrSlittingTransactionDetail>,
-        private val onWeightChanged: () -> Unit   // callback to activity
+        private val onWeightChanged: () -> Unit
     ) : RecyclerView.Adapter<SlittingStatusAdapter.ViewHolder>() {
 
         private val weightMap = mutableMapOf<Int, Double>()
@@ -76,7 +76,7 @@
 
                         Toasty.warning(
                             b.editC4.context,
-                            "Weight must be > 0"
+                            "Weight must be greater 0"
                         ).show()
 
                         return

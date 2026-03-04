@@ -15,6 +15,20 @@
             import com.example.aplapollo.adapter.Slitting.OngoingJobAdapter
             import com.example.aplapollo.api.RetrofitInstance
             import com.example.aplapollo.helper.Constants
+            import com.example.aplapollo.helper.Constants.BarcodeValue
+            import com.example.aplapollo.helper.Constants.GradeV
+            import com.example.aplapollo.helper.Constants.HrSlittingId
+            import com.example.aplapollo.helper.Constants.JobId
+            import com.example.aplapollo.helper.Constants.LocationId
+            import com.example.aplapollo.helper.Constants.LocationName
+            import com.example.aplapollo.helper.Constants.MotherWeightV
+            import com.example.aplapollo.helper.Constants.SelectFromPlan
+            import com.example.aplapollo.helper.Constants.SelectStationFirstError
+            import com.example.aplapollo.helper.Constants.SourceStockId
+            import com.example.aplapollo.helper.Constants.SupplierNo
+            import com.example.aplapollo.helper.Constants.ThicknessV
+            import com.example.aplapollo.helper.Constants.WidthId
+            import com.example.aplapollo.helper.Constants.WithOutPlan
             import com.example.aplapollo.helper.Resource
             import com.example.aplapollo.helper.SessionManager
             import com.example.aplapollo.model.LocationPaginationRequest
@@ -112,16 +126,16 @@
                         }
         
                         val intent = Intent(this, SlittingStatusActivity::class.java)
-                        intent.putExtra("JOB_ID", selectedJob.jobNumber)
-                        intent.putExtra("HrSlitting_planID", selectedJob.hrSlittingTranId)
-                        intent.putExtra("Source_StockID", selectedJob.sourceStockId)
-                        intent.putExtra("Location_ID", selectedJob.locationId)
-                        intent.putExtra("Mother_Weight", selectedJob.stockTransaction?.weight.toString())
-                        intent.putExtra("BARCODE", selectedJob.stockTransaction?.barcode)
-                        intent.putExtra("SupplierNo", selectedJob.stockTransaction?.supplierBatchNo)
-                        intent.putExtra("WIDTH", selectedJob.stockTransaction?.width)
-                        intent.putExtra("THICKNESS", selectedJob.stockTransaction?.thickness)
-                        intent.putExtra("GRADE", selectedJob.stockTransaction?.grade)
+                        intent.putExtra(JobId, selectedJob.jobNumber)
+                        intent.putExtra(HrSlittingId, selectedJob.hrSlittingTranId)
+                        intent.putExtra(SourceStockId, selectedJob.sourceStockId)
+                        intent.putExtra(LocationId, selectedJob.locationId)
+                        intent.putExtra(MotherWeightV, selectedJob.stockTransaction?.weight.toString())
+                        intent.putExtra(BarcodeValue, selectedJob.stockTransaction?.barcode)
+                        intent.putExtra(SupplierNo, selectedJob.stockTransaction?.supplierBatchNo)
+                        intent.putExtra(WidthId, selectedJob.stockTransaction?.width)
+                        intent.putExtra(ThicknessV, selectedJob.stockTransaction?.thickness)
+                        intent.putExtra(GradeV, selectedJob.stockTransaction?.grade)
                         startActivity(intent)
                     }
         
@@ -201,22 +215,22 @@
                         selectedLocation?.let {
                             selectedLocationId = it.locationId
                             selectedLocationName = it.locationName
-                            // ✅ Save in session
+
 //                            session.saveSelectedLocation(it.locationId, it.locationName)
 
-                            // ✅ Load ongoing jobs immediately
+
                             slittingViewModel.getOngoingSlittingJobs(it.locationId)
-                            Log.d(
-                                "STATION_SELECTED",
-                                "ID=$selectedLocationId, NAME=$selectedLocationName"
-                            )
+//                            Log.d(
+//                                "STATION_SELECTED",
+//                                "ID=$selectedLocationId, NAME=$selectedLocationName"
+//                            )
         
                         }
                     }
         
                     val coilOptions = listOf(
-                        "Select from plan",
-                        "Without plan",
+                        SelectFromPlan,
+                        WithOutPlan,
         
                     )
         
@@ -230,23 +244,23 @@
                         when (position) {
                             0 -> {
                                 if (selectedLocationId == null) {
-                                    Toasty.warning(this, "Please select station first").show()
+                                    Toasty.warning(this, SelectStationFirstError).show()
                                     return@setOnItemClickListener
                                 }
         
                                 val intent = Intent(this, SlittingPlan2Activity::class.java)
-                                intent.putExtra("LOCATION_ID", selectedLocationId!!)
-                                intent.putExtra("LOCATION_NAME", selectedLocationName ?: "")
+                                intent.putExtra(LocationId, selectedLocationId!!)
+                                intent.putExtra(LocationName, selectedLocationName ?: "")
                                 startActivity(intent)
                             }
                             1 -> {
                                 if (selectedLocationId == null) {
-                                Toasty.warning(this, "Please select station first").show()
+                                Toasty.warning(this, SelectStationFirstError).show()
                                 return@setOnItemClickListener
                             }
         
                                 val intent = Intent(this, Slittingplan3Activity::class.java)
-                                intent.putExtra("Location_ID", selectedLocationId!!)
+                                intent.putExtra(LocationId, selectedLocationId!!)
                                 startActivity(intent)
                             }
         

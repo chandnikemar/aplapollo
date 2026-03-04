@@ -41,7 +41,7 @@ object Constants {
     const val KEY_IS_LOGGED_IN = "loggedIn"
     const val KEY_Refresh_Token = "refreshToken"
     const val KEY_COORDINATE = "location_coordinates"
-    const val SERVER_IP_SHARED = "192.168.1.105"
+
     private const val PRINTER_MAC = "AB:3F:A4:CF:89:AD"
     const val SESSION_EXPIRED = "SESSION_EXPIRED"
 
@@ -59,8 +59,8 @@ object Constants {
     const val HTTP_INTERNAL_SERVER_ERROR = 500
     const val HTTP_ERROR = 400
 
-    const val SlittingSTATUS="InStock"
-    const val CRMPlannedSTATUS="InStock"
+    const val InsStockStatus="InStock"
+    const val CompleteStatus="Completed"
 
     const val REFRESH_TOKEN_DATA = "AuthService/refreshtoken"
     const val DASHBOARD_DATA = "VehicleMilestone/GetVehicleMilestoneDashBoardData"
@@ -123,14 +123,38 @@ object Constants {
     const val GET_going_CRMJob="CRM/getOngoingCRMJobs"
     const val GET_CRM_BY_Id="CRM/getCRMByIdAsync"
     const val POST_CRMWithout_Plan="CRM/initiateCRMWithoutPlan"
-
+    const val GET_PrintLabel= "PrintPRNDetails/printLabel"
 
     //change password
     const val CHANGE_PASSWORD = "UserManagement/change-password"
 
 
-    const val LOCATION_ID = "locationId"
 
 
+//Error
+    const val SelectStationFirstError="Please select station first"
+    const val SelectCoil="Please select at least one coil"
+    const val  ChildMotherExceedError="Child weight and mother weight cannot exceed Mother weight"
+    const val WeightExceed= "Weight exceeds Mother Coil"
+    const val ValidChildWeightError="Enter valid Child Weight"
+    const val EnterScrapWeight="Enter Scrap Weight"
+    const val InvalidIronLoss="Invalid Iron Loss"
+//intentString
+    const val LocationId="LOCATION_ID"
+    const val LocationName="LOCATION_NAME"
+   const val CrmTranJob="CRM_TRAN_JOB"
+    const val JobId="JOB_ID"
+    const val BarcodeValue="BARCODE"
+    const val PicklingId="PICKLING_ID"
+    const val WidthId= "WIDTH"
+    const val  HrSlittingId="HrSlitting_planID"
+    const val SourceStockId="Source_StockID"
+    const val MotherWeightV="Mother_Weight"
+    const val SupplierNo="SupplierNo"
+    const val ThicknessV="THICKNESS"
+    const val GradeV="GRADE"
+//DropeDownValue
+     const val SelectFromPlan= "Select from plan"
+    const val  WithOutPlan="Without plan"
 
 }

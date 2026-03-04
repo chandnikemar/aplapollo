@@ -22,7 +22,8 @@ import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchData
 import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
-import com.example.aplapollo.viewmodel.printlabel.QcPrintlabelViewModel
+import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
+
 import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.aplapollo.viewmodel.qualitycheck.QCViewModel
 import com.example.aplapollo.viewmodel.qualitycheck.QcViewModelFactory
@@ -38,7 +39,7 @@ import es.dmoral.toasty.Toasty
 class QualityCheckActivity : AppCompatActivity() {
     private lateinit var binding: ActivityQualityCheckBinding
     private lateinit var qcviewModel: QCViewModel
-    private lateinit var qcPrintLabelViewModel:QcPrintlabelViewModel
+    private lateinit var qcPrintLabelViewModel: PrintlabelViewModel
     private lateinit var progress: ProgressDialog
     private lateinit var session: SessionManager
     private lateinit var tenantCode: String
@@ -82,7 +83,7 @@ class QualityCheckActivity : AppCompatActivity() {
             val viewModelProviderFactory = QcViewModelFactory(application, retrofitInstance)
             qcviewModel = ViewModelProvider(this, viewModelProviderFactory)[QCViewModel::class.java]
         val printlabelviewModelProviderFactory=QcprintlabelViewModelFactory(application,retrofitInstance)
-        qcPrintLabelViewModel =ViewModelProvider(this,printlabelviewModelProviderFactory)[QcPrintlabelViewModel::class.java]
+        qcPrintLabelViewModel =ViewModelProvider(this,printlabelviewModelProviderFactory)[PrintlabelViewModel::class.java]
         session = SessionManager(this)
         userDetail = session.getUserDetails()
         if (userDetail!!.isEmpty()) {
@@ -227,7 +228,7 @@ class QualityCheckActivity : AppCompatActivity() {
                 is Resource.Error -> {
                     hideProgressBar()
 
-                    // ❌ API error → re-enable buttons
+
                     resetApproveRejectButtons()
 
                     showErrorMessage(response.message ?: "Unknown Error")
@@ -619,11 +620,6 @@ binding.commanInputRow.btnClear.setOnClickListener {
 
     }
 
-    private fun hideAllButtons() {
-        binding.btnReprint.visibility = View.GONE
-        binding.buttonPrintLabel.visibility = View.GONE
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setQCDataToUI(data: QCFetchData?) {
@@ -674,19 +670,14 @@ binding.commanInputRow.btnClear.setOnClickListener {
 
         if (event.action == android.view.KeyEvent.ACTION_DOWN) {
             val now = System.currentTimeMillis()
-
-
             if (now - lastKeyTime > SCAN_TIMEOUT) {
                 scanBuffer.clear()
             }
             lastKeyTime = now
-
             val char = event.unicodeChar.toChar()
             if (char.code > 0) {
                 scanBuffer.append(char)
             }
-
-            // Scanner usually sends ENTER at end
             if (event.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
                 val scannedCode = scanBuffer.toString().trim()
                 scanBuffer.clear()
@@ -703,15 +694,9 @@ binding.commanInputRow.btnClear.setOnClickListener {
     private fun handleScannedCoil(coilNumber: String) {
 
         Log.d("QC_SCANNER", "Scanned = $coilNumber")
-
-        // ✅ CLEAR OLD DATA FIRST
         clearPreviousQCData()
-
-        // ✅ THEN show scanned value
         binding.commanInputRow.inputField.setText(coilNumber)
         Log.d("QC_INPUT", "Input text = ${binding.commanInputRow.inputField.text}")
-
-
         val request = QCFetchRequest(
             RequestId = "1",
             coilBatchNumber = coilNumber

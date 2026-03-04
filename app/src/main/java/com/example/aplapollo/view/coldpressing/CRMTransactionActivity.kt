@@ -3,13 +3,17 @@ package com.example.aplapollo.view.coldpressing
 import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.ChildMotherExceedError
+import com.example.aplapollo.helper.Constants.CompleteStatus
+import com.example.aplapollo.helper.Constants.CrmTranJob
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.LocationName
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
@@ -17,8 +21,11 @@ import com.example.aplapollo.helper.WeightResult
 import com.example.aplapollo.helper.WeightValidationUtils
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.model.CRM.CRMTransactionResponse
+import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.viewmodel.crm.CRMViewModel
 import com.example.aplapollo.viewmodel.crm.CRMViewModelfactory
+import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
+import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityCrmtransactionBinding
 import es.dmoral.toasty.Toasty
@@ -27,6 +34,7 @@ class CRMTransactionActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCrmtransactionBinding
     private lateinit var progress: ProgressDialog
     private  lateinit var crmViewModel: CRMViewModel
+    private lateinit var printlabelViewModel: PrintlabelViewModel
     private lateinit var session: SessionManager
     private var baseUrl: String = ""
     private var userName: String? = ""
@@ -62,37 +70,32 @@ private var sourceStockId:Int=0
 
         val viewModelProviderFactory = CRMViewModelfactory(application, retrofitInstance)
         crmViewModel = ViewModelProvider(this, viewModelProviderFactory)[CRMViewModel::class.java]
+        val viewModelProviderFactorys = QcprintlabelViewModelFactory(application, retrofitInstance)
+        printlabelViewModel =
+            ViewModelProvider(this, viewModelProviderFactorys)[PrintlabelViewModel::class.java]
         session = SessionManager(this)
         userDetail = session.getUserDetails()
-        locationId = intent.getIntExtra("LOCATION_ID", 0)
-        locationName = intent.getStringExtra("LOCATION_NAME") ?: ""
-        tranId=intent.getIntExtra("CRM_TRAN_JOB",0)
-        Log.d("RECEIVED_LOCATION", "Id=$locationId Name=$locationName")
+//        locationId = intent.getIntExtra("LOCATION_ID", 0)
+//        tranId=intent.getIntExtra("CRM_TRAN_JOB",0)
+//        Log.d("RECEIVED_LOCATION", "Id=$locationId Name=$locationName")
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
         if (userDetail!!.isEmpty()) {
             Toasty.error(this, "User details are missing.", Toasty.LENGTH_SHORT).show()
         } else {
-
             token = userDetail!!["jwtToken"].toString()
             userName = userDetail!!["userName"].toString()
             tenantCode= userDetail!![SessionManager.Key_tenantCode].toString()
-
             serverIpSharedPrefText = userDetail!![Constants.KEY_SERVER_IP].toString()
             serverHttpPrefText = userDetail!![Constants.KEY_HTTP].toString()
-
             baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
-
-
-
-
-
             // ⭐ PRINT TOKEN HERE
-            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
-            Log.d("Tanent_Code","Tenant Code= $tenantCode")
-            tranId = intent.getIntExtra("CRM_TRAN_JOB", 0)
-            locationId = intent.getIntExtra("LOCATION_ID", 0)
+//            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
+//            Log.d("Tanent_Code","Tenant Code= $tenantCode")
+            tranId = intent.getIntExtra(CrmTranJob, 0)
+            locationId = intent.getIntExtra(LocationId, 0)
+            locationName = intent.getStringExtra(LocationName) ?: ""
             // Disable until API loads
             binding.jobTable.editC4.isEnabled = false
             binding.layoutScrapTable.etScrapWeight.isEnabled = false
@@ -118,6 +121,7 @@ private var sourceStockId:Int=0
 
                         bindTransactionData(transaction)
                         binding.btnSave.isEnabled = true
+
 
                     }
                     is Resource.Error -> {
@@ -148,7 +152,16 @@ private var sourceStockId:Int=0
                         response?.responseMessage ?: "CRM initiated",
                         Toasty.LENGTH_SHORT
                     ).show()
+                    val printRequestList = listOf(
+                        PrintLabelBarcodeRequest(
+                            barcode = barcode,
+                            locationId = locationId,
+                            createdDate = Utils.getCurrentDateTimeISO(),
+                            createdBy = userName ?: ""
+                        )
+                    )
 
+                    printlabelViewModel.printLabelBarcode(printRequestList)
 //                    Log.d("SLITTING_INIT", "TranId=$tranId JobNo=$jobNo")
                     finish()
                 }
@@ -165,6 +178,26 @@ private var sourceStockId:Int=0
                 else -> {}
             }
         }
+        printlabelViewModel.barcodePrintLabelMutableLiveData.observe(this){ resource->
+            when (resource) {
+                is Resource.Loading -> {
+                    progress.show()
+                }
+
+                is Resource.Success -> {
+                    progress.dismiss()
+
+                    finish()
+                }
+
+                is Resource.Error -> {
+                    progress.dismiss()
+
+                }
+
+                else -> {}
+            }}
+
         // Listen to Scrap Weight
 
         binding.btnSave.setOnClickListener { submitCRM() }
@@ -175,12 +208,9 @@ private var sourceStockId:Int=0
         binding.textJobNumber.text = "Job #${transaction.jobNumber}"
         binding.tvMotherCoil.setText(transaction.motherBarcode)
         binding.tvBatchNumber.setText(transaction.motherCoilWeight.toString())
-
         binding.jobTable.textC2?.setText(transaction.barcode)
-
         barcode = transaction.barcode ?: ""
-
-        // ✅ IMPORTANT
+        //  IMPORTANT
         motherWeight = transaction.motherCoilWeight ?: 0.0
 
         tranId = transaction.crmTranId
@@ -188,14 +218,9 @@ private var sourceStockId:Int=0
         tenantCode = transaction.tenantCode
         sourceStockId = transaction.sourceStockId
         jobNumber = transaction.jobNumber
-
-
-        // ✅ Enable inputs after load
         binding.jobTable.editC4.isEnabled = true
         binding.layoutScrapTable.etScrapWeight.isEnabled = true
 
-
-        // ✅ Recalculate after data load
         calculateAndShowIronLoss()
     }
     private val weightWatcher = object : android.text.TextWatcher {
@@ -232,7 +257,7 @@ private var sourceStockId:Int=0
             if (!isWeightErrorShown) {
                 Toasty.error(
                     this,
-                    "Child + Scrap weight cannot exceed Mother weight"
+                    ChildMotherExceedError
                 ).show()
 
                 isWeightErrorShown = true
@@ -247,7 +272,7 @@ private var sourceStockId:Int=0
         isWeightErrorShown = false
 
 
-        // ✅ Calculate remaining (Iron Loss)
+        //  Calculate remaining (Iron Loss)
         val ironLoss = motherWeight - totalUsedWeight
 
         binding.layoutScrapTable.tvIronLossValue?.setText(
@@ -307,7 +332,7 @@ private var sourceStockId:Int=0
             completedBy = userName ?: "",
             completedDate = Utils.getCurrentDateTimeISO(),
 
-            status = "Completed",
+            status = CompleteStatus,
             remarks = "CRM Transaction",
             isPlanned = false
         )

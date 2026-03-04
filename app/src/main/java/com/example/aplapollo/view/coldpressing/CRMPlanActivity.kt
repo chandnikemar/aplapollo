@@ -19,6 +19,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.InsStockStatus
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.LocationName
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.CRM.CRMPlanResponse
@@ -72,9 +75,9 @@ private  var weight:Double=0.0
         crmViewModel = ViewModelProvider(this, viewModelProviderFactory)[CRMViewModel::class.java]
         session = SessionManager(this)
         userDetail = session.getUserDetails()
-        locationId = intent.getIntExtra("LOCATION_ID", 0)
-        locationName = intent.getStringExtra("LOCATION_NAME") ?: ""
-        Log.d("RECEIVED_LOCATION", "Id=$locationId Name=$locationName")
+        locationId = intent.getIntExtra(LocationId, 0)
+        locationName = intent.getStringExtra(LocationName) ?: ""
+//        Log.d("RECEIVED_LOCATION", "Id=$locationId Name=$locationName")
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -347,7 +350,7 @@ private  var weight:Double=0.0
                 grade = plan.grade ?: "",
                 width = plan.width ?: 0.0,
                 thickness = plan.thickness ?: 0.0,
-                Status= Constants.CRMPlannedSTATUS
+                Status= InsStockStatus
             )
             slittingViewModel.getAllItemAgainstPlan( request)
 

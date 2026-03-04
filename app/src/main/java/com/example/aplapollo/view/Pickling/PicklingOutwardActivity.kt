@@ -3,7 +3,6 @@ package com.example.aplapollo.view.Pickling
 import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +10,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.ChildMotherExceedError
+import com.example.aplapollo.helper.Constants.CompleteStatus
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.PicklingId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils.getCurrentDateTimeISO
@@ -18,8 +21,11 @@ import com.example.aplapollo.helper.WeightResult
 import com.example.aplapollo.helper.WeightValidationUtils
 import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
+import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModel
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModelfactory
+import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
+import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityPicklingOutwardBinding
 import es.dmoral.toasty.Toasty
@@ -30,6 +36,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
     private lateinit var progress: ProgressDialog
     private lateinit var session: SessionManager
     private lateinit var picklingViewModel: PicklingViewModel
+    private lateinit var printlabelViewModel: PrintlabelViewModel
 
     private var baseUrl: String = ""
     private var userName: String? = ""
@@ -51,7 +58,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_outward)
-        binding.idLayoutHeader.tvTitle.text = "Hr Pickling Onward"
+        binding.idLayoutHeader.tvTitle.text = "HR Pickling Output"
         supportActionBar?.hide()
 
         progress = ProgressDialog(this).apply { setMessage("Please Wait...") }
@@ -62,6 +69,10 @@ class PicklingOutwardActivity : AppCompatActivity() {
         val retrofitInstance = RetrofitInstance.getInstance(applicationContext)
         val factory = PicklingViewModelfactory(application, retrofitInstance)
         picklingViewModel = ViewModelProvider(this, factory)[PicklingViewModel::class.java]
+        val viewModelProviderFactorys = QcprintlabelViewModelFactory(application, retrofitInstance)
+        printlabelViewModel =
+            ViewModelProvider(this, viewModelProviderFactorys)[PrintlabelViewModel::class.java]
+
 
         // Back button
         binding.idLayoutHeader.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
@@ -78,13 +89,13 @@ class PicklingOutwardActivity : AppCompatActivity() {
             serverHttpPrefText = userDetail!![Constants.KEY_HTTP] as? String
             baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
 
-            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
-            Log.d("Tenant_Code", "Tenant Code = $tenantCode")
+//            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
+//            Log.d("Tenant_Code", "Tenant Code = $tenantCode")
         }
 
         // Get Intent extras safely
-        transactionId = intent.getIntExtra("PICKLING_ID", 0)
-        locationId = intent.getIntExtra("LOCATION_ID", 0)
+        transactionId = intent.getIntExtra(PicklingId, 0)
+        locationId = intent.getIntExtra(LocationId, 0)
 
         if (transactionId == 0) {
             Toasty.error(this, "Invalid Transaction ID").show()
@@ -131,6 +142,16 @@ class PicklingOutwardActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     dismissProgress()
                     Toast.makeText(this, result.data, Toast.LENGTH_LONG).show()
+                    val printRequestList = listOf(
+                        PrintLabelBarcodeRequest(
+                            barcode = barcode,
+                            locationId = locationId,
+                            createdDate = getCurrentDateTimeISO(),
+                            createdBy = userName ?: ""
+                        )
+                    )
+
+                    printlabelViewModel.printLabelBarcode(printRequestList)
                     finish()
                 }
                 is Resource.Error -> {
@@ -139,6 +160,25 @@ class PicklingOutwardActivity : AppCompatActivity() {
                 }
             }
         }
+        printlabelViewModel.barcodePrintLabelMutableLiveData.observe(this){ resource->
+            when (resource) {
+                is Resource.Loading -> {
+                    progress.show()
+                }
+
+                is Resource.Success -> {
+                    progress.dismiss()
+
+                    finish()
+                }
+
+                is Resource.Error -> {
+                    progress.dismiss()
+
+                }
+
+                else -> {}
+            }}
 
 
 //        binding.layoutScrapTable.etScrapWeight.addTextChangedListener(object : android.text.TextWatcher {
@@ -156,7 +196,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
         binding.textJobNumber.text = "Job #${transaction.jobNumber}"
         binding.tvMotherCoil.setText(transaction.motherBarcode)
         binding.tvBatchNumber.setText(transaction.motherCoilWeight.toString())
-        binding.jobTable.textC2?.setText(transaction.barcode)
+        binding.jobTable.textC2.setText(transaction.barcode)
 
         barcode = transaction.barcode ?: ""
         motherWeight = transaction.motherCoilWeight ?: 0.0
@@ -182,7 +222,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
 
         // Wait until API loads
         if (motherWeight <= 0) {
-            binding.layoutScrapTable.tvIronLossValue?.setText("0.00")
+            binding.layoutScrapTable.tvIronLossValue.setText("0.00")
             return
         }
 
@@ -201,13 +241,13 @@ class PicklingOutwardActivity : AppCompatActivity() {
             if (!isWeightErrorShown) {
                 Toasty.error(
                     this,
-                    "Child + Scrap weight cannot exceed Mother weight"
+                    ChildMotherExceedError
                 ).show()
 
                 isWeightErrorShown = true
             }
 
-            binding.layoutScrapTable.tvIronLossValue?.setText("0.00")
+            binding.layoutScrapTable.tvIronLossValue.setText("0.00")
             binding.btnSave.isEnabled = false
             return
         }
@@ -216,10 +256,10 @@ class PicklingOutwardActivity : AppCompatActivity() {
         isWeightErrorShown = false
 
 
-        // ✅ Calculate remaining (Iron Loss)
+        // Calculate remaining (Iron Loss)
         val ironLoss = motherWeight - totalUsedWeight
 
-        binding.layoutScrapTable.tvIronLossValue?.setText(
+        binding.layoutScrapTable.tvIronLossValue.setText(
             String.format("%.2f", ironLoss)
         )
 
@@ -252,12 +292,7 @@ class PicklingOutwardActivity : AppCompatActivity() {
         val ironLoss = (result as WeightResult.Success).ironLoss
 
 
-
-
-
-
-
-        val calculatedIronLoss = motherWeight - (enteredWeight + scrapWeight)
+//        val calculatedIronLoss = motherWeight - (enteredWeight + scrapWeight)
 
 
         val request = ProcessPicklingRequest(
@@ -272,12 +307,12 @@ class PicklingOutwardActivity : AppCompatActivity() {
             weightAfterPickling = enteredWeight,
             completedBy = userName ?: "",
             completedDate = getCurrentDateTimeISO(),
-            status = "Completed",
-            remarks = "Pickling Completed",
+            status = CompleteStatus,
+            remarks = "Pickling Transaction",
             isDivided = false
         )
 
-        Log.d("PICKLING_POST", "Request Body = $request")
+//        Log.d("PICKLING_POST", "Request Body = $request")
         picklingViewModel.submitPickling(request)
     }
 

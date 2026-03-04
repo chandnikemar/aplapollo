@@ -11,6 +11,7 @@ import com.example.aplapollo.model.LocationResponse
 import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
 import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
+import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchResponse
@@ -235,5 +236,13 @@ suspend fun getHrSlittingDetailsById(
         retrofitInstance
             .serviceApi()
             .initiateCRMWithoutPlan(request)
+
+    suspend fun printLabelBarcode(
+        request: List<PrintLabelBarcodeRequest>
+    ): Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .printLabelBarcode(request)
+
 
 }

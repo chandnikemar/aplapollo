@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.Utils
+import com.example.aplapollo.model.ApiCommonResponse
+import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.PrintZplResponse
 
@@ -15,7 +17,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Response
 
-class QcPrintlabelViewModel(
+class PrintlabelViewModel(
     application: Application,
     private val aplRepository: APLRepository
 ) : AndroidViewModel(application) {
@@ -23,6 +25,8 @@ class QcPrintlabelViewModel(
     val qcPrintMutableLiveData: MutableLiveData<Resource<PrintZplResponse>> =
         MutableLiveData()
 
+    val barcodePrintLabelMutableLiveData: MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
     fun printQcLabel(
 
 
@@ -32,10 +36,13 @@ class QcPrintlabelViewModel(
             safeApiCallQcPrintLabel(  request)
         }
     }
+    fun printLabelBarcode(request: List<PrintLabelBarcodeRequest>) {
+        viewModelScope.launch {
+            safeApiCallBarcodePrintLabel(request)
+        }
+    }
 
     private suspend fun safeApiCallQcPrintLabel(
-
-
         request: PrintLabelRequest
     ) {
         qcPrintMutableLiveData.postValue(Resource.Loading())
@@ -43,7 +50,7 @@ class QcPrintlabelViewModel(
         try {
             if (Utils.hasInternetConnection(getApplication())) {
                 val response =
-                    aplRepository.printLabelQC(  request)
+                    aplRepository.printLabelQC(request)
 
                 qcPrintMutableLiveData.postValue(
                     handleQcPrintLabelResponse(response)
@@ -66,7 +73,6 @@ class QcPrintlabelViewModel(
             }
         }
     }
-
     private fun handleQcPrintLabelResponse(
         response: Response<PrintZplResponse>
     ): Resource<PrintZplResponse> {
@@ -87,4 +93,59 @@ class QcPrintlabelViewModel(
 
         return Resource.Error(errorMessage)
     }
+
+//------------------------------------------Barcode Printlabel----------------
+private suspend fun safeApiCallBarcodePrintLabel(
+    request: List<PrintLabelBarcodeRequest>
+) {
+    barcodePrintLabelMutableLiveData.postValue(Resource.Loading())
+
+    try {
+        if (Utils.hasInternetConnection(getApplication())) {
+
+            val response = aplRepository.printLabelBarcode(request)
+
+            barcodePrintLabelMutableLiveData.postValue(
+                handleBarcodePrintLabelResponse(response)
+            )
+
+        } else {
+            barcodePrintLabelMutableLiveData.postValue(
+                Resource.Error(Constants.NO_INTERNET)
+            )
+        }
+
+    } catch (e: Exception) {
+        barcodePrintLabelMutableLiveData.postValue(
+            Resource.Error(e.message ?: "Network error")
+        )
+    }
+}
+
+    private fun handleBarcodePrintLabelResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        if (response.isSuccessful) {
+            response.body()?.let { body ->
+
+                if (body.statusCode == 200) {
+                    return Resource.Success(body)
+                } else {
+                    return Resource.Error(body.errorMessage ?: "Print failed")
+                }
+            }
+        }
+        return try {
+            val errorJson = response.errorBody()?.string()
+            val errorObject = JSONObject(errorJson ?: "")
+            val message = errorObject.optString("errorMessage", "Print failed")
+            Resource.Error(message)
+        } catch (e: Exception) {
+            Resource.Error("Something went wrong")
+        }
+    }
+
+
+
 }

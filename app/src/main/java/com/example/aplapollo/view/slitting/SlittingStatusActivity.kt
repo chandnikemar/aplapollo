@@ -3,7 +3,6 @@ package com.example.aplapollo.view.slitting
 import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -13,11 +12,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aplapollo.adapter.Slitting.SlittingStatusAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.BarcodeValue
+import com.example.aplapollo.helper.Constants.ChildMotherExceedError
+import com.example.aplapollo.helper.Constants.CompleteStatus
+import com.example.aplapollo.helper.Constants.EnterScrapWeight
+import com.example.aplapollo.helper.Constants.HrSlittingId
+import com.example.aplapollo.helper.Constants.InvalidIronLoss
+import com.example.aplapollo.helper.Constants.JobId
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.MotherWeightV
+import com.example.aplapollo.helper.Constants.SelectCoil
+import com.example.aplapollo.helper.Constants.SourceStockId
+import com.example.aplapollo.helper.Constants.ValidChildWeightError
+import com.example.aplapollo.helper.Constants.WeightExceed
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils.getCurrentDateTimeISO
+import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.model.Slitting.HrSlittingTransactionDetails
 import com.example.aplapollo.model.Slitting.HrSlittingTransactionRequest
+import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
+import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.aplapollo.viewmodel.slittingstatus.SlittingStatusViewModel
 import com.example.aplapollo.viewmodel.slittingstatus.SlittingStatusViewModelfactory
 import com.example.apolloapl.R
@@ -28,6 +43,7 @@ class SlittingStatusActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySlittingStatusBinding
     private lateinit var progress: ProgressDialog
     private lateinit var slittingStatusViewModel: SlittingStatusViewModel
+    private lateinit var printlabelViewModel: PrintlabelViewModel
     private lateinit var session: SessionManager
     private lateinit var slittingAdapter: SlittingStatusAdapter
 
@@ -70,6 +86,11 @@ class SlittingStatusActivity : AppCompatActivity() {
         val viewModelProviderFactory = SlittingStatusViewModelfactory(application, retrofitInstance)
         slittingStatusViewModel =
             ViewModelProvider(this, viewModelProviderFactory)[SlittingStatusViewModel::class.java]
+        val viewModelProviderFactorys = QcprintlabelViewModelFactory(application, retrofitInstance)
+        printlabelViewModel =
+            ViewModelProvider(this, viewModelProviderFactorys)[PrintlabelViewModel::class.java]
+
+
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -85,29 +106,24 @@ class SlittingStatusActivity : AppCompatActivity() {
             serverHttpPrefText = userDetail!![Constants.KEY_HTTP].toString()
 
             baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
-
-
-            // ⭐ PRINT TOKEN HERE
-            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
-            Log.d("Tanent_Code", "Tenant Code= $tenantCode")
+//            // PRINT TOKEN HERE
+//            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
+//            Log.d("Tanent_Code", "Tenant Code= $tenantCode")
         }
-        jobId = intent.getIntExtra("JOB_ID", 0)
-        barcode = intent.getStringExtra("BARCODE") ?: ""
-        motherWeight = intent.getStringExtra("Mother_Weight")
-            ?.toDoubleOrNull() ?: 0.0
+
 
         binding.layoutScrapTable.tvIronLossValue.isEnabled = false
         supplierNo = barcode
 
-        tranPlanId = intent.getIntExtra("HrSlitting_planID", 0)
-        sourceStockId = intent.getIntExtra("Source_StockID", 0)
-        locationId = intent.getIntExtra("Location_ID", 0)
+        tranPlanId = intent.getIntExtra(HrSlittingId, 0)
+        sourceStockId = intent.getIntExtra(SourceStockId, 0)
+        locationId = intent.getIntExtra(LocationId, 0)
 
 
-        val jobId = intent.getStringExtra("JOB_ID") ?: "--"
-        val barcode = intent.getStringExtra("BARCODE") ?: "--"
+        val jobId = intent.getStringExtra(JobId) ?: "--"
+        val barcode = intent.getStringExtra(BarcodeValue) ?: "--"
 //        val supplierNo = intent.getStringExtra("SupplierNo") ?: "--"
-        motherWeight = intent.getStringExtra("Mother_Weight")
+        motherWeight = intent.getStringExtra(MotherWeightV)
             ?.toDoubleOrNull() ?: 0.0
 
 
@@ -169,12 +185,24 @@ class SlittingStatusActivity : AppCompatActivity() {
 
                 is Resource.Success -> {
                     progress.dismiss()
+                    val adapter = slittingAdapter
+                    val updatedList = adapter.getUpdatedTransactionDetails()
+                    val printRequestList = updatedList.map { item ->
+                        PrintLabelBarcodeRequest(
+                            barcode = item.barcode ?: "",
+                            locationId = locationId,
+                            createdDate = getCurrentDateTimeISO() ,
+                            createdBy =userName.toString()
+                        )
+                    }
+
+                    printlabelViewModel.printLabelBarcode(printRequestList)
                     Toasty.success(
                         this,
                         "HR Slitting completed successfully",
                         Toasty.LENGTH_SHORT
                     ).show()
-                    finish() // or navigate back
+//                    finish() // or navigate back
                 }
 
                 is Resource.Error -> {
@@ -185,8 +213,30 @@ class SlittingStatusActivity : AppCompatActivity() {
                         Toasty.LENGTH_LONG
                     ).show()
                 }
+
+                else -> {}
             }
         }
+
+        printlabelViewModel.barcodePrintLabelMutableLiveData.observe(this){ resource->
+            when (resource) {
+            is Resource.Loading -> {
+                progress.show()
+            }
+
+            is Resource.Success -> {
+                progress.dismiss()
+
+                finish()
+            }
+
+            is Resource.Error -> {
+                progress.dismiss()
+
+            }
+
+            else -> {}
+        }}
         binding.btnPrintBarcode.setOnClickListener {
 
 //            printBarcodeLabel()
@@ -207,22 +257,22 @@ class SlittingStatusActivity : AppCompatActivity() {
         val detailsList = adapter.getUpdatedTransactionDetails()
 
         if (detailsList.isEmpty()) {
-            Toasty.warning(this, "Please select at least one coil").show()
+            Toasty.warning(this, SelectCoil).show()
             return
         }
 
         if (detailsList.any { it.weighAfterSlitting ?: 0.0 <= 0 }) {
-            Toasty.error(this, "Enter valid Child Weight").show()
+            Toasty.error(this, ValidChildWeightError).show()
             return
         }
 
         if (scrapWeight <= 0) {
-            Toasty.warning(this, "Enter Scrap Weight").show()
+            Toasty.warning(this, EnterScrapWeight).show()
             return
         }
 
         if (ironLossWeight <= 0) {
-            Toasty.warning(this, "Invalid Iron Loss").show()
+            Toasty.warning(this, InvalidIronLoss).show()
             return
         }
 
@@ -231,12 +281,12 @@ class SlittingStatusActivity : AppCompatActivity() {
 
         if (totalChildWeight + scrapWeight > motherWeight) {
 
-            Toasty.error(this, "Weight exceeds Mother Coil").show()
+            Toasty.error(this, WeightExceed).show()
             return
         }
 
 
-        // ✅ Convert to API Model
+        //  Convert to API Model
         val apiDetailsList = detailsList.map { item ->
 
             HrSlittingTransactionDetails(
@@ -252,7 +302,7 @@ class SlittingStatusActivity : AppCompatActivity() {
                 weightLocationId = locationId,
                 weightDatetime = getCurrentDateTimeISO(),
 
-                status = "Completed",
+                status = CompleteStatus,
                 isActive = true,
 
                 createdBy = userName ?: "",
@@ -282,8 +332,8 @@ class SlittingStatusActivity : AppCompatActivity() {
             scrapWeight = scrapWeight,
             completedBy = userName,
             completedDate = getCurrentDateTimeISO(),
-            status = "Completed",
-            remarks = "Completed from app",
+            status = CompleteStatus,
+            remarks = "Completed Slitting",
             totalRecord = apiDetailsList.size,
             hrSlittingTransactionDetail = apiDetailsList
         )
@@ -314,7 +364,7 @@ class SlittingStatusActivity : AppCompatActivity() {
             if (!isWeightErrorShown) {
                 Toasty.error(
                     this,
-                    "Total weight exceeds Mother Coil Weight"
+                    ChildMotherExceedError
                 ).show()
 
                 isWeightErrorShown = true
@@ -329,7 +379,7 @@ class SlittingStatusActivity : AppCompatActivity() {
         }
 
 
-        // ✅ Calculate Iron Loss
+        //  Calculate Iron Loss
         val calculatedIronLoss =
             motherWeight - (totalChildWeight + scrapWeightInput)
 
@@ -341,7 +391,7 @@ class SlittingStatusActivity : AppCompatActivity() {
         scrapWeight = scrapWeightInput
 
 
-        // ✅ Show Iron Loss
+        //  Show Iron Loss
         binding.layoutScrapTable.tvIronLossValue.setText(
             String.format("%.2f", ironLoss)
         )

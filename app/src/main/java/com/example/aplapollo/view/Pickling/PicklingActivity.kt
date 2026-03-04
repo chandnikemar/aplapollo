@@ -13,6 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aplapollo.adapter.Pickling.OngoingJobPicklingAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.BarcodeValue
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.LocationName
+import com.example.aplapollo.helper.Constants.PicklingId
+import com.example.aplapollo.helper.Constants.WidthId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.LocationPaginationRequest
@@ -102,11 +107,11 @@ class PicklingActivity : AppCompatActivity() {
             }
 
             val intent = Intent(this, PicklingOutwardActivity::class.java)
-            intent.putExtra("LOCATION_ID", selectedLocationId!!)
-            intent.putExtra("LOCATION_NAME", selectedLocationName ?: "")
-            intent.putExtra("PICKLING_ID", selectedJob.picklingTranId)
-            intent.putExtra("BARCODE", selectedJob.barcode)
-            intent.putExtra("WIDTH", selectedJob.width)
+            intent.putExtra(LocationId, selectedLocationId!!)
+            intent.putExtra(LocationName, selectedLocationName ?: "")
+            intent.putExtra(PicklingId, selectedJob.picklingTranId)
+            intent.putExtra(BarcodeValue, selectedJob.barcode)
+            intent.putExtra(WidthId, selectedJob.width)
             intent.putExtra("THICKNESS", selectedJob.thickness)
             intent.putExtra("GRADE", selectedJob.grade)
 
@@ -149,8 +154,8 @@ class PicklingActivity : AppCompatActivity() {
                     }
 
                     val intent = Intent(this, PicklingInwardActivity::class.java)
-                    intent.putExtra("LOCATION_ID", selectedLocationId!!)
-                    intent.putExtra("LOCATION_NAME", selectedLocationName ?: "")
+                    intent.putExtra(LocationId, selectedLocationId!!)
+                    intent.putExtra(LocationName, selectedLocationName ?: "")
                     startActivity(intent)
                 }
                 locationViewModel.locationListMutableLiveData.observe(this) { resource ->

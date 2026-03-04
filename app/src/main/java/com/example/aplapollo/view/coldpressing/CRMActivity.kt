@@ -15,6 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aplapollo.adapter.Coldpressing.OngoingCRMJobAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.CrmTranJob
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.LocationName
+import com.example.aplapollo.helper.Constants.SelectFromPlan
+import com.example.aplapollo.helper.Constants.SelectStationFirstError
+import com.example.aplapollo.helper.Constants.WithOutPlan
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.LocationPaginationRequest
@@ -97,8 +103,8 @@ class CRMActivity : AppCompatActivity() {
             currentPage = 1
         )
         val coilOptions = listOf(
-            "Select from plan",
-            "Without plan",
+            SelectFromPlan,
+            WithOutPlan,
             )
 
 
@@ -113,9 +119,9 @@ class CRMActivity : AppCompatActivity() {
 
             val intent = Intent(this, CRMTransactionActivity::class.java)
 
-            intent.putExtra("LOCATION_ID", selectedLocationId!!)
-            intent.putExtra("LOCATION_NAME", selectedLocationName ?: "")
-            intent.putExtra("CRM_TRAN_JOB", selectedJob.crmTranId )
+            intent.putExtra(LocationId, selectedLocationId!!)
+            intent.putExtra(LocationName, selectedLocationName ?: "")
+            intent.putExtra(CrmTranJob, selectedJob.crmTranId )
             startActivity(intent)
         }
 
@@ -171,7 +177,7 @@ class CRMActivity : AppCompatActivity() {
                         ongoingJobAdapter.updateList(emptyList())
                     } else {
                         ongoingJobAdapter.updateList(jobs)
-                        Log.d("ONGOING_JOBS", "Jobs size = ${jobs.size}")
+//                        Log.d("ONGOING_JOBS", "Jobs size = ${jobs.size}")
 
                     }
                 }
@@ -194,10 +200,10 @@ class CRMActivity : AppCompatActivity() {
                 selectedLocationId = it.locationId
                 selectedLocationName = it.locationName
                 crmViewModel.getOngoingCRMJobs(it.locationId)
-                Log.d(
-                    "STATION_SELECTED",
-                    "ID=$selectedLocationId, NAME=$selectedLocationName"
-                )
+//                Log.d(
+//                    "STATION_SELECTED",
+//                    "ID=$selectedLocationId, NAME=$selectedLocationName"
+//                )
 
             }
         }
@@ -211,23 +217,23 @@ class CRMActivity : AppCompatActivity() {
             when (position) {
                 0 -> {
                     if (selectedLocationId == null) {
-                        Toasty.warning(this, "Please select station first").show()
+                        Toasty.warning(this, SelectStationFirstError).show()
                         return@setOnItemClickListener
                     }
 
                     val intent = Intent(this, CRMPlanActivity::class.java)
-                    intent.putExtra("LOCATION_ID", selectedLocationId!!)
-                    intent.putExtra("LOCATION_NAME", selectedLocationName ?: "")
+                    intent.putExtra(LocationId, selectedLocationId!!)
+                    intent.putExtra(LocationName, selectedLocationName ?: "")
                     startActivity(intent)
                 }
                 1 -> {
                     if (selectedLocationId == null) {
-                        Toasty.warning(this, "Please select station first").show()
+                        Toasty.warning(this, SelectStationFirstError).show()
                         return@setOnItemClickListener
                     }
 
                     val intent = Intent(this, CRMPlanOutwardActivity::class.java)
-                    intent.putExtra("Location_ID", selectedLocationId!!)
+                    intent.putExtra(LocationId, selectedLocationId!!)
                     startActivity(intent)
                 }
 

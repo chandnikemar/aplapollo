@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.LocationId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
@@ -39,7 +40,7 @@ class PicklingInwardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_inward)
-        binding.idLayoutHeader.tvTitle.text = "Hr Pickling Inward"
+        binding.idLayoutHeader.tvTitle.text = "HR Pickling Input"
         supportActionBar?.hide()
         progress = ProgressDialog(this)
         progress.setMessage("Please Wait...")
@@ -71,7 +72,7 @@ class PicklingInwardActivity : AppCompatActivity() {
             Log.d("Tanent_Code","Tenant Code= $tenantCode")
         }
 
-        locationId = intent.getIntExtra("LOCATION_ID", 0)
+        locationId = intent.getIntExtra(LocationId, 0)
 
 
         binding.layoutBatchDetails.visibility = View.GONE

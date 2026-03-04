@@ -19,7 +19,9 @@
     import com.example.aplapollo.adapter.Slitting.SlittingWidthAdapter
     import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
-    import com.example.aplapollo.helper.Constants.SlittingSTATUS
+    import com.example.aplapollo.helper.Constants.InsStockStatus
+    import com.example.aplapollo.helper.Constants.LocationId
+    import com.example.aplapollo.helper.Constants.LocationName
     import com.example.aplapollo.helper.Resource
     import com.example.aplapollo.helper.SessionManager
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
@@ -73,9 +75,9 @@
             slittingWidthAdapter = SlittingWidthAdapter()
             session = SessionManager(this)
             userDetail = session.getUserDetails()
-            locationId = intent.getIntExtra("LOCATION_ID", 0)
-            locationName = intent.getStringExtra("LOCATION_NAME") ?: ""
-            Log.d("RECEIVED_LOCATION", "Id=$locationId Name=$locationName")
+            locationId = intent.getIntExtra(LocationId, 0)
+            locationName = intent.getStringExtra(LocationName) ?: ""
+//            Log.d("RECEIVED_LOCATION", "Id=$locationId Name=$locationName")
             binding.idLayoutHeader.ivBack.setOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
@@ -359,7 +361,7 @@
                     grade = plan.grade ?: "",
                     width = plan.width ?: 0.0,
                     thickness = plan.thickness ?: 0.0,
-                    Status=SlittingSTATUS
+                    Status=InsStockStatus
                 )
                 slittingViewModel.getAllItemAgainstPlan( request)
     
@@ -388,7 +390,7 @@
                 val scanRunnable = Runnable {
                     val barcode = binding.etScanCoil.text.toString().trim()
 
-                    // ✅ Validate
+
                     if (barcode.isEmpty()) return@Runnable
 
                     if (selectedPlanDetail == null) {
@@ -446,7 +448,7 @@
                     HRSlittingTranId = 0,
                     TenantCode = selectedPlan.tenantCode ?: "",
                     HRSlittingPlanId = selectedPlan.hrSlittingPlanId ,
-                    LocationId = locationId ,          // 🔁 replace if dynamic
+                    LocationId = locationId ,
                     SourceStockId = scannedStockId?:0,
                     weight = scannedWeight ?: 0.0,
                     IsActive = true,
@@ -454,21 +456,8 @@
                     IsPlanned=true,
                     Remarks = "Draft"
                 )
-                Log.d(
-                    "SLITTING_SUBMIT_REQ",
-                    """
-            InitiateSlittingRequest(
-                HRSlittingTranId=${request.HRSlittingTranId},
-                TenantCode=${request.TenantCode},
-                HRSlittingPlanId=${request.HRSlittingPlanId},
-                LocationId=${request.LocationId},
-                SourceStockId=${request.SourceStockId},
-                Status=${request.Status},
-                Remarks=${request.Remarks}
-            )
-            """.trimIndent()
-                )
-                // ✅ API CALL
+
+
                 slittingViewModel.initiateHrSlitting( request)
             }
             binding.btnClear.setOnClickListener {
@@ -479,19 +468,16 @@
         }
         private fun resetAllUI() {
 
-            // Clear scanned id
             scannedStockId = null
 
-            // Clear scan text
             binding.etScanCoil.setText("")
 
-            // Reset plan selection
+
             binding.spinnerSelectPlan.setText("-- Select Plan --", false)
 
-            // Clear selected plan
             selectedPlanDetail = null
 
-            // Hide all sections
+
             binding.layoutScanDetails.visibility = View.GONE
             binding.layoutBatchDetails.visibility = View.GONE
             binding.layoutButtons.visibility = View.GONE
@@ -499,23 +485,14 @@
             binding.layoutSlittingPlan.visibility = View.GONE
             binding.layoutScanCoil.visibility = View.GONE
 
-            // Reset border color
             binding.tilScanCoil.boxStrokeColor =
                 ContextCompat.getColor(this, androidx.appcompat.R.color.material_blue_grey_900  )
-
-            // Clear adapter data
             slittingWidthAdapter.submitList(emptyList())
-
-            // Clear text fields
             binding.Tvitem.text = ""
             binding.tvGrade.text = ""
             binding.tvWidth.text = ""
             binding.tvthickness.text = ""
-
-            // Hide keyboard
             hideKeyboard()
-
-            // Focus on dropdown
             binding.spinnerSelectPlan.requestFocus()
         }
 

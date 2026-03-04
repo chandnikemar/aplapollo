@@ -13,11 +13,11 @@ private val retrofitInstance: RetrofitInstance
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(QcPrintlabelViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(PrintlabelViewModel::class.java)) {
 
             val repository = APLRepository(retrofitInstance)
 
-            return QcPrintlabelViewModel(application, repository) as T
+            return PrintlabelViewModel(application, repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

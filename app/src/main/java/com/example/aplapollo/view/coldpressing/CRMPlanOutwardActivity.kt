@@ -12,6 +12,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
+import com.example.aplapollo.helper.Constants.LocationId
+import com.example.aplapollo.helper.Constants.WithOutPlan
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
@@ -58,7 +60,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
         slittingWithoutplanvViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingWithoutplanvViewModel::class.java]
         val viewModelProviderFactorys = CRMViewModelfactory(application, retrofitInstance)
         crmViewModel = ViewModelProvider(this, viewModelProviderFactorys)[CRMViewModel::class.java]
-        binding.idLayoutHeader.tvTitle.text = "WithOut Plan "
+        binding.idLayoutHeader.tvTitle.text = WithOutPlan
         session = SessionManager(this)
         userDetail = session.getUserDetails()
         binding.idLayoutHeader.ivBack.setOnClickListener {
@@ -78,7 +80,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
             Log.d("JWT_TOKEN_QC", "JWT Token = $token")
             Log.d("Tanent_Code","Tenant Code= $tenantCode")
         }
-        locationId=intent.getIntExtra("Location_ID",0)
+        locationId=intent.getIntExtra(LocationId,0)
 
         binding.layoutBatchDetails.visibility = View.GONE
 

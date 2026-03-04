@@ -11,10 +11,10 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.helper.ZebraPrinterHelper
+import com.example.aplapollo.view.GP.GPActivity
 import com.example.aplapollo.view.Pickling.PicklingActivity
 import com.example.aplapollo.view.coldpressing.CRMActivity
 import com.example.aplapollo.view.slitting.SlittingActivity
-
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityHomeBinding
 
@@ -41,19 +41,28 @@ class HomeActivity : AppCompatActivity() {
 
         // Navigation
         binding.card1.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, QualityCheckActivity::class.java))
+            startActivity(Intent(this@HomeActivity, GateEntryActivity::class.java))
         }
         binding.card2.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, SlittingActivity::class.java))
+            startActivity(Intent(this@HomeActivity, QualityCheckActivity::class.java))
         }
         binding.card3.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, PicklingActivity ::class.java))
+            startActivity(Intent(this@HomeActivity, SlittingActivity::class.java))
         }
         binding.card4.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, CRMActivity ::class.java))
+            startActivity(Intent(this@HomeActivity, PicklingActivity ::class.java))
         }
         binding.card5.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, CRMActivity ::class.java))
+        }
+        binding.card6.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, GPActivity ::class.java))
+        }
+        binding.card7.setOnClickListener {
             startActivity(Intent(this@HomeActivity, PrinterMACAddActivity::class.java))
+        }
+        binding.card8.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, AdminActivity::class.java))
         }
         binding.idLayoutHeader.ivPrinter.setOnClickListener {
 
