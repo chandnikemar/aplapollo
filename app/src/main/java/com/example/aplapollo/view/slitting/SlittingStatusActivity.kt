@@ -202,7 +202,7 @@ class SlittingStatusActivity : AppCompatActivity() {
                         "HR Slitting completed successfully",
                         Toasty.LENGTH_SHORT
                     ).show()
-//                    finish() // or navigate back
+                   finish() // or navigate back
                 }
 
                 is Resource.Error -> {

@@ -40,6 +40,7 @@
         android:theme="@style/Base.Theme.Apolloapl"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
         <activity
             android:name="com.example.aplapollo.view.GP.GPOutwardActivity"
             android:exported="false" />

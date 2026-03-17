@@ -4,16 +4,27 @@
     <style name="Base.Theme.Apolloapl"
         parent="Theme.Material3.DayNight.NoActionBar">
 
-        <!-- Primary -->
-        <item name="colorPrimary">@color/rippleColor</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryContainer">@color/primaryLight</item>
 
-        <!-- Secondary -->
-        <item name="colorSecondary">@color/orange</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryContainer">@color/secondaryLight</item>
+
+        <item name="android:statusBarColor">@color/primaryDark</item>
+
+        <item name="android:windowBackground">@color/bgcolor</item>
+
+
+<!--        &lt;!&ndash; Primary &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/rippleColor</item>-->
+<!--        <item name="colorOnPrimary">@android:color/white</item>-->
+
+<!--        &lt;!&ndash; Secondary &ndash;&gt;-->
+<!--        <item name="colorSecondary">@color/orange</item>-->
+<!--        <item name="colorOnSecondary">@android:color/white</item>-->
 
         <!-- Background -->
-        <item name="android:windowBackground">@color/white</item>
+<!--        <item name="android:windowBackground">@color/white</item>-->
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/text_light</item>
 
@@ -41,7 +52,7 @@
         parent="Widget.Material3.Button">
 
         <item name="cornerRadius">12dp</item>
-        <item name="backgroundTint">@color/primary_light</item>
+        <item name="backgroundTint">@color/primaryLight</item>
         <item name="android:textColor">@android:color/white</item>
 
     </style>
@@ -50,7 +61,7 @@
     <style name="TextAppearance.Apollo.Headline"
         parent="TextAppearance.Material3.HeadlineSmall">
 
-        <item name="android:textColor">@color/primary_light</item>
+        <item name="android:textColor">@color/primaryLight</item>
 
     </style>
 

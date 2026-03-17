@@ -110,7 +110,7 @@
                     android:elevation="6dp"
                     android:stateListAnimator="@drawable/button_elevation"
                     app:cornerRadius="12dp"
-                    app:backgroundTint="@color/blue"
+                    app:backgroundTint="@color/primaryDark"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/textInputPassword" />

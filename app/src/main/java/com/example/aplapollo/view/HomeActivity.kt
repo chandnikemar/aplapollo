@@ -1,6 +1,7 @@
 package com.example.aplapollo.view
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -26,20 +27,47 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-
         session = SessionManager(this)
-
-        // Set username
         val username = Utils.getSharedPrefs(this, Constants.KEY_USER_NAME)
         binding.idLayoutHeader.profileTXt.text = username
-
-
         updatePrinterIndicator()
+        val summaryList = listOf(
+            SummaryItem(
+                "Gate Entry",
+                12,
+                R.drawable.ic_dashboard,
+                Color.parseColor("#3A6C97"),
+                Color.parseColor("#6EC6FF")
+            ),
+            SummaryItem(
+                "Quality Check",
+                5,
+                R.drawable.ic_dashboard,
+                Color.parseColor("#11998E"),
+                Color.parseColor("#38EF7D")
+            ),
+            SummaryItem(
+                "HR Slitting",
+                8,
+                R.drawable.ic_dashboard,
+                Color.parseColor("#FC466B"),
+                Color.parseColor("#3F5EFB")
+            ),
+            SummaryItem(
+                "Dispatch",
+                3,
+                R.drawable.ic_dashboard,
+                Color.parseColor("#F7971E"),
+                Color.parseColor("#FFD200")
 
-        // Navigation
+            )
+        )
+//        binding.rvSummary.layoutManager =
+//            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        binding.rvSummary.adapter = SummaryAdapter(summaryList)
+
+
         binding.card1.setOnClickListener {
             startActivity(Intent(this@HomeActivity, GateEntryActivity::class.java))
         }
@@ -129,3 +157,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
 }
+
+data class SummaryItem(
+    val title: String,
+    val count: Int,
+    val icon: Int,
+    val startColor: Int,
+    val endColor: Int
+)

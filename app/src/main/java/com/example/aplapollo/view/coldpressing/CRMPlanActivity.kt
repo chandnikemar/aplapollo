@@ -198,7 +198,7 @@ private  var weight:Double=0.0
 
                     val stock = resource.data?.responseObject
 
-                    // ❌ Invalid Barcode
+
                     if (stock?.stockId == null || stock.stockId == 0) {
 
                         showScanBox()
@@ -265,7 +265,6 @@ private  var weight:Double=0.0
                         return@observe
                     }
 
-                    // 🔥 Show popup with actual data from API
                     showViewStockPopup(stockList)
 
                     //                        binding.spinnerViewStock.setAdapter(stockAdapter)

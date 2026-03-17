@@ -34,7 +34,7 @@ class PicklingActivity : AppCompatActivity() {
     private lateinit var progress: ProgressDialog
     private lateinit var session: SessionManager
     private lateinit var locationViewModel: LocationViewModel
-    private  lateinit var  picklingViewModel: PicklingViewModel
+        private  lateinit var  picklingViewModel: PicklingViewModel
     private var baseUrl: String = ""
     private var userName: String? = ""
     private var token: String? = ""
@@ -45,6 +45,7 @@ class PicklingActivity : AppCompatActivity() {
     private var selectedLocationId: Int? = null
     private var selectedLocationName: String? = null
     private lateinit var ongoingJobAdapter: OngoingJobPicklingAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

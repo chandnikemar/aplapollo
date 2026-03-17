@@ -16,6 +16,17 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent" />
 
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/rvSummary"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingStart="16dp"-->
+<!--            android:clipToPadding="false"-->
+<!--            android:overScrollMode="always"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"/>-->
+
         <!-- Title -->
         <TextView
             android:id="@+id/ChooseTxt"
@@ -23,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Choose your services"
-            android:textColor="#3A6C97"
+            android:textColor="@color/primaryDark"
             android:textSize="@dimen/tv_sub_heading"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
@@ -46,7 +57,7 @@
 
                 <!-- Row 1 -->
 
-                <!-- Gate Entry -->
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card1"
                     android:layout_width="0dp"
@@ -56,6 +67,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/card2"
                     app:layout_constraintHorizontal_weight="1"
+
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
@@ -63,13 +75,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/qc" />
+                            android:src="@drawable/img_ge" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -79,6 +92,7 @@
                             android:textAlignment="center"
                             android:textAllCaps="true"
                             android:textStyle="bold"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/tv_text" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -100,13 +114,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/qc" />
+                            android:src="@drawable/img_qc" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -116,11 +131,12 @@
                             android:textAlignment="center"
                             android:textAllCaps="true"
                             android:textStyle="bold"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/tv_text" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Row 2 -->
+
 
                 <!-- HR Slitting -->
                 <com.google.android.material.card.MaterialCardView
@@ -139,13 +155,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/slitingimg" />
+                            android:src="@drawable/img_hrslitting" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -153,6 +170,7 @@
                             android:padding="8dp"
                             android:text="HR Slitting"
                             android:textAlignment="center"
+                            android:textColor="@color/white"
                             android:textAllCaps="true"
                             android:textStyle="bold"
                             android:textSize="@dimen/tv_text" />
@@ -176,13 +194,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/hrpicklingimg" />
+                            android:src="@drawable/img_pickling" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -190,13 +209,14 @@
                             android:padding="8dp"
                             android:text="HR Pickling"
                             android:textAlignment="center"
+                            android:textColor="@color/white"
                             android:textAllCaps="true"
                             android:textStyle="bold"
                             android:textSize="@dimen/tv_text" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Row 3 -->
+
 
                 <!-- Cold Pressing -->
                 <com.google.android.material.card.MaterialCardView
@@ -215,13 +235,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/coldpressing" />
+                            android:src="@drawable/img_coldpressing" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -230,6 +251,7 @@
                             android:text="Cold Pressing"
                             android:textAlignment="center"
                             android:textAllCaps="true"
+                            android:textColor="@color/white"
                             android:textStyle="bold"
                             android:textSize="@dimen/tv_text" />
                     </LinearLayout>
@@ -252,13 +274,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/qc" />
+                            android:src="@drawable/img_gp" />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -267,6 +290,7 @@
                             android:text="GP"
                             android:textAlignment="center"
                             android:textAllCaps="true"
+                            android:textColor="@color/white"
                             android:textStyle="bold"
                             android:textSize="@dimen/tv_text" />
                     </LinearLayout>
@@ -291,19 +315,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/admin" />
+                            android:src="@drawable/img_admin" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="8dp"
                             android:text="Admin"
+                            android:textColor="@color/white"
                             android:textAlignment="center"
                             android:textAllCaps="true"
                             android:textStyle="bold"
@@ -328,19 +354,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="@color/secondaryColor">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="120dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/printer_setting" />
+                            android:src="@drawable/img_printer" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="8dp"
                             android:text="Print"
+                            android:textColor="@color/white"
                             android:textAlignment="center"
                             android:textAllCaps="true"
                             android:textStyle="bold"

@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="secondaryColor">#004f8c</color>
+    <!-- Brand Colors -->
+    <color name="primaryColor">#1DB5CA</color>
+    <color name="primaryDark">#1493A4</color>
+    <color name="primaryLight">#7AD7E4</color>
+
+    <color name="secondaryColor">#F8A931</color>
+    <color name="secondaryDark">#E28F0E</color>
+    <color name="secondaryLight">#FFD18A</color>
+<!--    <color name="secondaryColor">#004f8c</color>-->
     <color name="secondaryLightColor">#5ea9f0</color>
-    <color name="primaryColor">#1976D2</color>
+<!--    <color name="primaryColor">#1976D2</color>-->
     <color name="primaryDarkColor">#0D47A1</color>
     <color name="accentColor">#FFC107</color>
 

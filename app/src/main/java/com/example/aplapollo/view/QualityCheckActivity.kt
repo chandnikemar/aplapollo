@@ -100,11 +100,11 @@ class QualityCheckActivity : AppCompatActivity() {
 
             baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
 
-            Log.d("SESSION_DEBUG", "User Details = $userDetail")
-
-            // ⭐ PRINT TOKEN HERE
-            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
-            Log.d("Tanent_Code","Tenant Code= $tenantCode")
+//            Log.d("SESSION_DEBUG", "User Details = $userDetail")
+//
+//            // ⭐ PRINT TOKEN HERE
+//            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
+//            Log.d("Tanent_Code","Tenant Code= $tenantCode")
         }
         window.setSoftInputMode(
             android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN

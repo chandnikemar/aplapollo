@@ -125,6 +125,11 @@ object Constants {
     const val POST_CRMWithout_Plan="CRM/initiateCRMWithoutPlan"
     const val GET_PrintLabel= "PrintPRNDetails/printLabel"
 
+    //Gate Entry
+    const val ADD_Supplier="GateTransaction/addSuppilerItems"
+    const val GATE_Transaction="GateTransaction/gateTransactionEntry"
+
+
     //change password
     const val CHANGE_PASSWORD = "UserManagement/change-password"
 

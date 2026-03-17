@@ -1,5 +1,7 @@
     package com.example.aplapollo.api
 
+    import com.example.aplapollo.helper.Constants.ADD_Supplier
+    import com.example.aplapollo.helper.Constants.GATE_Transaction
     import com.example.aplapollo.helper.Constants.GET_CRM_BY_Id
     import com.example.aplapollo.helper.Constants.GET_CRM_PlanID
     import com.example.aplapollo.helper.Constants.GET_CRM_PlannedList
@@ -32,6 +34,9 @@
     import com.example.aplapollo.model.CRM.CRMTransactionRequest
     import com.example.aplapollo.model.CRM.CRMTransactionResponse
     import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
+    import com.example.aplapollo.model.GateEntry.CoilSubmitRequest
+    import com.example.aplapollo.model.GateEntry.GateTransactionRequest
+    import com.example.aplapollo.model.GateEntry.GateTransactionResponse
     import com.example.aplapollo.model.LocationPaginationRequest
     import com.example.aplapollo.model.LocationResponse
     import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -195,4 +200,14 @@
         suspend fun printLabelBarcode(
             @Body request:List<PrintLabelBarcodeRequest>
         ): Response<ApiCommonResponse>
+
+        @POST(GATE_Transaction)
+        suspend fun gateTransactionEntry(
+            @Body request: GateTransactionRequest
+        ): Response<GateTransactionResponse>
+        @POST(ADD_Supplier)
+        suspend fun saveGateTransactionItem(
+            @Body request: CoilSubmitRequest
+        ): Response<ApiCommonResponse>
+
     }

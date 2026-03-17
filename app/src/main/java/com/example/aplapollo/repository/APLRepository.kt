@@ -6,6 +6,9 @@ import com.example.aplapollo.model.CRM.CRMPlanResponse
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.model.CRM.CRMTransactionResponse
 import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
+import com.example.aplapollo.model.GateEntry.CoilSubmitRequest
+import com.example.aplapollo.model.GateEntry.GateTransactionRequest
+import com.example.aplapollo.model.GateEntry.GateTransactionResponse
 import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.model.LocationResponse
 import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -243,6 +246,18 @@ suspend fun getHrSlittingDetailsById(
         retrofitInstance
             .serviceApi()
             .printLabelBarcode(request)
+
+    suspend fun gateTransactionEntry(
+        request: GateTransactionRequest
+    ): Response<GateTransactionResponse> =
+        retrofitInstance.serviceApi().gateTransactionEntry(request)
+
+    suspend fun saveGateTransactionItem(
+        request: CoilSubmitRequest
+    ): Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .saveGateTransactionItem(request)
 
 
 }
