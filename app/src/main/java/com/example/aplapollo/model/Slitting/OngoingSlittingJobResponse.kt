@@ -15,7 +15,7 @@ data class OngoingSlittingJobResponse(
     val status: String?,
     val isActive: Boolean?,
     val remarks: String?,
-    val stockTransaction: StockTransaction?
+    val stockTransaction: StockTransaction
 )
 data class StockTransaction(
     val stockId: Int,
@@ -30,7 +30,7 @@ data class StockTransaction(
     val parentStockId: Int?,
     val grade: String?,
     val barcode: String?,
-        val weight: Double?,
+    val weight: Double?,
     val thickness: Double?,
     val length: Double?,
     val width: Double?,

@@ -46,6 +46,7 @@
         private  var userDetail: HashMap<String, Any?>?=null
         private var serverIpSharedPrefText: String? = null
         private var serverHttpPrefText: String? = null
+
         private lateinit var planAdapter: ArrayAdapter<String>
         private var planList = listOf<HrSlittingPlanResponse>()
         private lateinit var slittingWidthAdapter: SlittingWidthAdapter

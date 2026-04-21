@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="6dp"
+    android:weightSum="10">
+
+    <!-- FG Label -->
+    <TextView
+        android:id="@+id/tvFgLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FG 1"
+        android:textStyle="bold"
+        android:textColor="@color/primaryDark"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- Material -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:hint="Material">
+
+        <AutoCompleteTextView
+            android:id="@+id/tvMaterial"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none"
+            android:textColor="@color/black"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <!-- Weight -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="Weight">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tvWeight"
+            android:enabled="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/black"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

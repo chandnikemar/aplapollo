@@ -5,6 +5,7 @@
     import android.util.Log
     import android.view.View
     import android.widget.EditText
+    import android.widget.ImageButton
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.widget.addTextChangedListener
     import androidx.databinding.DataBindingUtil
@@ -23,7 +24,7 @@
     import com.example.apolloapl.databinding.ActivitySlittingplan3Binding
     import es.dmoral.toasty.Toasty
 
-    class Slittingplan3Activity<ImageButton : View?> : AppCompatActivity() {
+    class Slittingplan3Activity : AppCompatActivity() {
         private lateinit var binding: ActivitySlittingplan3Binding
         private lateinit var slittingWithoutplanvViewModel: SlittingWithoutplanvViewModel
         private lateinit var progress: ProgressDialog
@@ -31,7 +32,7 @@
         private var baseUrl: String = ""
         private var userName: String? = ""
         private var token: String? = ""
-//        private  var tenantCode:String?=""
+//       private  var tenantCode:String?=""
         private  var userDetail: HashMap<String, Any?>?=null
         private var serverIpSharedPrefText: String? = null
         private var serverHttpPrefText: String? = null
@@ -41,7 +42,7 @@
         private  var tenantCode:String?=null
         private var transactionId:Int=0
         private var maxAllowedWidth: Double = 0.0
-
+         private val MaterialCode: String? = null
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = DataBindingUtil.setContentView(this,R.layout.activity_slittingplan3)
@@ -193,6 +194,7 @@
 
 
             binding.btncSaves.setOnClickListener {
+
                 if (sourceStockId == 0) {
                     Toasty.warning(this, "Please scan coil first").show()
                     return@setOnClickListener
@@ -236,19 +238,16 @@
                     HRSlittingPlanId = 0,
                     LocationId = locationId,
                     SourceStockId = sourceStockId,
-                    JobNumber = null,
+
                     Barcode = scannedBarcode,
-                    Weight = null,
-                    IronLossWeight = null,
-                    ScrapWeight = null,
+
                     CompletedBy = "",
                     CompletedDate = "",
                     Status = "",
-                    IsActive = true,
+
                     Remarks = "Slitting without plan",
-                    IsPlanned=false,
-                    hrSlittingTransactionDetail =
-                    buildTransactionDetails(0)
+
+                    hrSlittingTransactionDetail = buildTransactionDetails(transactionId)
                 )
 
                 slittingWithoutplanvViewModel
@@ -405,22 +404,19 @@
         ): List<HRSlittingTransactionDetailRequest> {
 
             val details = mutableListOf<HRSlittingTransactionDetailRequest>()
-
-            val weights = getAllWeights()   // ← you already have this method
+            val weights = getAllWeights()
 
             weights.forEach { weightStr ->
 
                 if (weightStr.isNotBlank()) {
+
                     details.add(
                         HRSlittingTransactionDetailRequest(
                             HRSlittingTranDtlId = 0,
-                            HRSlittingTranId = 0,
+                            HRSlittingTranId = hrSlittingTranId,
                             Width = weightStr.toDouble(),
-                            Barcode = null,
-                            WeighAfterSlitting = null,
-                            WeightTakenBy = null,
-                            WeightLocationId = 0,
-                            WeightDatetime = null,
+
+                            WeightLocationId = locationId,
 
                             IsActive = true,
                             Status = "InProgress"

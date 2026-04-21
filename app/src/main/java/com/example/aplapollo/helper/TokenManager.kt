@@ -42,7 +42,11 @@ object TokenManager {
             val refreshToken = prefs.getString(Constants.KEY_Refresh_Token, null)
             val baseUrl =prefs.getString(Constants.BASE_URL, null).toString()
 
-            val newToken = refreshAccessToken(refreshToken, baseUrl+"/api/")
+            fun getBaseUrl(): String {
+                val prefs = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
+                return prefs.getString(Constants.BASE_URL, "") ?: ""
+            }
+            val newToken = refreshAccessToken(refreshToken, getBaseUrl() + "Tgs/api/")
 
             return if (newToken != null) {
                 prefs.edit().putString(Constants.KEY_JWT_TOKEN, newToken.jwtToken).apply()

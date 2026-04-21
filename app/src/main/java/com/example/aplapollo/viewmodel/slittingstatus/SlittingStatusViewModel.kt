@@ -9,7 +9,8 @@ import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.ApiCommonResponse
 import com.example.aplapollo.model.Slitting.HrSlittingDetailsResponse
-import com.example.aplapollo.model.Slitting.HrSlittingTransactionRequest
+import com.example.aplapollo.model.Slitting.HrSlittingRequest
+
 import com.example.aplapollo.repository.APLRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -36,7 +37,7 @@ class SlittingStatusViewModel(
     }
     fun completeHrSlitting(
 
-        request: HrSlittingTransactionRequest
+        request: HrSlittingRequest
     ) {
         viewModelScope.launch {
             safeApiCallCompleteHrSlitting( request)
@@ -98,7 +99,7 @@ class SlittingStatusViewModel(
   //  ==================================================Slitting complte APi
   private suspend fun safeApiCallCompleteHrSlitting(
 
-      request: HrSlittingTransactionRequest
+      request: HrSlittingRequest
   ) {
       completeHrSlittingLiveData.postValue(Resource.Loading())
 

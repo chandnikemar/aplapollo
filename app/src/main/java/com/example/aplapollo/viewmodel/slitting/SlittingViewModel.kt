@@ -1,6 +1,7 @@
 package com.example.aplapollo.viewmodel.slitting
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -13,7 +14,7 @@ import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
 import com.example.aplapollo.model.Slitting.HrSlittingscanReponse
 import com.example.aplapollo.model.Slitting.InitiateSlittingRequest
 import com.example.aplapollo.model.Slitting.InitiateSlittingResponse
-import com.example.aplapollo.model.Slitting.OngoingSlittingJobResponse
+import com.example.aplapollo.model.Slitting.OngoingJobResponse
 
 import com.example.aplapollo.repository.APLRepository
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ class SlittingViewModel(
         MutableLiveData()
 
     val ongoingJobsLiveData:
-            MutableLiveData<Resource<List<OngoingSlittingJobResponse>>> =
+            MutableLiveData<Resource<List<OngoingJobResponse>>> =
         MutableLiveData()
 
     fun getHrSlittingPlannedList(
@@ -84,13 +85,11 @@ class SlittingViewModel(
         }
     }
 
-    fun getOngoingSlittingJobs(locationId: Int) {
-
+    fun getOngoingSlittingJobs(tenantCode:String,locationId: Int) {
         viewModelScope.launch {
-            safeApiCallOngoingJobs(locationId)
+            safeApiCallOngoingJobs(tenantCode,locationId)
         }
     }
-
 
 
     private suspend fun safeApiCallHrSlittingPlan(
@@ -340,14 +339,18 @@ private suspend fun safeApiCallInitiateSlitting(
         return Resource.Error(errorMessage)
     }
     //=========================================================================================
-    private suspend fun safeApiCallOngoingJobs(locationId: Int) {
+    private suspend fun safeApiCallOngoingJobs(tenantCode: String,locationId: Int) {
 
         ongoingJobsLiveData.postValue(Resource.Loading())
 
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response = aplRepository.getOngoingJobs(locationId)  // ✅ PASS HERE
+                val response = aplRepository.getOngoingJobs(tenantCode ,locationId)
+
+                // 🔥 DEBUG
+                Log.d("API_DEBUG", "Response Code = ${response.code()}")
+                Log.d("API_DEBUG", "Response Body = ${response.body()}")
 
                 ongoingJobsLiveData.postValue(
                     handleOngoingJobsResponse(response)
@@ -366,28 +369,22 @@ private suspend fun safeApiCallInitiateSlitting(
         }
     }
     private fun handleOngoingJobsResponse(
-        response: Response<List<OngoingSlittingJobResponse>>
-    ): Resource<List<OngoingSlittingJobResponse>> {
+        response: Response<List<OngoingJobResponse>>
+    ): Resource<List<OngoingJobResponse>> {
 
-        var errorMessage = ""
+        return if (response.isSuccessful) {
 
-        if (response.isSuccessful) {
-            response.body()?.let {
-                return Resource.Success(it)
-            }
-        } else if (response.errorBody() != null) {
+            val jobs = response.body() ?: emptyList()
 
-            val errorObject = JSONObject(
-                response.errorBody()!!.charStream().readText()
-            )
+            Log.d("API_DEBUG", "Jobs size = ${jobs.size}")
 
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                "Failed to load ongoing jobs"
-            )
+            Resource.Success(jobs)
+
+        } else {
+
+            val error = response.errorBody()?.string()
+            Resource.Error(error ?: "Failed to load ongoing jobs")
         }
-
-        return Resource.Error(errorMessage)
     }
 
 }

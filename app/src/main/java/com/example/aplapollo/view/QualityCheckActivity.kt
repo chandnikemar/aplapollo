@@ -386,13 +386,14 @@ class QualityCheckActivity : AppCompatActivity() {
 
             val request = QCStatusSubmissionRequest(
                 qcId = 0,
-                tenantCode="",
+                tenantCode=tenantCode,
                 materialTypeId = 0,
                 materialCode= binding.column2RowMaterialCode.text.toString(),
                 barcode = "",
                 supplierName = binding.column2Row2.text.toString(),
                 supplierBatchNo = binding.column2Row1.text.toString(),
-                grade = binding.column2Row4.text.toString(),
+                grade = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
+                    ?: "A",
                 netWeight = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
                 thickness = binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
                 length = binding.column2Row7.text.toString().toDoubleOrNull() ?: 0.0,
@@ -450,7 +451,8 @@ binding.commanInputRow.btnClear.setOnClickListener {
                 barcode = "", // No barcode for reject
                 supplierName = binding.column2Row2.text.toString(),
                 supplierBatchNo = binding.column2Row1.text.toString(),
-                grade = binding.column2Row4.text.toString(),
+                grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
+                    ?: "A",
                 netWeight = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
                 thickness = binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
                 length = binding.column2Row7.text.toString().toDoubleOrNull() ?: 0.0,
@@ -476,7 +478,8 @@ binding.commanInputRow.btnClear.setOnClickListener {
                 BarCode  = binding.barcodeText.text.toString(),
                 SupplierBatchNo  = binding.column2Row1.text.toString(),
                 MaterialCode  =  binding.column2RowMaterialCode.text.toString(),
-                Grade  = binding.column2Row4.text.toString(),
+                Grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
+                    ?: "A",
                 Thickness  =  binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
                 Width  =  binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 GRNNumber  = binding.column2Row8.text.toString(),
@@ -500,7 +503,8 @@ binding.commanInputRow.btnClear.setOnClickListener {
                 BarCode  = binding.barcodeText.text.toString(),
                 SupplierBatchNo  = binding.column2Row1.text.toString(),
                 MaterialCode  =  binding.column2RowMaterialCode.text.toString(),
-                Grade  = binding.column2Row4.text.toString(),
+                Grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
+                    ?: "A",
                 Thickness  =  binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
                 Width  =  binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 GRNNumber  = binding.column2Row8.text.toString(),

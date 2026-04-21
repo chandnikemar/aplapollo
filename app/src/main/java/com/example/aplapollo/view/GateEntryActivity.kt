@@ -31,7 +31,7 @@ import es.dmoral.toasty.Toasty
         private val coilList = mutableListOf<String>()
 
         private var gateEntryNo: String = ""   // ✅ IMPORTANT
-
+private var transactionId:Int=0
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
@@ -73,7 +73,7 @@ import es.dmoral.toasty.Toasty
 
                         if (data != null) {
                             gateEntryNo = data.gateEntryNo   // ✅ store
-
+transactionId=data.gateTransactionId
                             onGateEntrySuccess(gateEntryNo)
 
                             Toasty.success(
@@ -104,9 +104,9 @@ import es.dmoral.toasty.Toasty
                             response.data?.responseMessage ?: "Saved Successfully"
                         ).show()
 
-                        // ✅ Clear after submit
                         coilList.clear()
                         adapter.notifyDataSetChanged()
+                        finish()
                     }
 
                     is Resource.Error -> {
@@ -181,7 +181,7 @@ import es.dmoral.toasty.Toasty
                 }
                 val request = CoilSubmitRequest(
                     gateTransactionItemId = 0,
-                    gateTransactionId = 0,
+                    gateTransactionId =transactionId ,
                     gateEntryNo = gateEntryNo,
                     gateTransactionItems = coilItems
                 )

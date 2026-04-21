@@ -79,7 +79,13 @@
         <item name="android:layout_margin">6dp</item>
         <item name="android:background">@drawable/card_green_gradient</item>
     </style>
-
-
+    <style name="TopCurveShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeBottomLeft">30dp</item>
+        <item name="cornerSizeBottomRight">30dp</item>
+    </style>
+    <style name="WhiteHintTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="hintTextColor">@android:color/white</item>
+    </style>
 
 </resources>

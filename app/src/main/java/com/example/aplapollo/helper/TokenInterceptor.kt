@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 
+
 object AuthState {
     @Volatile var isUnauthorized = false
 }
@@ -15,50 +16,54 @@ class TokenInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
-         fun getToken(): String? {
+        fun getToken(): String? {
             val prefs = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
             return prefs.getString(Constants.KEY_JWT_TOKEN, null)
         }
 
-//        val sharedPrefer  = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
-//        var accessToken = sharedPrefer.getString(Constants.KEY_JWT_TOKEN, null)
-
         val originalRequest = chain.request()
+
         val isLoginEndpoint = originalRequest.url.toString()
             .contains("AuthService/authenticate", ignoreCase = true)
-        var token = getToken()
-        val requestWithToken = if (isLoginEndpoint) {
+
+        val isRetry = originalRequest.header("Retry") != null
+
+        val token = getToken()
+
+        val requestWithToken = if (isLoginEndpoint || token.isNullOrEmpty()) {
             originalRequest
         } else {
             originalRequest.newBuilder()
-                .header("Authorization", token ?: "")
+                .header("Authorization", "Bearer $token")
                 .build()
         }
 
-        var response = chain.proceed(requestWithToken)
+        val response = chain.proceed(requestWithToken)
 
-        if (isLoginEndpoint || response.code != 401) {
+        // ✅ If not 401 → return directly (DO NOT TOUCH)
+        if (isLoginEndpoint || response.code != 401 || isRetry) {
             return response
         }
 
+        // 🔁 Token refresh (NO close here yet)
+        val newToken = runBlocking {
+            TokenManager.refreshTokenIfNeeded(context, token)
+        }
+
+        if (newToken.isNullOrEmpty()) {
+            AuthState.isUnauthorized = true
+            return response // ✅ return original response safely
+        }
+
+        // ❗ Now close old response ONLY because we retry
         response.close()
 
-        runBlocking {
-            val newToken = TokenManager.refreshTokenIfNeeded(context, token)
-            if (newToken != null) {
-                token = newToken
-            } else {
-                AuthState.isUnauthorized = true
-                return@runBlocking
-            }
-        }
-        token = getToken()
         val newRequest = originalRequest.newBuilder()
             .removeHeader("Authorization")
-            .addHeader("Authorization", token ?: "")
+            .addHeader("Authorization", "Bearer $newToken")
+            .addHeader("Retry", "true")
             .build()
 
         return chain.proceed(newRequest)
     }
-
 }

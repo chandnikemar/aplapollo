@@ -25,6 +25,7 @@
 
                     <include
                         android:id="@+id/includeShiftStation"
+                        android:visibility="gone"
                         layout="@layout/tabel_row_common"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

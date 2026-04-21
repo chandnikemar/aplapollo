@@ -1,7 +1,9 @@
 package com.example.aplapollo.repository
 
 import com.example.aplapollo.api.RetrofitInstance
+import com.example.aplapollo.model.ActionTypeResponse
 import com.example.aplapollo.model.ApiCommonResponse
+import com.example.aplapollo.model.BoMMasterResponse
 import com.example.aplapollo.model.CRM.CRMPlanResponse
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.model.CRM.CRMTransactionResponse
@@ -15,6 +17,7 @@ import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
 import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
 import com.example.aplapollo.model.PrintLabelBarcodeRequest
+import com.example.aplapollo.model.ProcessMachineMappingResponse
 import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchResponse
@@ -24,12 +27,12 @@ import com.example.aplapollo.model.Slitting.HrSlittingDetailsResponse
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
 import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
-import com.example.aplapollo.model.Slitting.HrSlittingTransactionRequest
+import com.example.aplapollo.model.Slitting.HrSlittingRequest
 import com.example.aplapollo.model.Slitting.HrSlittingscanReponse
 import com.example.aplapollo.model.Slitting.InitiateSlittingRequest
 import com.example.aplapollo.model.Slitting.InitiateSlittingResponse
 import com.example.aplapollo.model.Slitting.InitiateSlittingWithoutPlanRequest
-import com.example.aplapollo.model.Slitting.OngoingSlittingJobResponse
+import com.example.aplapollo.model.Slitting.OngoingJobResponse
 import com.example.aplapollo.model.Slitting.StockBarcodeWithoutplanResponse
 import com.example.aplapollo.model.login.LoginRequest
 import retrofit2.Response
@@ -111,11 +114,12 @@ suspend fun initiateHrSlitting(
         .initiateSlitting(request)
 
     suspend fun getOngoingJobs(
+        tenantCode: String,
         locationId: Int
-    ): Response<List<OngoingSlittingJobResponse>> =
+    ): Response<List<OngoingJobResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingJobs(locationId)
+            .getOngoingJobs(tenantCode,locationId)
 
 suspend fun getHrSlittingDetailsById(
     tranId: Int
@@ -126,7 +130,7 @@ suspend fun getHrSlittingDetailsById(
 
     suspend fun completeHRSlitting(
 
-        request: HrSlittingTransactionRequest
+        request: HrSlittingRequest
     ): Response<ApiCommonResponse> =
         retrofitInstance
             .serviceApi()
@@ -258,6 +262,24 @@ suspend fun getHrSlittingDetailsById(
         retrofitInstance
             .serviceApi()
             .saveGateTransactionItem(request)
+
+    suspend fun getActionTypeList(
+
+    ): Response<List<ActionTypeResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getActionType()
+    suspend fun getProccesMachineById(
+
+        actionTypeId: Int
+    ): Response<List<ProcessMachineMappingResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .proccesMachinById(actionTypeId)
+    suspend fun getBomInputCode(
+    inputCode:String
+):Response<List<BoMMasterResponse>> = retrofitInstance
+    .serviceApi().getBomByInputCode(inputCode)
 
 
 }

@@ -2,6 +2,8 @@
 
     import com.example.aplapollo.helper.Constants.ADD_Supplier
     import com.example.aplapollo.helper.Constants.GATE_Transaction
+    import com.example.aplapollo.helper.Constants.GET_ActionType
+    import com.example.aplapollo.helper.Constants.GET_BomInputCode
     import com.example.aplapollo.helper.Constants.GET_CRM_BY_Id
     import com.example.aplapollo.helper.Constants.GET_CRM_PlanID
     import com.example.aplapollo.helper.Constants.GET_CRM_PlannedList
@@ -10,6 +12,7 @@
     import com.example.aplapollo.helper.Constants.GET_Pickling_By_Id
     import com.example.aplapollo.helper.Constants.GET_Pickling_Product_By_Barcode
     import com.example.aplapollo.helper.Constants.GET_PrintLabel
+    import com.example.aplapollo.helper.Constants.GET_ProcessMachine
     import com.example.aplapollo.helper.Constants.GET_going_CRMJob
     import com.example.aplapollo.helper.Constants.Get_AllItemAgainstPlan
     import com.example.aplapollo.helper.Constants.Get_CRM_Scan
@@ -29,7 +32,9 @@
     import com.example.aplapollo.helper.Constants.PosT_ProcessCRM
     import com.example.aplapollo.helper.Constants.Print_PRN
     import com.example.aplapollo.helper.Constants.QC_StatusSubmission
+    import com.example.aplapollo.model.ActionTypeResponse
     import com.example.aplapollo.model.ApiCommonResponse
+    import com.example.aplapollo.model.BoMMasterResponse
     import com.example.aplapollo.model.CRM.CRMPlanResponse
     import com.example.aplapollo.model.CRM.CRMTransactionRequest
     import com.example.aplapollo.model.CRM.CRMTransactionResponse
@@ -43,6 +48,7 @@
     import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
     import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
     import com.example.aplapollo.model.PrintLabelBarcodeRequest
+    import com.example.aplapollo.model.ProcessMachineMappingResponse
     import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
     import com.example.aplapollo.model.QualityCheck.PrintZplResponse
     import com.example.aplapollo.model.QualityCheck.QCFetchRequest
@@ -54,18 +60,19 @@
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
     import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
-    import com.example.aplapollo.model.Slitting.HrSlittingTransactionRequest
+    import com.example.aplapollo.model.Slitting.HrSlittingRequest
     import com.example.aplapollo.model.Slitting.HrSlittingscanReponse
     import com.example.aplapollo.model.Slitting.InitiateSlittingRequest
     import com.example.aplapollo.model.Slitting.InitiateSlittingResponse
     import com.example.aplapollo.model.Slitting.InitiateSlittingWithoutPlanRequest
-    import com.example.aplapollo.model.Slitting.OngoingSlittingJobResponse
+    import com.example.aplapollo.model.Slitting.OngoingJobResponse
     import com.example.aplapollo.model.Slitting.StockBarcodeWithoutplanResponse
     import com.example.aplapollo.model.login.LoginRequest
     import com.example.aplapollo.model.login.LoginResponse
     import retrofit2.Response
     import retrofit2.http.Body
     import retrofit2.http.GET
+    import retrofit2.http.Header
     import retrofit2.http.POST
     import retrofit2.http.Query
 
@@ -121,8 +128,9 @@
 
         @GET(Get_OnGoing)
         suspend fun getOngoingJobs(
+            @Header("TenantCode") tenantCode: String,
             @Query("locationId") locationId: Int
-        ): Response<List<OngoingSlittingJobResponse>>
+        ): Response<List<OngoingJobResponse>>
 
 
 
@@ -137,7 +145,7 @@
         ): Response<List<LocationResponse>>
         @POST(Get_Complete_Hr_Slitting)
         suspend fun completeHRSlitting(
-            @Body request: HrSlittingTransactionRequest
+            @Body request: HrSlittingRequest
         ): Response<ApiCommonResponse>
         @GET(Get_Stock_BYBatchOr_Barcode)
         suspend fun getStockByBatchOrBarcode(
@@ -209,5 +217,18 @@
         suspend fun saveGateTransactionItem(
             @Body request: CoilSubmitRequest
         ): Response<ApiCommonResponse>
+
+        @GET(GET_ActionType)
+        suspend fun getActionType(
+        ): Response<List<ActionTypeResponse>>
+
+        @GET(GET_ProcessMachine)
+        suspend fun proccesMachinById(
+            @Query("actionTypeId") actionTypeId: Int?
+        ): Response<List<ProcessMachineMappingResponse>>
+        @GET(GET_BomInputCode)
+        suspend fun getBomByInputCode(
+            @Query("inputCode") inputCode: String
+        ): Response<List<BoMMasterResponse>>
 
     }

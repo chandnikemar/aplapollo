@@ -3,12 +3,14 @@ package com.example.aplapollo.view.slitting
 import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.aplapollo.adapter.BomAdapter
 import com.example.aplapollo.adapter.Slitting.SlittingStatusAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
@@ -16,7 +18,9 @@ import com.example.aplapollo.helper.Constants.BarcodeValue
 import com.example.aplapollo.helper.Constants.ChildMotherExceedError
 import com.example.aplapollo.helper.Constants.CompleteStatus
 import com.example.aplapollo.helper.Constants.EnterScrapWeight
+import com.example.aplapollo.helper.Constants.GradeV
 import com.example.aplapollo.helper.Constants.HrSlittingId
+import com.example.aplapollo.helper.Constants.HrSlittingPlanId
 import com.example.aplapollo.helper.Constants.InvalidIronLoss
 import com.example.aplapollo.helper.Constants.JobId
 import com.example.aplapollo.helper.Constants.LocationId
@@ -28,9 +32,15 @@ import com.example.aplapollo.helper.Constants.WeightExceed
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils.getCurrentDateTimeISO
+import com.example.aplapollo.model.BoMMasterResponse
 import com.example.aplapollo.model.PrintLabelBarcodeRequest
+import com.example.aplapollo.model.Slitting.ComponentRequest
+import com.example.aplapollo.model.Slitting.HrSlittingRequest
 import com.example.aplapollo.model.Slitting.HrSlittingTransactionDetails
-import com.example.aplapollo.model.Slitting.HrSlittingTransactionRequest
+import com.example.aplapollo.model.Slitting.InputRequest
+import com.example.aplapollo.model.Slitting.OutputRequest
+import com.example.aplapollo.viewmodel.bommaster.BomInputCodeViewModelfactory
+import com.example.aplapollo.viewmodel.bommaster.BomViewModel
 import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
 import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.aplapollo.viewmodel.slittingstatus.SlittingStatusViewModel
@@ -44,8 +54,10 @@ class SlittingStatusActivity : AppCompatActivity() {
     private lateinit var progress: ProgressDialog
     private lateinit var slittingStatusViewModel: SlittingStatusViewModel
     private lateinit var printlabelViewModel: PrintlabelViewModel
+    private lateinit var bomViewModel:BomViewModel
     private lateinit var session: SessionManager
     private lateinit var slittingAdapter: SlittingStatusAdapter
+    private lateinit var bomAdapter: BomAdapter
 
     private var baseUrl: String = ""
     private var userName: String? = ""
@@ -60,13 +72,19 @@ class SlittingStatusActivity : AppCompatActivity() {
     private var tranPlanId: Int = 0
     private var locationId: Int = 0
     private var sourceStockId: Int = 0
+    private var hrSlittingPlanId=0
 
     private var motherWeight: Double = 0.00
     private var scrapWeight: Double = 0.0
     private var ironLossWeight: Double = 0.0
     private var isWeightErrorShown = false
-    private val weightMap = mutableMapOf<Int, Double>()
 
+    private var bomList: List<BoMMasterResponse> = emptyList()
+
+    private var selectedInputMaterial: String = ""
+    private lateinit var selectedProcess:String
+    private lateinit var selectedMachineName:String
+    private lateinit var grade:String
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +108,9 @@ class SlittingStatusActivity : AppCompatActivity() {
         printlabelViewModel =
             ViewModelProvider(this, viewModelProviderFactorys)[PrintlabelViewModel::class.java]
 
-
+        val viewModelProviderFactor = BomInputCodeViewModelfactory(application, retrofitInstance)
+        bomViewModel =
+            ViewModelProvider(this, viewModelProviderFactor)[BomViewModel::class.java]
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -118,8 +138,10 @@ class SlittingStatusActivity : AppCompatActivity() {
         tranPlanId = intent.getIntExtra(HrSlittingId, 0)
         sourceStockId = intent.getIntExtra(SourceStockId, 0)
         locationId = intent.getIntExtra(LocationId, 0)
-
-
+grade= intent.getStringExtra(GradeV)?:""
+       hrSlittingPlanId=intent.getIntExtra(HrSlittingPlanId,0)
+        selectedProcess = intent.getStringExtra("PROCESS_NAME") ?: ""
+        selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
         val jobId = intent.getStringExtra(JobId) ?: "--"
         val barcode = intent.getStringExtra(BarcodeValue) ?: "--"
 //        val supplierNo = intent.getStringExtra("SupplierNo") ?: "--"
@@ -132,6 +154,12 @@ class SlittingStatusActivity : AppCompatActivity() {
 
         binding.tvMotherCoil.setText(barcode)
         binding.tvBatchNumber.setText("${motherWeight} Kg")
+
+        val inputCode = binding.tvMotherCoil.text.toString()
+        if (inputCode.isNotEmpty()) {
+            bomViewModel.getBom(inputCode)
+        }
+
 
 
         slittingStatusViewModel.getHrSlittingDetailsById(tranPlanId)
@@ -237,9 +265,42 @@ class SlittingStatusActivity : AppCompatActivity() {
 
             else -> {}
         }}
+        bomViewModel.bomMutableLiveData.observe(this) { resource ->
+            when (resource) {
+
+                is Resource.Loading -> progress.show()
+
+                is Resource.Success -> {
+                    progress.dismiss()
+
+                    bomList = resource.data ?: emptyList()
+
+                    bomAdapter = BomAdapter(bomList)
+
+                    binding.recyclerBomDetails.layoutManager = LinearLayoutManager(this)
+                    binding.recyclerBomDetails.adapter = bomAdapter
+                }
+
+                is Resource.Error -> {
+                    progress.dismiss()
+                    Toasty.warning(this, resource.message ?: "Error").show()
+                }
+
+                else -> {}
+            }
+        }
+        binding.dropdownBom.setOnItemClickListener { _, _, position, _ ->
+
+            val selected = bomList[position]
+            selectedInputMaterial = selected.inputMaterial
+
+            val adapter = BomAdapter(listOf(selected))
+
+            binding.recyclerBomDetails.adapter = adapter
+        }
         binding.btnPrintBarcode.setOnClickListener {
 
-//            printBarcodeLabel()
+
         }
 
         binding.btnSave.setOnClickListener {
@@ -251,6 +312,7 @@ class SlittingStatusActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun submitCompleteSlitting() {
+
 
         val adapter = slittingAdapter
 
@@ -284,65 +346,111 @@ class SlittingStatusActivity : AppCompatActivity() {
             Toasty.error(this, WeightExceed).show()
             return
         }
+        val bomData = getSelectedBomData()
 
+        bomData.forEach {
+            Log.d("FINAL_INPUT", it.MaterialCode + " - " + it.Weight)
+
+            it.Outputs.forEach { output ->
+                Log.d("FINAL_OUTPUT", output.MaterialCode + " - " + output.Weight)
+
+                output.Component.forEach { comp ->
+                    Log.d("FINAL_COMPONENT", comp.MaterialCode + " - " + comp.Weight)
+                }
+            }
+        }
 
         //  Convert to API Model
         val apiDetailsList = detailsList.map { item ->
 
             HrSlittingTransactionDetails(
 
-                hrSlittingTranDtlId = item.hrSlittingTranDtlId,
-                hrSlittingTranId = item.hrSlittingTranId,
-                width = item.width ?: 0.0,
-                barcode = item.barcode ?: "",
+                HRSlittingTranDtlId = item.hrSlittingTranDtlId,
+                HRSlittingTranId = item.hrSlittingTranId,
+                Width = item.width ?: 0.0,
+                Barcode = item.barcode ?: "",
+                    MaterialCode =  bomData.firstOrNull()?.MaterialCode ?: "",
 
-                weighAfterSlitting = item.weighAfterSlitting ?: 0.0,
+                WeighAfterSlitting = item.weighAfterSlitting ?: 0.0,
+                WeightTakenBy = userName ?: "",
+                WeightLocationId = locationId,
+                WeightDatetime = getCurrentDateTimeISO(),
 
-                weightTakenBy = userName,
-                weightLocationId = locationId,
-                weightDatetime = getCurrentDateTimeISO(),
+                IsActive = true,
+                Status = CompleteStatus,
 
-                status = CompleteStatus,
-                isActive = true,
-
-                createdBy = userName ?: "",
-                createdDate = getCurrentDateTimeISO(),
-
-                modifiedBy = null,
-                modifiedDate = null,
-
-                tenantCode = tenantCode,
-                tenantGroupCode = null
+                Component = bomData
+                    .flatMap { it.Outputs }
+                    .flatMap { it.Component }
             )
         }
 
 
-        val request = HrSlittingTransactionRequest(
+        val request = HrSlittingRequest(
 
-            hrSlittingTranId = tranPlanId,
-            tenantCode = tenantCode ?: "",
-            locationId = locationId,
-            locationName = null,
-            sourceStockId = sourceStockId,
+            HRSlittingTranId = tranPlanId,
+            TenantCode = tenantCode ?: "",
+            HRSlittingPlanId= hrSlittingPlanId,
+            LocationId  = locationId,
 
-            jobNumber = binding.textJobNumber.text
+            SourceStockId = sourceStockId,
+            Weight=motherWeight,
+
+            JobNumber = binding.textJobNumber.text
                 .toString()
                 .replace("Job #", ""),
-            ironLossWeight = ironLossWeight,
-            scrapWeight = scrapWeight,
-            completedBy = userName,
-            completedDate = getCurrentDateTimeISO(),
-            status = CompleteStatus,
-            remarks = "Completed Slitting",
-            totalRecord = apiDetailsList.size,
-            hrSlittingTransactionDetail = apiDetailsList
+            Barcode=barcode,
+            IronLossWeight = ironLossWeight,
+            ScrapWeight = scrapWeight,
+            CompletedBy = "",
+            CompletedDate = getCurrentDateTimeISO(),
+            Status = CompleteStatus,
+            Remarks = "Completed Slitting",
+            IsPlanned= true,   // TODO: \
+            Process=selectedProcess,
+            MachineName=selectedMachineName,
+            Tamper="",
+            Grade =grade,
+            hrSlittingTransactionDetail = apiDetailsList ?: emptyList()
+
         )
 
 
         slittingStatusViewModel.completeHrSlitting(request)
     }
 
+    fun getSelectedBomData(): List<InputRequest> {
 
+        return bomAdapter.getUpdatedData()
+            .filter { it.inputWeight > 0 } // ✅ only selected inputs
+            .map { input ->
+
+                InputRequest(
+                    MaterialCode = input.inputMaterial,
+                    Weight = input.inputWeight,
+
+                    Outputs = input.boMOutput
+                        .filter { it.weight > 0 } // ✅ only selected outputs
+                        .map { output ->
+
+                            OutputRequest(
+                                MaterialCode = output.outputMaterial,
+                                Weight = output.weight,
+
+                                Component = output.boMComponent
+                                    .filter { it.weight > 0 } // ✅ only selected components
+                                    .map { comp ->
+
+                                        ComponentRequest(
+                                            MaterialCode = comp.componentCode,
+                                            Weight = comp.weight
+                                        )
+                                    }
+                            )
+                        }
+                )
+            }
+    }
     private fun calculateAndShowIronLoss() {
 
         val adapter = slittingAdapter

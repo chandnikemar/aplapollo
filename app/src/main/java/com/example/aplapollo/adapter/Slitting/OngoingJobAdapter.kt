@@ -7,12 +7,12 @@ import android.widget.TableLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.aplapollo.model.Slitting.OngoingSlittingJobResponse
+import com.example.aplapollo.model.Slitting.OngoingJobResponse
 import com.example.apolloapl.R
 
 class OngoingJobAdapter(
-    private var jobList: List<OngoingSlittingJobResponse>,
-    private val onItemClick: (OngoingSlittingJobResponse) -> Unit
+    private var jobList: List<OngoingJobResponse>,
+    private val onItemClick: (OngoingJobResponse) -> Unit
 ) : RecyclerView.Adapter<OngoingJobAdapter.JobViewHolder>() {
 
     inner class JobViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -59,7 +59,7 @@ class OngoingJobAdapter(
     }
 
     override fun getItemCount(): Int = jobList.size
-    fun updateList(newList: List<OngoingSlittingJobResponse>) {
+    fun updateList(newList: List<OngoingJobResponse>) {
         jobList = newList
         notifyDataSetChanged()
     }

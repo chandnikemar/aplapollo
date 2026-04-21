@@ -149,7 +149,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Select BOM"
+                    android:layout_marginTop="16dp"
+                    app:boxBackgroundMode="outline">
 
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdownBom"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:inputType="none"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerBomDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"/>
             <LinearLayout
                 android:id="@+id/layoutActionButtons"
                 android:layout_width="match_parent"

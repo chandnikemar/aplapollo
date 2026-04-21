@@ -1,36 +1,53 @@
 package com.example.aplapollo.model.Slitting
 
-data class HrSlittingTransactionRequest(
-    val hrSlittingTranId: Int,
-    val tenantCode: String,
-    val locationId: Int,
-    val locationName: String?,
-    val sourceStockId: Int,
-    val jobNumber: String,
-    val ironLossWeight: Double,
-    val scrapWeight: Double,
-    val completedBy: String?,
-    val completedDate: String?,
-    val status: String,
-    val remarks: String,
-    val totalRecord: Int,
+data class HrSlittingRequest(
+    val HRSlittingTranId: Int,
+    val TenantCode: String,
+    val HRSlittingPlanId: Int,
+    val LocationId: Int,
+    val SourceStockId: Int,
+    val Weight: Double,
+    val JobNumber: String,
+    val Barcode: String,
+    val IronLossWeight: Double,
+    val ScrapWeight: Double,
+    val CompletedBy: String,
+    val CompletedDate: String,
+    val Status: String,
+    val Remarks: String,
+    val IsPlanned: Boolean,
+    val Process: String,
+    val MachineName: String,
+    val Tamper: String,
+    val Grade: String,
     val hrSlittingTransactionDetail: List<HrSlittingTransactionDetails>
 )
-data class HrSlittingTransactionDetails(
-    val hrSlittingTranDtlId: Int,
-    val hrSlittingTranId: Int,
-    val width: Double,
-    val barcode: String,
-    val weighAfterSlitting: Double,
-    val weightTakenBy: String?,
-    val weightLocationId: Int,
-    val weightDatetime: String?,
-    val status: String,
-    val isActive: Boolean,
-    val createdBy: String?,
-    val createdDate: String?,
-    val modifiedBy: String?,
-    val modifiedDate: String?,
-    val tenantCode: String?,
-    val tenantGroupCode: String?
+    data class HrSlittingTransactionDetails(
+    val HRSlittingTranDtlId: Int,
+    val HRSlittingTranId: Int,
+    val Width: Double,
+    val Barcode: String,
+    val MaterialCode: String,
+    val WeighAfterSlitting: Double,
+    val WeightTakenBy: String,
+    val WeightLocationId: Int,
+    val WeightDatetime: String,
+    val IsActive: Boolean,
+    val Status: String,
+    val Component: List<ComponentRequest>
+)
+data class ComponentRequest(
+    val MaterialCode: String,
+    val Weight: Double
+)
+data class OutputRequest(
+    val MaterialCode: String,
+    val Weight: Double,
+    val Component: List<ComponentRequest>
+)
+
+data class InputRequest(
+    val MaterialCode: String,
+    val Weight: Double,
+    val Outputs: List<OutputRequest>
 )

@@ -128,6 +128,10 @@ object Constants {
     //Gate Entry
     const val ADD_Supplier="GateTransaction/addSuppilerItems"
     const val GATE_Transaction="GateTransaction/gateTransactionEntry"
+    // production Entry
+    const val GET_ActionType="ActionTypeMaster/getAllActionType"
+    const val GET_ProcessMachine="ProcessMachineMapping/getProcessMchineById"
+    const val GET_BomInputCode="BOM/getBoMByInputCode"
 
 
     //change password
@@ -145,7 +149,7 @@ object Constants {
     const val EnterScrapWeight="Enter Scrap Weight"
     const val InvalidIronLoss="Invalid Iron Loss"
 //intentString
-    const val LocationId="LOCATION_ID"
+const val LocationId = "LOCATION_ID"
     const val LocationName="LOCATION_NAME"
    const val CrmTranJob="CRM_TRAN_JOB"
     const val JobId="JOB_ID"
@@ -158,6 +162,7 @@ object Constants {
     const val SupplierNo="SupplierNo"
     const val ThicknessV="THICKNESS"
     const val GradeV="GRADE"
+    const val HrSlittingPlanId="Hr_Slitting_PlanID"
 //DropeDownValue
      const val SelectFromPlan= "Select from plan"
     const val  WithOutPlan="Without plan"
