@@ -1,16 +1,20 @@
 package com.example.aplapollo.repository
 
+
+import HrSlittingStatusResponse
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.model.ActionTypeResponse
 import com.example.aplapollo.model.ApiCommonResponse
-import com.example.aplapollo.model.BoMMasterResponse
+import com.example.aplapollo.model.BomResponse
 import com.example.aplapollo.model.CRM.CRMPlanResponse
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.model.CRM.CRMTransactionResponse
 import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
 import com.example.aplapollo.model.GateEntry.CoilSubmitRequest
+import com.example.aplapollo.model.GateEntry.GateEntryResponse
 import com.example.aplapollo.model.GateEntry.GateTransactionRequest
 import com.example.aplapollo.model.GateEntry.GateTransactionResponse
+import com.example.aplapollo.model.GateEntry.TransporterResponse
 import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.model.LocationResponse
 import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -23,11 +27,10 @@ import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchResponse
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
 import com.example.aplapollo.model.Slitting.ApiResponse
-import com.example.aplapollo.model.Slitting.HrSlittingDetailsResponse
+import com.example.aplapollo.model.Slitting.HrSlittingCompleteRequest
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
 import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
-import com.example.aplapollo.model.Slitting.HrSlittingRequest
 import com.example.aplapollo.model.Slitting.HrSlittingscanReponse
 import com.example.aplapollo.model.Slitting.InitiateSlittingRequest
 import com.example.aplapollo.model.Slitting.InitiateSlittingResponse
@@ -123,14 +126,14 @@ suspend fun initiateHrSlitting(
 
 suspend fun getHrSlittingDetailsById(
     tranId: Int
-): Response<HrSlittingDetailsResponse> =
+): Response<HrSlittingStatusResponse> =
     retrofitInstance
         .serviceApi()
         .getHrSlittingDetailsById(tranId)
 
     suspend fun completeHRSlitting(
 
-        request: HrSlittingRequest
+        request: HrSlittingCompleteRequest
     ): Response<ApiCommonResponse> =
         retrofitInstance
             .serviceApi()
@@ -180,13 +183,21 @@ suspend fun getHrSlittingDetailsById(
             .processPickling(request)
     suspend fun getPicklingTransactionById(
         picklingTranId: Int
-    ): Response<PicklingTransactionResponse> {
+    ): Response<PicklingTransactionResponse>{
 
         return retrofitInstance
             .serviceApi()
             .getPicklingTransaction(picklingTranId)
     }
+suspend fun getPicklingAddChild(
+    picklingTransId: Int,
+    tenantCode: String
+):Response<ApiCommonResponse> {
 
+    return retrofitInstance
+        .serviceApi()
+        .getPicklingAddChild(picklingTransId,tenantCode)
+}
     suspend fun getCRMPlannedList(
 
     ): Response<List<CRMPlanResponse>> =
@@ -278,8 +289,23 @@ suspend fun getHrSlittingDetailsById(
             .proccesMachinById(actionTypeId)
     suspend fun getBomInputCode(
     inputCode:String
-):Response<List<BoMMasterResponse>> = retrofitInstance
+):Response<List<BomResponse>> = retrofitInstance
     .serviceApi().getBomByInputCode(inputCode)
-
+    suspend fun getGateEntryList(
+    ): Response<List<GateEntryResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getGateTransactionList()
+    suspend fun getTransporterList(
+    ): Response<List<TransporterResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getTransporterList()
+    suspend fun getGateEntryUpdate(
+        gateTransactionId:Int
+    ): Response<List<GateEntryResponse>> =
+    retrofitInstance
+        .serviceApi()
+        .getGateTransactionUpdate(gateTransactionId)
 
 }

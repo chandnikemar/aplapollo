@@ -1,62 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-<TableRow
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingVertical="10dp"
-    android:paddingHorizontal="6dp"
-    android:gravity="center_vertical"
-    android:background="@drawable/table_row_bg">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Column 1: Checkbox -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.6"
-        android:descendantFocusability="blocksDescendants"
+        android:orientation="vertical">
 
-        android:gravity="center">
-
-        <CheckBox
-            android:id="@+id/checkBoxC1"
-            android:layout_width="wrap_content"
+        <!-- MAIN JOB CARD -->
+        <LinearLayout
+            android:id="@+id/layoutHeader"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:buttonTint="@color/blue"
-            android:background="@null"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:clickable="true" />
+            android:layout_marginBottom="6dp"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/table_row_bg">
+
+            <!-- ================================================= -->
+            <!-- BARCODE ROW -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <!-- LABEL -->
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Barcode : "
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:textColor="#757575"/>
+
+                <!-- BARCODE -->
+                <TextView
+                    android:id="@+id/tvBarcode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:textColor="@android:color/black"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <!-- UOM -->
+                <Spinner
+                    android:id="@+id/spinnerUnit"
+                    android:layout_width="80dp"
+                    android:layout_height="38dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/spinner_bg"
+                    android:enabled="false"
+
+                    android:paddingStart="8dp"
+                    android:paddingEnd="18dp"/>
+            </LinearLayout>
+
+            <!-- ================================================= -->
+            <!-- OUTPUT + WEIGHT -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- OUTPUT MATERIAL -->
+                <LinearLayout
+                    android:id="@+id/layoutOutputMaterial"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:background="@drawable/batch_chip_bg">
+
+                    <!-- TEXT -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <!-- OUTPUT NAME -->
+                        <TextView
+                            android:id="@+id/tvOutputMaterial"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Select Output Material"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="@android:color/white"
+                            android:textStyle="bold"
+                            android:textSize="13sp"
+                            android:maxLines="1"
+                            android:ellipsize="end"/>
+
+                        <!-- OUTPUT DESC -->
+                        <TextView
+                            android:id="@+id/tvOutputDesc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Select output material"
+                            android:textColorHint="@android:color/white"
+                            android:textColor="@android:color/white"
+                            android:textSize="11sp"
+                            android:alpha="0.8"
+                            android:maxLines="1"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+
+                    <!-- DROPDOWN -->
+                    <ImageView
+                        android:id="@+id/ivExpand"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="6dp"
+                        android:src="@drawable/ic_dropdown"
+                        app:tint="@android:color/white"/>
+                </LinearLayout>
+
+                <!-- WEIGHT -->
+                <EditText
+                    android:id="@+id/editC4"
+                    android:layout_width="85dp"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/edittext_background"
+                    android:gravity="center"
+                    android:hint="Weight"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- ================================================= -->
+            <!-- COMPONENT HINT -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/layoutComponentHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#4CAF50"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Expand to add component weights"
+                    android:textColor="#4CAF50"
+                    android:textStyle="bold"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ================================================= -->
+        <!-- COMPONENT SECTION -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/layoutExpand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="2dp"
+            android:background="#F8F9FB"
+            android:visibility="gone">
+
+            <!-- TITLE -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Components"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:textColor="#4CAF50"
+                android:layout_marginBottom="2dp"/>
+
+            <!-- COMPONENT LIST -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerComponent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
-
-    <!-- Column 2: Barcode -->
-    <TextView
-        android:id="@+id/textC2"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:layout_weight="1.2"
-        android:text=""
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:background="@drawable/batch_chip_bg"
-        android:paddingHorizontal="8dp"
-        android:layout_marginEnd="10dp" />
-
-    <!-- Column 3: Weight Input -->
-    <EditText
-        android:id="@+id/editC4"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_weight="1.2"
-        android:hint="Wt."
-        android:inputType="numberDecimal"
-        android:gravity="center"
-        android:background="@drawable/edittext_background"
-        android:padding="8dp"
-        android:textColor="@color/black"
-        android:textSize="13sp" />
-
-</TableRow>
 </layout>

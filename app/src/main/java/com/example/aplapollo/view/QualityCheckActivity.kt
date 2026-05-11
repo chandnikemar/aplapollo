@@ -144,13 +144,7 @@ class QualityCheckActivity : AppCompatActivity() {
             binding.buttonRight.visibility = View.VISIBLE
 
         }
-//        binding.commanInputRow.btnClear.setOnClickListener {
-//            clearPreviousQCData()
-//            binding.commanInputRow.inputField.text?.clear()
-//        }
-//        binding.scrollView.post {
-//            binding.scrollView.fullScroll(View.FOCUS_DOWN)
-//        }
+
 
 
         qcviewModel.qcFetchLiveData.observe(this) { response ->

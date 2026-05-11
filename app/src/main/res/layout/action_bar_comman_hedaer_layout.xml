@@ -13,7 +13,7 @@
         android:elevation="6dp">
 
         <!-- Back -->
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivBack"
             android:layout_width="40dp"
             android:layout_height="40dp"

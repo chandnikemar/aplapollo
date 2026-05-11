@@ -13,28 +13,54 @@ class CoilAdapter(
 ) : RecyclerView.Adapter<CoilAdapter.CoilViewHolder>() {
 
     inner class CoilViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvCoilNo: TextView = itemView.findViewById(R.id.tvCoilNo)
-        val btnDelete: ImageView = itemView.findViewById(R.id.btnDelete)
+
+        val tvCoilNo: TextView =
+            itemView.findViewById(R.id.tvCoilNo)
+
+        val btnDelete: ImageView =
+            itemView.findViewById(R.id.btnDelete)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CoilViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): CoilViewHolder {
+
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_coil, parent, false)
+
         return CoilViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CoilViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CoilViewHolder,
+        position: Int
+    ) {
 
         val coil = coilList[position]
+
         holder.tvCoilNo.text = coil
 
-        // Delete coil
+        // ✅ Delete Coil
         holder.btnDelete.setOnClickListener {
-            coilList.removeAt(position)
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, coilList.size)
+
+            val adapterPosition = holder.adapterPosition
+
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+
+                coilList.removeAt(adapterPosition)
+
+                notifyItemRemoved(adapterPosition)
+
+                notifyItemRangeChanged(
+                    adapterPosition,
+                    coilList.size
+                )
+            }
         }
     }
 
-    override fun getItemCount(): Int = coilList.size
+    override fun getItemCount(): Int {
+        return coilList.size
+    }
 }

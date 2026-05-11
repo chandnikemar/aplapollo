@@ -1,6 +1,6 @@
 package com.example.aplapollo.model.Slitting
 
-data class HrSlittingRequest(
+data class HrSlittingCompleteRequest(
     val HRSlittingTranId: Int,
     val TenantCode: String,
     val HRSlittingPlanId: Int,
@@ -20,9 +20,9 @@ data class HrSlittingRequest(
     val MachineName: String,
     val Tamper: String,
     val Grade: String,
-    val hrSlittingTransactionDetail: List<HrSlittingTransactionDetails>
+    val hrSlittingTransactionDetail: List<HrSlittingCompleteTransactionDetails>
 )
-    data class HrSlittingTransactionDetails(
+data class HrSlittingCompleteTransactionDetails(
     val HRSlittingTranDtlId: Int,
     val HRSlittingTranId: Int,
     val Width: Double,
@@ -34,20 +34,14 @@ data class HrSlittingRequest(
     val WeightDatetime: String,
     val IsActive: Boolean,
     val Status: String,
+    val Uom: String,
     val Component: List<ComponentRequest>
 )
 data class ComponentRequest(
     val MaterialCode: String,
-    val Weight: Double
-)
-data class OutputRequest(
-    val MaterialCode: String,
+    val MaterilDesc:String,
     val Weight: Double,
-    val Component: List<ComponentRequest>
+    val Uom: String,
 )
 
-data class InputRequest(
-    val MaterialCode: String,
-    val Weight: Double,
-    val Outputs: List<OutputRequest>
-)
+

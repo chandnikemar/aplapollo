@@ -6,7 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
-
         <!-- Header -->
         <include
             android:id="@+id/idLayoutHeader"
@@ -15,7 +14,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Main Card -->
         <com.google.android.material.card.MaterialCardView
@@ -39,73 +38,84 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
+                    <!-- Title -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Gate Entry Form"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:layout_marginBottom="16dp"/>
+                        android:layout_marginBottom="16dp" />
+                    <!-- Transporter Code (Dropdown with search) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="Transporter Code / Name"
+                        app:endIconMode="none"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/etTransporterCode"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp"
+                            android:inputType="text"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Transporter -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
                         android:hint="Transporter Name">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etTransporter"
+                            android:id="@+id/etTransporterName"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Transporter Number">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etTransporterNo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
-                    </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Vehicle -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Vehicle No">
+                        android:hint="Vehicle No"
+                        android:layout_marginTop="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etVehicleNo"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content" />
                     </com.google.android.material.textfield.TextInputLayout>
-
-
-
 
                     <!-- LR No -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
                         android:hint="LR No"
-                     >
-
+                        android:layout_marginTop="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etLrNo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            android:maxLength="15"/>
+                            android:maxLength="15" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Generate Button -->
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnSubmit"
                         android:layout_width="match_parent"
@@ -113,64 +123,67 @@
                         android:text="Generate Gate Entry"
                         android:layout_marginTop="16dp"
                         android:background="@drawable/button_generate"
-                        android:textColor="@android:color/white"/>
-                    <!-- Buttons -->
-                    <TextView
-                        android:id="@+id/tvGateEntryNo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Gate Entry No: -"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_marginTop="12dp"
-                        android:visibility="gone"/>
-                <LinearLayout
-                    android:id="@+id/layoutCoilSection"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_marginTop="16dp">
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Coil No">
+                        android:textColor="@android:color/white" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etCoilNo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnAddCoil"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:text="Add Coil"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/button_generate"
-                        android:textColor="@android:color/white"/>
+                    <!-- Gate Entry No -->
 
-                    <!-- Coil List -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvCoilList"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:visibility="gone"/>
 
-                    <!-- Final Submit -->
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnFinalSubmit"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:text="Submit All Coils"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/button_generate"
-                        android:textColor="@android:color/white"/>
+                    <!-- Coil Section -->
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/layoutCoilSection"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:visibility="gone"-->
+<!--                        android:layout_marginTop="16dp">-->
+
+<!--                        <com.google.android.material.textfield.TextInputLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:hint="Coil No">-->
+
+<!--                            <com.google.android.material.textfield.TextInputEditText-->
+<!--                                android:id="@+id/etCoilNo"-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="wrap_content" />-->
+<!--                        </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--                        <androidx.appcompat.widget.AppCompatButton-->
+<!--                            android:id="@+id/btnAddCoil"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="48dp"-->
+<!--                            android:text="Add Coil"-->
+<!--                            android:layout_marginTop="8dp"-->
+<!--                            android:background="@drawable/button_generate"-->
+<!--                            android:textColor="@android:color/white" />-->
+
+<!--                        <androidx.recyclerview.widget.RecyclerView-->
+<!--                            android:id="@+id/rvCoilList"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:visibility="gone" />-->
+
+<!--                        <androidx.appcompat.widget.AppCompatButton-->
+<!--                            android:id="@+id/btnFinalSubmit"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="48dp"-->
+<!--                            android:text="Submit All Coils"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:background="@drawable/button_generate"-->
+<!--                            android:textColor="@android:color/white" />-->
+<!--                    </LinearLayout>-->
+
+                    <!-- ================= HISTORY SECTION ================= -->
+
+
+
+
+
                 </LinearLayout>
-                </LinearLayout>
+
             </ScrollView>
+
         </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,16 +2,25 @@ package com.example.aplapollo.helper
 
 import android.app.Activity
 import android.app.Application
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.AppCompatButton
 import com.example.aplapollo.view.LoginActivity
+import com.example.apolloapl.R
 
 
 object Utils {
@@ -195,7 +204,6 @@ object Utils {
 //        }
 //    }
 
-}
 object WeightValidationUtils {
 
     fun validateWeight(
@@ -230,4 +238,43 @@ sealed class WeightResult {
 
     data class Error(val message: String) : WeightResult()
 }
+fun showErrorDialog(activity: Activity, message: String) {
 
+    if (activity.isFinishing || activity.isDestroyed) return
+
+    val dialog = Dialog(activity)
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    dialog.setContentView(R.layout.dialog_error)
+
+    dialog.setCancelable(false)
+
+    val tvTitle = dialog.findViewById<TextView?>(R.id.tvTitle)
+    val tvMessage = dialog.findViewById<TextView?>(R.id.tvMessage)
+    val btnOk = dialog.findViewById<AppCompatButton?>(R.id.btnOk)
+    val ivClose = dialog.findViewById<ImageView?>(R.id.ivClose)
+
+    tvTitle?.text = "Error"
+    tvMessage?.text = message
+
+    btnOk?.setOnClickListener { dialog.dismiss() }
+    ivClose?.setOnClickListener { dialog.dismiss() }
+    dialog.window?.apply {
+
+        setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        // ✅ SAFE WAY (NO resources issue)
+        val displayMetrics = android.util.DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        val width = (displayMetrics.widthPixels * 0.85).toInt()
+
+        setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
+        setGravity(android.view.Gravity.CENTER)
+    }
+
+    dialog.window?.setBackgroundDrawable(
+        ColorDrawable(Color.TRANSPARENT)
+    )
+
+    dialog.show()
+}}

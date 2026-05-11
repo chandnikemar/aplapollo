@@ -1,14 +1,21 @@
     package com.example.aplapollo.api
 
+
+
+    import HrSlittingStatusResponse
     import com.example.aplapollo.helper.Constants.ADD_Supplier
     import com.example.aplapollo.helper.Constants.GATE_Transaction
+    import com.example.aplapollo.helper.Constants.GET_ALL_Transporter_List
     import com.example.aplapollo.helper.Constants.GET_ActionType
     import com.example.aplapollo.helper.Constants.GET_BomInputCode
     import com.example.aplapollo.helper.Constants.GET_CRM_BY_Id
     import com.example.aplapollo.helper.Constants.GET_CRM_PlanID
     import com.example.aplapollo.helper.Constants.GET_CRM_PlannedList
+    import com.example.aplapollo.helper.Constants.GET_GATE_Transaction_Edit
+    import com.example.aplapollo.helper.Constants.GET_GATE_Transaction_List
     import com.example.aplapollo.helper.Constants.GET_Location
     import com.example.aplapollo.helper.Constants.GET_Ongoing_Pickl_Jobs
+    import com.example.aplapollo.helper.Constants.GET_Pick_AddChild
     import com.example.aplapollo.helper.Constants.GET_Pickling_By_Id
     import com.example.aplapollo.helper.Constants.GET_Pickling_Product_By_Barcode
     import com.example.aplapollo.helper.Constants.GET_PrintLabel
@@ -34,14 +41,16 @@
     import com.example.aplapollo.helper.Constants.QC_StatusSubmission
     import com.example.aplapollo.model.ActionTypeResponse
     import com.example.aplapollo.model.ApiCommonResponse
-    import com.example.aplapollo.model.BoMMasterResponse
+    import com.example.aplapollo.model.BomResponse
     import com.example.aplapollo.model.CRM.CRMPlanResponse
     import com.example.aplapollo.model.CRM.CRMTransactionRequest
     import com.example.aplapollo.model.CRM.CRMTransactionResponse
     import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
     import com.example.aplapollo.model.GateEntry.CoilSubmitRequest
+    import com.example.aplapollo.model.GateEntry.GateEntryResponse
     import com.example.aplapollo.model.GateEntry.GateTransactionRequest
     import com.example.aplapollo.model.GateEntry.GateTransactionResponse
+    import com.example.aplapollo.model.GateEntry.TransporterResponse
     import com.example.aplapollo.model.LocationPaginationRequest
     import com.example.aplapollo.model.LocationResponse
     import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -56,11 +65,11 @@
     import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
     import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionResponse
     import com.example.aplapollo.model.Slitting.ApiResponse
-    import com.example.aplapollo.model.Slitting.HrSlittingDetailsResponse
+    import com.example.aplapollo.model.Slitting.HrSlittingCompleteRequest
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
     import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
     import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
-    import com.example.aplapollo.model.Slitting.HrSlittingRequest
+
     import com.example.aplapollo.model.Slitting.HrSlittingscanReponse
     import com.example.aplapollo.model.Slitting.InitiateSlittingRequest
     import com.example.aplapollo.model.Slitting.InitiateSlittingResponse
@@ -137,7 +146,7 @@
         @GET(Get_Hr_Slitting_Detail)
         suspend fun getHrSlittingDetailsById(
             @Query("hrSlittingTranId") hrSlittingTranId: Int
-        ): Response<HrSlittingDetailsResponse>
+        ): Response<HrSlittingStatusResponse>
 
         @POST(GET_Location)
         suspend fun getLocationsWithPagination(
@@ -145,7 +154,7 @@
         ): Response<List<LocationResponse>>
         @POST(Get_Complete_Hr_Slitting)
         suspend fun completeHRSlitting(
-            @Body request: HrSlittingRequest
+            @Body request: HrSlittingCompleteRequest
         ): Response<ApiCommonResponse>
         @GET(Get_Stock_BYBatchOr_Barcode)
         suspend fun getStockByBatchOrBarcode(
@@ -172,6 +181,13 @@
         suspend fun getPicklingTransaction(
             @Query("picklingTranId") picklingTranId: Int
         ): Response<PicklingTransactionResponse>
+
+        @GET(GET_Pick_AddChild)
+        suspend fun getPicklingAddChild(
+            @Query("picklingTransId") picklingTranId: Int,
+            @Query("tenantCode") tenantCode: String
+        ): Response<ApiCommonResponse>
+
 
         //CRM
         @GET(GET_CRM_PlannedList)
@@ -229,6 +245,18 @@
         @GET(GET_BomInputCode)
         suspend fun getBomByInputCode(
             @Query("inputCode") inputCode: String
-        ): Response<List<BoMMasterResponse>>
+        ): Response<List<BomResponse>>
+
+
+        @GET(GET_GATE_Transaction_List)
+        suspend fun getGateTransactionList(
+        ):Response<List<GateEntryResponse>>
+        @GET(GET_ALL_Transporter_List)
+        suspend fun getTransporterList(
+        ):Response<List<TransporterResponse>>
+        @GET(GET_GATE_Transaction_Edit)
+        suspend fun getGateTransactionUpdate(
+            @Query("gateTransactionId") gateTransactionId: Int
+        ):Response<List<GateEntryResponse>>
 
     }

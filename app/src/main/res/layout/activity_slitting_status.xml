@@ -1,207 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:descendantFocusability="beforeDescendants"
+        android:background="@android:color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="0dp"
-            android:clipToPadding="false"
             android:orientation="vertical">
 
-            <!-- 1️⃣ Header: No padding -->
+            <!-- Header -->
             <include
                 android:id="@+id/idLayoutHeader"
                 layout="@layout/action_bar_comman_hedaer_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <!-- 2️⃣ Content below header with padding -->
+            <!-- Content -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp"
-            android:clipToPadding="false">
+                android:padding="16dp">
 
-
-                <LinearLayout
-                    android:id="@+id/layoutJobStatus"
+                <!-- Top Row -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginBottom="2dp">
+
+                    <TextView
+                        android:id="@+id/textInputMaterial"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Material Code : Material Code"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorAccent"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:minHeight="48dp"
+                        android:gravity="center_vertical"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/textJobNumber"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                     <TextView
                         android:id="@+id/textJobNumber"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Job#12344"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:gravity="start" />
+                        android:textSize="15sp"
+                        android:minHeight="48dp"
+                        android:gravity="center_vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </LinearLayout>
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="#BDBDBD"/>
 
-
-
-            <View
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="#BDBDBD" />
-
+                <!-- ================= Mother + Grade + Weight ================= -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layoutMotherCoilBatch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp">
+                    android:layout_marginBottom="6dp">
 
-
+                    <!-- 60% left / 40% right -->
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline70"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.6" />
+                        app:layout_constraintGuide_begin="236dp" />
 
+                    <!-- Split left into 2 -->
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline35"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="142dp" />
 
+                    <!-- Mother Barcode -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilMotherCoil"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:hint="Mother Barcode"
                         app:boxBackgroundMode="outline"
-                        app:boxStrokeColor="@color/black"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/guideline70"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintEnd_toStartOf="@id/guideline35"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginEnd="4dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/tvMotherCoil"
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
-                            android:text=""
+                            android:layout_height="40dp"
                             android:textColor="@color/black"
-                            android:textSize="14sp"
-                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:textSize="12sp"
                             android:focusable="false"
                             android:clickable="false"
-                            android:cursorVisible="false"
-                            android:background="@null" />
-
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Grade -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilGrade"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Grade"
+                        app:hintTextColor="@color/grey"
+                        app:boxBackgroundMode="outline"
+                        app:layout_constraintStart_toEndOf="@id/guideline35"
+                        app:layout_constraintEnd_toStartOf="@id/guideline70"
+                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp">
 
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etGrade"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:textColor="@color/black"
+                            android:padding="8dp"
+                            android:maxLines="1"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Weight -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilWeight"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:hint="Weight"
                         app:boxBackgroundMode="outline"
-                        app:boxStrokeColor="@color/black"
                         app:layout_constraintStart_toStartOf="@id/guideline70"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil">
+                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil"
+                        android:layout_marginStart="4dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/tvBatchNumber"
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
-                            android:text="cgccg"
+                            android:layout_height="40dp"
+                            android:textSize="10sp"
+                            android:gravity="center_vertical|end"
                             android:textColor="@color/black"
-                            android:textSize="14sp"
-                            android:gravity="center"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:focusable="false"
-                            android:clickable="false"
-                            android:cursorVisible="false"
-                            android:background="@null" />
-
+                            android:padding="4dp"
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
-
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
+                <!-- Recycler -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerSlitting"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:focusable="false"
+                    android:overScrollMode="never"
+                    android:layout_marginBottom="12dp"/>
 
-
-            <include
-                android:id="@+id/layoutScrapTable"
-                layout="@layout/layout_scrap_table"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilBom"
+                <!-- Scrap -->
+                <include
+                    android:id="@+id/layoutScrapTable"
+                    layout="@layout/layout_scrap_table"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Select BOM"
-                    android:layout_marginTop="16dp"
-                    app:boxBackgroundMode="outline">
+                    android:layout_marginBottom="16dp"/>
 
-                    <AutoCompleteTextView
-                        android:id="@+id/dropdownBom"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerBomDetails"
+                <!-- Buttons -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"/>
-            <LinearLayout
-                android:id="@+id/layoutActionButtons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="20dp">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnSave"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="Save"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/button_generate"
-                    android:layout_marginEnd="8dp"/>
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnSave"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Save"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/button_generate"
+                        android:layout_marginEnd="8dp"/>
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnPrintBarcode"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="Print Barcode Label"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/button_clear"
-                    android:layout_marginStart="8dp"/>
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnPrintBarcode"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Print Label"
+                        android:textAllCaps="false"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/button_clear"/>
+                </LinearLayout>
+
             </LinearLayout>
-
-        </LinearLayout> <!-- End of content below header -->
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </layout>
-

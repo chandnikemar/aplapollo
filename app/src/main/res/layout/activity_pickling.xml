@@ -23,16 +23,16 @@
             <!-- Table above button (optional) -->
 
 
-            <include
-                android:id="@+id/includeShiftStation"
-                layout="@layout/tabel_row_common"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+<!--            <include-->
+<!--                android:id="@+id/includeShiftStation"-->
+<!--                layout="@layout/tabel_row_common"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="8dp"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent" />-->
 
             <Button
                 android:id="@+id/btnInProgress"
@@ -44,7 +44,7 @@
                 android:background="@drawable/bg_dropdown_plan"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintTop_toBottomOf="@id/includeShiftStation"
+                app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
 

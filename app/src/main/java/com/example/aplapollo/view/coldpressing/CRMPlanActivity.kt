@@ -50,6 +50,7 @@ class CRMPlanActivity : AppCompatActivity() {
     private var serverIpSharedPrefText: String? = null
     private var serverHttpPrefText: String? = null
     private var scannedStockId: Int? = null
+    private var scannedBarcode: String? = null
     private var locationId: Int = 0
     private var planList = listOf<CRMPlanResponse>()
     private lateinit var planAdapter: ArrayAdapter<String>
@@ -198,12 +199,12 @@ private  var weight:Double=0.0
 
                     val stock = resource.data?.responseObject
 
-
+                    scannedBarcode = stock?.barcode ?: ""
                     if (stock?.stockId == null || stock.stockId == 0) {
 
                         showScanBox()
 
-                        // Red border
+
                         binding.tilScanCoil.boxStrokeColor =
                             ContextCompat.getColor(this, android.R.color.holo_red_dark)
 
@@ -211,18 +212,18 @@ private  var weight:Double=0.0
                         return@observe
                     }
 
-                    // ✅ Valid Barcode
+
                     scannedStockId = stock.stockId
 
-                    // Hide scan, show data
+
                     hideScanBox()
                     showBatchDetails()
                     weight = stock.weight ?: 0.0
-                    // Green border
+
                     binding.tilScanCoil.boxStrokeColor =
                         ContextCompat.getColor(this, android.R.color.holo_green_dark)
 
-                    // Bind Data
+
                     binding.tvscBatch.text = "Barcode: ${stock.barcode}"
                     binding.tvscQcDate.text = "Grade: ${stock.grade}"
                     binding.tvscSupplier.text = "Weight: ${stock.weight}"
@@ -443,6 +444,7 @@ private  var weight:Double=0.0
                 return@setOnClickListener
             }
 
+
             val request = CRMTransactionRequest(
                 crmTranId = 0,
 
@@ -450,20 +452,30 @@ private  var weight:Double=0.0
                 tenantCode=tenantCode,
                 locationId=locationId,
                 sourceStockId=scannedStockId?:0,
+                weight =weight,
                 desiredThickness=desiredThickness,
-                Weight=weight,
+
                 jobNumber="",
-                barcode="",
+                inputBarcode = null,
+                inputWeight = null,
+                barcode=scannedBarcode,
+                materialCode = null,
                 ironLossWeight=null,
                 scrapWeight=null,
                 weightAfterCRM=null,
+
                 isCoilDivided = false,
                 dividedCRMTranId=null,
-                completedBy = "",
-                completedDate="",
-                status="",
-                remarks="",
-                isPlanned=true
+                completedBy = null,
+                completedDate=null,
+                status="InProgress",
+                remarks="CRM process InProgress ",
+                isPlanned = false,
+                process=null,
+                machineName = null,
+                tamper = null,
+                grade=null,
+                component=null
 
             )
 
@@ -476,9 +488,7 @@ private  var weight:Double=0.0
 
 
 
-//        binding.btnSubmit.setOnClickListener {
-//            startActivity(Intent(this@CRMPlanActivity, CRMTransactionActivity::class.java))
-//        }
+
     }
     private fun resetAllUI() {
 

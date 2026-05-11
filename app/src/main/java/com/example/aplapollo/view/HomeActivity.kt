@@ -10,6 +10,7 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.view.GP.GPActivity
+import com.example.aplapollo.view.GateEntry.GateEntryTransactionActivity
 import com.example.aplapollo.view.Pickling.PicklingActivity
 import com.example.aplapollo.view.ProductionEntry.InputProductionEntryActivity
 import com.example.aplapollo.view.coldpressing.CRMActivity
@@ -38,7 +39,7 @@ class HomeActivity : AppCompatActivity() {
 
 
         binding.card1.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, GateEntryActivity::class.java))
+            startActivity(Intent(this@HomeActivity, GateEntryTransactionActivity::class.java))
         }
         binding.card2.setOnClickListener {
             startActivity(Intent(this@HomeActivity, QualityCheckActivity::class.java))

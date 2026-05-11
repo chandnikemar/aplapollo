@@ -1,11 +1,10 @@
 package com.example.aplapollo.view.Pickling
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -14,17 +13,11 @@ import com.example.aplapollo.adapter.Pickling.OngoingJobPicklingAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Constants.BarcodeValue
-import com.example.aplapollo.helper.Constants.LocationId
-import com.example.aplapollo.helper.Constants.LocationName
 import com.example.aplapollo.helper.Constants.PicklingId
-import com.example.aplapollo.helper.Constants.WidthId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
-import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModel
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModelfactory
-import com.example.aplapollo.viewmodel.location.LocationViewModel
-import com.example.aplapollo.viewmodel.location.LocationViewModelFactory
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityPicklingBinding
 import es.dmoral.toasty.Toasty
@@ -33,33 +26,34 @@ class PicklingActivity : AppCompatActivity() {
     private lateinit var binding:ActivityPicklingBinding
     private lateinit var progress: ProgressDialog
     private lateinit var session: SessionManager
-    private lateinit var locationViewModel: LocationViewModel
+
         private  lateinit var  picklingViewModel: PicklingViewModel
     private var baseUrl: String = ""
     private var userName: String? = ""
     private var token: String? = ""
     private  var tenantCode:String?=""
     private  var userDetail: HashMap<String, Any?>?=null
+    private var locationId: Int = 0
+
     private var serverIpSharedPrefText: String? = null
     private var serverHttpPrefText: String? = null
-    private var selectedLocationId: Int? = null
-    private var selectedLocationName: String? = null
+
     private lateinit var ongoingJobAdapter: OngoingJobPicklingAdapter
+    private var selectedProcessName: String = ""
+    private var selectedMachineName: String = ""
 
-
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
                 binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling)
                 binding.idLayoutHeader.tvTitle.text = "Pickling"
                 supportActionBar?.hide()
-                progress = ProgressDialog(this)
-                progress.setMessage("Please Wait...")
+
                 val retrofitInstance =
                     RetrofitInstance.getInstance(applicationContext)
                 session = SessionManager(this)
                 userDetail = session.getUserDetails()
-                val viewModelProviderFactory = LocationViewModelFactory(application, retrofitInstance)
-                locationViewModel = ViewModelProvider(this, viewModelProviderFactory)[LocationViewModel::class.java]
+
                 val viewModelProviderFactoryPickling = PicklingViewModelfactory(application, retrofitInstance)
                 picklingViewModel = ViewModelProvider(this, viewModelProviderFactoryPickling)[PicklingViewModel::class.java]
                 binding.idLayoutHeader.ivBack.setOnClickListener {
@@ -84,37 +78,30 @@ class PicklingActivity : AppCompatActivity() {
                 supportActionBar?.hide()
                 progress = ProgressDialog(this)
                 progress.setMessage("Please Wait...")
-                val stationDropdown = binding.includeShiftStation.dropdownFields
-                binding.includeShiftStation.textOperator.setText(userName)
-                val locationRequest = LocationPaginationRequest(
-                    locationId = 0,
-                    locationName = "",
-                    locationCode = "",
-                    locationType = null,
-                    displayName = null,
-                    parentLocationId = null,
-                    isActive = true,
-                    rowSize = 10,
-                    currentPage = 1
-                )
         binding.rvOngoingJobs.layoutManager = LinearLayoutManager(this)
-        locationViewModel.getLocations( locationRequest)
-        selectedLocationId?.let { picklingViewModel.getOngoingPicklingJobs(it) }
+        locationId = intent.getIntExtra(Constants.LocationId, -1)
+        selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
+        selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
+        Log.d("LOCATION_ID", "Received locationId = $locationId")
+
+        if (locationId != -1) {
+            picklingViewModel.getOngoingPicklingJobs(locationId)
+
+        } else {
+            Toasty.error(this, "Invalid LocationId").show()
+        }
         ongoingJobAdapter = OngoingJobPicklingAdapter(emptyList()) { selectedJob ->
 
-            if (selectedLocationId == null) {
-                Toasty.warning(this, "Please select a location first").show()
-                return@OngoingJobPicklingAdapter
-            }
+
 
             val intent = Intent(this, PicklingOutwardActivity::class.java)
-            intent.putExtra(LocationId, selectedLocationId!!)
-            intent.putExtra(LocationName, selectedLocationName ?: "")
+
             intent.putExtra(PicklingId, selectedJob.picklingTranId)
             intent.putExtra(BarcodeValue, selectedJob.barcode)
-            intent.putExtra(WidthId, selectedJob.width)
             intent.putExtra("THICKNESS", selectedJob.thickness)
             intent.putExtra("GRADE", selectedJob.grade)
+            intent.putExtra("PROCESS_NAME", selectedProcessName)
+            intent.putExtra("MACHINE_NAME", selectedMachineName)
 
             startActivity(intent)
         }
@@ -124,83 +111,18 @@ class PicklingActivity : AppCompatActivity() {
             adapter = ongoingJobAdapter
         }
 
-        stationDropdown.setOnItemClickListener { _, _, position, _ ->
-
-                    val selectedLocation =
-                        (locationViewModel.locationListMutableLiveData.value as? Resource.Success)
-                            ?.data
-                            ?.get(position)
-
-                    selectedLocation?.let {
-                        selectedLocationId = it.locationId
-                        selectedLocationName = it.locationName
-                        selectedLocationId = selectedLocation.locationId
-                        picklingViewModel.getOngoingPicklingJobs(it.locationId)
-                        Log.d(
-                            "STATION_SELECTED",
-                            "ID=$selectedLocationId, NAME=$selectedLocationName"
-                        )
-
-                    }
-                }
-
-                binding.btnInProgress.setOnClickListener {
-
-                    val selectedLocation =
-                        binding.includeShiftStation.dropdownFields.text.toString().trim()
-
-                    if (selectedLocationId == null) {
-                        Toasty.warning(this, "Please select location first").show()
-                        return@setOnClickListener
-                    }
-
+                     binding.btnInProgress.setOnClickListener {
                     val intent = Intent(this, PicklingInwardActivity::class.java)
-                    intent.putExtra(LocationId, selectedLocationId!!)
-                    intent.putExtra(LocationName, selectedLocationName ?: "")
-                    startActivity(intent)
+                         intent.putExtra(Constants.LocationId, locationId)
+                         startActivity(intent)
                 }
-                locationViewModel.locationListMutableLiveData.observe(this) { resource ->
-                    when (resource) {
 
-                        is Resource.Loading -> {
-                            progress.show()
-
-                        }
-
-                        is Resource.Success -> {
-                            progress.dismiss()
-                            val locations = resource.data ?: emptyList()
-
-
-                            val stationNames = locations.map { it.locationName }
-
-                            val adapter = ArrayAdapter(
-                                this,
-                                android.R.layout.simple_list_item_1,
-                                stationNames
-                            )
-                            binding.includeShiftStation.dropdownFields.setAdapter(adapter)
-                        }
-
-                        is Resource.Error -> {
-                            Toast.makeText(
-                                this,
-                                resource.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        else -> {}
-                    }
-                }
         picklingViewModel.ongoingJobsLiveData.observe(this) { resource ->
             when (resource) {
                 is Resource.Loading -> progress.show()
                 is Resource.Success -> {
                     progress.dismiss()
-                    selectedLocationName?.let {
-                        binding.includeShiftStation.dropdownFields.setText(it, false)
-                    }
+
                     val jobs = resource.data ?: emptyList()
 
                     if (jobs.isEmpty()) {
@@ -221,9 +143,11 @@ class PicklingActivity : AppCompatActivity() {
         }
 
             }
+
     override fun onResume() {
         super.onResume()
-        selectedLocationId?.let { picklingViewModel.getOngoingPicklingJobs(locationId = it) }
+        if (locationId != -1) {
+            picklingViewModel.getOngoingPicklingJobs(locationId)
+        }
     }
-
 }

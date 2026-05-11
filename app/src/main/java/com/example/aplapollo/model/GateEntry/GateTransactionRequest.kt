@@ -8,6 +8,5 @@ data class GateTransactionRequest(
     val TransporterName: String,
     val TransporterNo: String,
     val LRNumber: String,
-    val GateEntryNo: String? = null
-
+    val GateEntryNo: String? = null,
 )

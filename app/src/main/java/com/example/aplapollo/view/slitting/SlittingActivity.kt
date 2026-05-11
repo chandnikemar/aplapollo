@@ -46,9 +46,9 @@
                 private var locationId: Int = 0
 
                 private lateinit var ongoingJobAdapter: OngoingJobAdapter
-private var selectedLocationId:Int=0
-                private var selectedProcessName: String = ""
-                private var selectedMachineName: String = ""
+
+                    private var selectedProcessName: String = ""
+                    private var selectedMachineName: String = ""
 
                 override fun onCreate(savedInstanceState: Bundle?) {
                     super.onCreate(savedInstanceState)

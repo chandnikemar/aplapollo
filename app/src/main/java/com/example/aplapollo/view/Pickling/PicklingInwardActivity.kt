@@ -28,11 +28,11 @@ class PicklingInwardActivity : AppCompatActivity() {
     private var baseUrl: String = ""
     private var userName: String? = ""
     private var token: String? = ""
-
     private  var userDetail: HashMap<String, Any?>?=null
     private var serverIpSharedPrefText: String? = null
     private var serverHttpPrefText: String? = null
-    private var locationId:Int=0
+    private var locationId: Int = 0
+    private var locationName: String = ""
     private var sourceStockId: Int = 0
     private var scannedBarcode: String? = null
     private  var tenantCode:String?=null
@@ -50,10 +50,8 @@ class PicklingInwardActivity : AppCompatActivity() {
         userDetail = session.getUserDetails()
         val viewModelProviderFactoryPickling = PicklingViewModelfactory(application, retrofitInstance)
         picklingViewModel = ViewModelProvider(this, viewModelProviderFactoryPickling)[PicklingViewModel::class.java]
-        binding.idLayoutHeader.ivBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-        if (userDetail!!.isEmpty()) {
+        binding.idLayoutHeader.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed()}
+            if (userDetail!!.isEmpty()) {
             Toasty.error(this, "User details are missing.", Toasty.LENGTH_SHORT).show()
         } else {
 
@@ -73,7 +71,7 @@ class PicklingInwardActivity : AppCompatActivity() {
         }
 
         locationId = intent.getIntExtra(LocationId, 0)
-
+        Log.d("Tanent_Code","Tenant Code= $locationId")
 
         binding.layoutBatchDetails.visibility = View.GONE
 
@@ -93,23 +91,23 @@ class PicklingInwardActivity : AppCompatActivity() {
                     Log.d("BARCODE", data.toString())
                     binding.layoutBatchDetails.visibility = View.VISIBLE
 
-                    binding.inCommanBatch.tvItemCode.text =
-                        "Item Code : ${data?.materialCode}"
+                    binding.inPicklingBatch.tvItemCode.text =
+                        data?.materialCode ?: ""
 
-                    binding.inCommanBatch.tvGrade.text =
-                        "Grade : ${data?.grade}"
-                    binding.inCommanBatch.tvLength.text =
-                        "Length : ${data?.length}"
+                    binding.inPicklingBatch.tvGrade.text =
+                        "${data?.grade ?: "-"}"
 
-                    binding.inCommanBatch.tvWidth.text =
-                        "Width : ${data?.width} MM"
+                    binding.inPicklingBatch.tvSupplierBatchNo.text =
+                        "${data?.supplierBatchNo ?: "-"}"
 
-                    binding.inCommanBatch.tvThickness.text =
-                        "Thickness : ${data?.thickness} MM"
+                    binding.inPicklingBatch.tvWidth.text =
+                        "${data?.width ?: 0} MM"
 
-                    binding.inCommanBatch.tvWeight.text =
-                        "Weight : ${data?.weight} KG"
+                    binding.inPicklingBatch.tvThickness.text =
+                        "${data?.thickness ?: 0} MM"
 
+                    binding.inPicklingBatch.tvWeight.text =
+                        "${data?.weight ?: 0} KG"
                     sourceStockId = data?.stockId!!
                     scannedBarcode = data?.barcode
                     tenantCode=data?.tenantCode
@@ -179,7 +177,45 @@ class PicklingInwardActivity : AppCompatActivity() {
             picklingViewModel
                 .fetchPicklingBarcodeData( barcode)
         }
-       binding.btncSaves.setOnClickListener {
+        binding.commanInputRow.btnClear.setOnClickListener {
+
+            // Clear input field
+            binding.commanInputRow.inputField.setText("")
+
+            // Hide data card
+            binding.layoutBatchDetails.visibility = View.GONE
+
+            // Reset values
+            scannedBarcode = null
+            sourceStockId = 0
+            transactionId = 0
+
+            Toasty.info(this, "Input cleared").show()
+        }
+        binding.btnbClear.setOnClickListener {
+
+            // Clear input field also (optional but recommended)
+            binding.commanInputRow.inputField.setText("")
+
+            // Clear UI data
+            binding.inPicklingBatch.tvItemCode.text = ""
+            binding.inPicklingBatch.tvGrade.text = ""
+            binding.inPicklingBatch.tvSupplierBatchNo.text = ""
+            binding.inPicklingBatch.tvWidth.text = ""
+            binding.inPicklingBatch.tvThickness.text = ""
+            binding.inPicklingBatch.tvWeight.text = ""
+
+            // Hide card
+            binding.layoutBatchDetails.visibility = View.GONE
+
+            // Reset variables
+            scannedBarcode = null
+            sourceStockId = 0
+            transactionId = 0
+
+            Toasty.info(this, "Data cleared").show()
+        }
+       binding.btnSave.setOnClickListener {
            if (locationId == 0) {
                Toasty.warning(this, "Location is missing").show()
                return@setOnClickListener
@@ -197,19 +233,15 @@ class PicklingInwardActivity : AppCompatActivity() {
 
             val request = ProcessPicklingRequest(
                 picklingTranId = 0,
-                tenantCode =tenantCode ?: "",
+                tenantCode=tenantCode,
                 locationId = locationId,
                 sourceStockId = sourceStockId,
                 jobNumber = "",
-                barcode = scannedBarcode?:"",
-                ironLossWeight = null,
-                scrapWeight = null,
-                weightAfterPickling = null,
-                completedBy = "",
-                completedDate ="",
                 status = "",
                 remarks = "Pickling Proccess",
-                isDivided = false
+                isDivided = false,
+                IsActive=true,
+
             )
 
             picklingViewModel.submitPickling(request)
@@ -217,11 +249,11 @@ class PicklingInwardActivity : AppCompatActivity() {
         }
 
     }
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        if (::progress.isInitialized && progress.isShowing) {
-//            progress.dismiss()
-//        }
-//    }
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::progress.isInitialized && progress.isShowing) {
+            progress.dismiss()
+        }
+    }
 
 }

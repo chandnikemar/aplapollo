@@ -1,5 +1,6 @@
 package com.example.aplapollo.viewmodel.slittingstatus
 
+import HrSlittingStatusResponse
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -8,9 +9,7 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.ApiCommonResponse
-import com.example.aplapollo.model.Slitting.HrSlittingDetailsResponse
-import com.example.aplapollo.model.Slitting.HrSlittingRequest
-
+import com.example.aplapollo.model.Slitting.HrSlittingCompleteRequest
 import com.example.aplapollo.repository.APLRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -21,7 +20,7 @@ class SlittingStatusViewModel(
     private val aplRepository: APLRepository
 ) : AndroidViewModel(application) {
 
-    val hrSlittingDetailsLiveData: MutableLiveData<Resource<HrSlittingDetailsResponse>> =
+    val hrSlittingDetailsLiveData: MutableLiveData<Resource<HrSlittingStatusResponse>> =
         MutableLiveData()
 
     val completeHrSlittingLiveData: MutableLiveData<Resource<ApiCommonResponse>> =
@@ -37,7 +36,7 @@ class SlittingStatusViewModel(
     }
     fun completeHrSlitting(
 
-        request: HrSlittingRequest
+        request:HrSlittingCompleteRequest
     ) {
         viewModelScope.launch {
             safeApiCallCompleteHrSlitting( request)
@@ -53,7 +52,7 @@ class SlittingStatusViewModel(
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response: Response<HrSlittingDetailsResponse> =
+                val response: Response<HrSlittingStatusResponse> =
                     aplRepository.getHrSlittingDetailsById( tranId)
 
                 hrSlittingDetailsLiveData.postValue(
@@ -73,8 +72,8 @@ class SlittingStatusViewModel(
     }
 
     private fun handleHrSlittingDetailsResponse(
-        response: Response<HrSlittingDetailsResponse>
-    ): Resource<HrSlittingDetailsResponse> {
+        response: Response<HrSlittingStatusResponse>
+    ): Resource<HrSlittingStatusResponse> {
 
         var errorMessage = ""
 
@@ -99,7 +98,7 @@ class SlittingStatusViewModel(
   //  ==================================================Slitting complte APi
   private suspend fun safeApiCallCompleteHrSlitting(
 
-      request: HrSlittingRequest
+      request: HrSlittingCompleteRequest
   ) {
       completeHrSlittingLiveData.postValue(Resource.Loading())
 

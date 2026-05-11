@@ -15,6 +15,7 @@ import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.view.Pickling.PicklingActivity
+import com.example.aplapollo.view.coldpressing.CRMActivity
 import com.example.aplapollo.view.slitting.SlittingActivity
 import com.example.aplapollo.viewmodel.actiontype.ActionTypeViewModel
 import com.example.aplapollo.viewmodel.actiontype.ActionTypeViewModelfactory
@@ -74,7 +75,10 @@ class InputProductionEntryActivity : AppCompatActivity() {
         )[MachineViewModel::class.java]
 
         session = SessionManager(this)
+        val user = session.getUserDetails()
+        val userName = user["userName"] ?: ""
 
+        binding.textOperator.text = userName.toString()
         binding.dropdownProcess.isEnabled = false
         binding.machineName.isEnabled = false
         binding.machineRW.visibility = View.GONE
@@ -254,7 +258,7 @@ class InputProductionEntryActivity : AppCompatActivity() {
                 Toasty.warning(this, "Select machine").show()
             }
 
-            selectedProcessName.equals("HRC", true) -> {
+            selectedProcessName.equals("Slitting", true) -> {
 
                 val intent = Intent(this, SlittingActivity::class.java)
 
@@ -273,12 +277,25 @@ class InputProductionEntryActivity : AppCompatActivity() {
 
                 intent.putExtra(Constants.LocationId, selectedLocationId)
                 intent.putExtra(Constants.LocationName, selectedLocationName)
+                intent.putExtra("PROCESS_NAME", selectedProcessName)
+                intent.putExtra("MACHINE_NAME", selectedMachineName)
+
+                startActivity(intent)
+            }
+            selectedProcessName.equals("CRFH", true) -> {
+
+                val intent = Intent(this, CRMActivity::class.java)
+
+                intent.putExtra(Constants.LocationId, selectedLocationId)
+                intent.putExtra(Constants.LocationName, selectedLocationName)
+                intent.putExtra("PROCESS_NAME", selectedProcessName)
+                intent.putExtra("MACHINE_NAME", selectedMachineName)
 
                 startActivity(intent)
             }
 
             else -> {
-                Toasty.info(this, "Only HRC allowed for Slitting").show()
+                Toasty.info(this, "Select Valid Process").show()
             }
         }
     }

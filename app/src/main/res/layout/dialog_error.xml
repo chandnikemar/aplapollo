@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/lighter_grey">
+
+    <!-- Close icon -->
+    <ImageView
+        android:id="@+id/ivClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Error"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#D32F2F"
+        android:gravity="center"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Something went wrong"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:textColor="#333333"/>
+
+    <!-- OK button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOk"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="OK"
+        android:textAllCaps="false"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#D32F2F"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>

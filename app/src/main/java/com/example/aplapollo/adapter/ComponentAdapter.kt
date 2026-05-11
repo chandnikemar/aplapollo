@@ -1,65 +1,125 @@
 package com.example.aplapollo.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.Typeface
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.aplapollo.model.BoMComponentResponse
-import com.example.aplapollo.model.Slitting.ComponentRequest
-import com.example.apolloapl.R
+import com.example.aplapollo.model.BomComponent
+import com.example.apolloapl.databinding.ItemComponentBinding
+
+
 
 class ComponentAdapter(
-    private val list: List<BoMComponentResponse>
+
+    private val list: MutableList<BomComponent>,
+    private val inputWeightTon: Double,
+    private val onComponentChanged: (() -> Unit)? = null
+
 ) : RecyclerView.Adapter<ComponentAdapter.ViewHolder>() {
 
-    // Store entered weights
-    private val weightMap = mutableMapOf<Int, Double>()
+    private val units = listOf("Kg")
 
-    inner class ViewHolder(val binding: View) :
-        RecyclerView.ViewHolder(binding) {
-
-        val tvComponent = binding.findViewById<TextView>(R.id.tvComponentCode)
-        val etWeight = binding.findViewById<EditText>(R.id.etWeight)
+    inner class ViewHolder(val binding: ItemComponentBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        var watcher: TextWatcher? = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_bom_component, parent, false)
-        return ViewHolder(view)
-    }
 
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        val item = list[position]
+        val binding = ItemComponentBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
 
-        holder.tvComponent.text = item.componentCode
-
-        // Restore value if already entered
-        holder.etWeight.setText(weightMap[position]?.toString() ?: "")
-
-        holder.etWeight.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val weight = s.toString().toDoubleOrNull() ?: 0.0
-                weightMap[position] = weight
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+        return ViewHolder(binding)
     }
 
     override fun getItemCount() = list.size
 
-    // ✅ Get updated data with weights
-    fun getUpdatedComponents(): List<ComponentRequest> {
-        return list.mapIndexed { index, item ->
-            ComponentRequest(
-                MaterialCode = item.componentCode,
-                Weight = weightMap[index] ?: 0.0
-            )
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        val item = list[position]
+        val b = holder.binding
+
+        // ================= BASIC DATA =================
+        b.tvComponentCode.text = item.componentCode
+        b.tvComponentDescription.text = item.materialDescription
+
+        item.Uom = "Kg"
+
+        // ================= SPINNER =================
+        val adapter = object : ArrayAdapter<String>(
+            holder.itemView.context,
+            android.R.layout.simple_spinner_item,
+            units
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.setTextColor(Color.BLACK)
+                view.setTypeface(null, Typeface.BOLD)
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+                view.setTextColor(Color.BLACK)
+                return view
+            }
         }
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        b.spinnerComponentUom.adapter = adapter
+        b.spinnerComponentUom.setSelection(0)
+        b.spinnerComponentUom.isEnabled = false
+        b.spinnerComponentUom.isClickable = false
+
+        // ================= WEIGHT INPUT =================
+        holder.watcher?.let {
+            b.etComponentWeight.removeTextChangedListener(it)
+        }
+
+        b.etComponentWeight.setText(
+            if (item.weight > 0) item.weight.toString() else ""
+        )
+
+        val watcher = object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable?) {
+
+                val weight = s.toString().toDoubleOrNull() ?: 0.0
+
+                // ONLY ASSIGN VALUE (NO VALIDATION)
+                item.weight = weight
+
+                onComponentChanged?.invoke()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+
+        b.etComponentWeight.addTextChangedListener(watcher)
+        holder.watcher = watcher
+    }
+
+    // ================= HELPERS =================
+
+    fun getUpdatedList(): List<BomComponent> = list
+
+    fun getUom(position: Int): String = "Kg"
+
+    fun updateList(newList: List<BomComponent>) {
+        list.clear()
+        list.addAll(newList)
+        notifyDataSetChanged()
     }
 }

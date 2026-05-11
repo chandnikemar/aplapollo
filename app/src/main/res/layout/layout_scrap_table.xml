@@ -21,8 +21,7 @@
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tvIronTitle"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.5"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Iron Loss Header -->
     <TextView
@@ -38,8 +37,7 @@
         android:gravity="center"
         app:layout_constraintStart_toEndOf="@id/tvScrapTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.5"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Scrap Weight Input -->
     <EditText
@@ -54,8 +52,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvScrapTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tvIronLossValue"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.5"/>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <!-- Iron Loss Calculated Value -->
     <TextView
@@ -71,8 +68,6 @@
         app:layout_constraintTop_toBottomOf="@id/tvIronTitle"
         app:layout_constraintStart_toEndOf="@id/etScrapWeight"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.5"/>
-
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

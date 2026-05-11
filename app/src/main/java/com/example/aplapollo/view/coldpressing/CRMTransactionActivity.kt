@@ -3,25 +3,26 @@ package com.example.aplapollo.view.coldpressing
 import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.aplapollo.adapter.Coldpressing.CRMAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
-import com.example.aplapollo.helper.Constants.ChildMotherExceedError
 import com.example.aplapollo.helper.Constants.CompleteStatus
-import com.example.aplapollo.helper.Constants.CrmTranJob
 import com.example.aplapollo.helper.Constants.LocationId
-import com.example.aplapollo.helper.Constants.LocationName
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
-import com.example.aplapollo.helper.WeightResult
-import com.example.aplapollo.helper.WeightValidationUtils
+import com.example.aplapollo.model.BomOutput
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.model.CRM.CRMTransactionResponse
 import com.example.aplapollo.model.PrintLabelBarcodeRequest
+import com.example.aplapollo.viewmodel.bommaster.BomInputCodeViewModelfactory
+import com.example.aplapollo.viewmodel.bommaster.BomViewModel
 import com.example.aplapollo.viewmodel.crm.CRMViewModel
 import com.example.aplapollo.viewmodel.crm.CRMViewModelfactory
 import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
@@ -35,6 +36,7 @@ class CRMTransactionActivity : AppCompatActivity() {
     private lateinit var progress: ProgressDialog
     private  lateinit var crmViewModel: CRMViewModel
     private lateinit var printlabelViewModel: PrintlabelViewModel
+    private lateinit var bomViewModel: BomViewModel
     private lateinit var session: SessionManager
     private var baseUrl: String = ""
     private var userName: String? = ""
@@ -46,14 +48,21 @@ class CRMTransactionActivity : AppCompatActivity() {
     private var tranId: Int = 0
     private var planId:Int=0
     private var locationId: Int = 0
-    private var locationName: String = ""
+
 private var sourceStockId:Int=0
     private var barcode: String = ""
+    private var motherBarcode: String = ""
     private var jobNumber:String=""
     private var motherWeight: Double = 0.0
     private var isCoilDivided: Boolean = false
+    private lateinit var selectedProcess:String
+    private lateinit var selectedMachineName:String
+    private lateinit var grade:String
     private var isWeightErrorShown = false
-
+    private var inputMaterialCode: String = ""
+    private var inputBarcode:String=""
+    private var bomOutputs: List<BomOutput> = emptyList()
+    private var crmAdapter: CRMAdapter? = null
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +82,9 @@ private var sourceStockId:Int=0
         val viewModelProviderFactorys = QcprintlabelViewModelFactory(application, retrofitInstance)
         printlabelViewModel =
             ViewModelProvider(this, viewModelProviderFactorys)[PrintlabelViewModel::class.java]
+        val viewModelProviderFactor = BomInputCodeViewModelfactory(application, retrofitInstance)
+        bomViewModel =
+            ViewModelProvider(this, viewModelProviderFactor)[BomViewModel::class.java]
         session = SessionManager(this)
         userDetail = session.getUserDetails()
 //        locationId = intent.getIntExtra("LOCATION_ID", 0)
@@ -89,23 +101,39 @@ private var sourceStockId:Int=0
             tenantCode= userDetail!![SessionManager.Key_tenantCode].toString()
             serverIpSharedPrefText = userDetail!![Constants.KEY_SERVER_IP].toString()
             serverHttpPrefText = userDetail!![Constants.KEY_HTTP].toString()
-            baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
-            // ⭐ PRINT TOKEN HERE
-//            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
-//            Log.d("Tanent_Code","Tenant Code= $tenantCode")
-            tranId = intent.getIntExtra(CrmTranJob, 0)
-            locationId = intent.getIntExtra(LocationId, 0)
-            locationName = intent.getStringExtra(LocationName) ?: ""
-            // Disable until API loads
-            binding.jobTable.editC4.isEnabled = false
-            binding.layoutScrapTable.etScrapWeight.isEnabled = false
+            baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"}
 
-            binding.layoutScrapTable.tvIronLossValue.isEnabled = false
+            // Disable until API loads
+        binding.recyclerOutput.layoutManager = LinearLayoutManager(this)
+
+//        crmAdapter = CRMAdapter(
+//            list = mutableListOf(),
+//            bomOutputs = emptyList(),
+//            onWeightChanged = { calculateAndShowIronLoss() }
+//        )
+
+        binding.recyclerOutput.adapter = crmAdapter
+        // Get Intent extras safely
+        selectedProcess = intent.getStringExtra("PROCESS_NAME") ?: ""
+        selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
+       tranId=intent.getIntExtra("CRM_TRAN_JOB",0)
+        inputBarcode=intent.getStringExtra(Constants.BarcodeValue)?:""
+//        transactionId = intent.getIntExtra(Constants.PicklingId, 0)
+        sourceStockId = intent.getIntExtra(Constants.SourceStockId, 0)
+        locationId = intent.getIntExtra(LocationId, 0)
+        grade= intent.getStringExtra(Constants.GradeV)?:""
+        Log.d("LOCATION_DEBUG", "Received LocationId = $locationId")
+        if (tranId == 0) {
+            Toasty.error(this, "Invalid Transaction ID").show()
+            finish()
+            return
+        }
+
             binding.btnSave.isEnabled = false
 // Attach same watcher to both fields
-            binding.layoutScrapTable.etScrapWeight.addTextChangedListener(weightWatcher)
 
-            binding.jobTable.editC4.addTextChangedListener(weightWatcher)
+
+
 
             crmViewModel.getCRMPlanTranDetailById(tranId)
             crmViewModel.CrmPlanTranDetailLiveData.observe(this) { resource ->
@@ -118,7 +146,15 @@ private var sourceStockId:Int=0
                             Toasty.error(this, "No transaction data found").show()
                             return@observe
                         }
+                        val materialCode = resource?.data.materialCode ?: ""
+                        inputMaterialCode = materialCode
+                        binding.textInputMaterial.text = "$materialCode"
 
+                        if (materialCode.isNotEmpty()) {
+                            bomViewModel.getBom(materialCode)
+                            Log.d("BOM_DEBUG", "MaterialCode = $materialCode")
+                        }
+                        crmAdapter?.updateList(listOf(transaction.barcode ?: ""))
                         bindTransactionData(transaction)
                         binding.btnSave.isEnabled = true
 
@@ -132,7 +168,7 @@ private var sourceStockId:Int=0
                     else -> {}
                 }
             }
-        }
+
         crmViewModel.ProcessCRMLiveData.observe(this) { resource ->
             when (resource) {
 
@@ -197,20 +233,47 @@ private var sourceStockId:Int=0
 
                 else -> {}
             }}
+        bomViewModel.bomLiveData.observe(this) { response ->
 
+            when (response) {
+
+                is Resource.Success -> {
+                    progress.dismiss()
+
+                    val bomList = response.data ?: emptyList()
+
+                    bomOutputs = bomList.flatMap { it.boMOutput }
+                    crmAdapter?.updateList(listOf(barcode ?: ""))
+
+                    crmAdapter?.setBomOutputs(bomOutputs)
+                    // ✅ Step 1: ensure adapter has data
+//                    if (crmAdapter?.getAllItems()?.isEmpty() == true && barcode.isNotEmpty()) {
+//                        crmAdapter?.updateList(listOf(barcode))
+//                    }
+
+                }
+
+                is Resource.Error -> {
+                    progress.dismiss()
+                    Toasty.error(this, response.message ?: "Error").show()
+                }
+
+                else -> {}
+            }
+        }
         // Listen to Scrap Weight
 
         binding.btnSave.setOnClickListener { submitCRM() }
 
     }
     private fun bindTransactionData(transaction: CRMTransactionResponse) {
-
+        motherBarcode=transaction.motherBarcode
         binding.textJobNumber.text = "Job #${transaction.jobNumber}"
-        binding.tvMotherCoil.setText(transaction.motherBarcode)
+        binding.tvMotherCoil.setText(transaction.motherBarcode).toString()
         binding.tvBatchNumber.setText(transaction.motherCoilWeight.toString())
-        binding.jobTable.textC2?.setText(transaction.barcode)
+//        binding.tvBarcode?.setText(transaction.barcode)
         barcode = transaction.barcode ?: ""
-        //  IMPORTANT
+
         motherWeight = transaction.motherCoilWeight ?: 0.0
 
         tranId = transaction.crmTranId
@@ -218,9 +281,10 @@ private var sourceStockId:Int=0
         tenantCode = transaction.tenantCode
         sourceStockId = transaction.sourceStockId
         jobNumber = transaction.jobNumber
-        binding.jobTable.editC4.isEnabled = true
-        binding.layoutScrapTable.etScrapWeight.isEnabled = true
+//        binding.jobTable.editC4.isEnabled = true
 
+        // ✅ ADD HERE
+        crmAdapter?.updateList(listOf(barcode))
         calculateAndShowIronLoss()
     }
     private val weightWatcher = object : android.text.TextWatcher {
@@ -237,47 +301,23 @@ private var sourceStockId:Int=0
     private fun calculateAndShowIronLoss() {
 
         // Wait until API loads
-        if (motherWeight <= 0) {
-            binding.layoutScrapTable.tvIronLossValue?.setText("0.00")
-            return
-        }
-
-        val scrapWeight = binding.layoutScrapTable.etScrapWeight
-            ?.text.toString().toDoubleOrNull() ?: 0.0
-
-        val childWeight = binding.jobTable.editC4
-            ?.text.toString().toDoubleOrNull() ?: 0.0
 
 
-        val totalUsedWeight = scrapWeight + childWeight
+
+
+        val childWeight = crmAdapter?.getTotalWeight()?:0.0
+
+
+
 
         // Validation
-        if (totalUsedWeight > motherWeight) {
 
-            if (!isWeightErrorShown) {
-                Toasty.error(
-                    this,
-                    ChildMotherExceedError
-                ).show()
-
-                isWeightErrorShown = true
-            }
-
-            binding.layoutScrapTable.tvIronLossValue?.setText("0.00")
-            binding.btnSave.isEnabled = false
-            return
-        }
 
         // Reset error
         isWeightErrorShown = false
 
 
-        //  Calculate remaining (Iron Loss)
-        val ironLoss = motherWeight - totalUsedWeight
 
-        binding.layoutScrapTable.tvIronLossValue?.setText(
-            String.format("%.2f", ironLoss)
-        )
 
         // Enable save only if valid
         binding.btnSave.isEnabled = true
@@ -287,30 +327,29 @@ private var sourceStockId:Int=0
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun submitCRM() {
+        binding.recyclerOutput.adapter as CRMAdapter
 
-        val scrapWeight =
-            binding.layoutScrapTable.etScrapWeight
-                ?.text.toString().toDoubleOrNull() ?: 0.0
-
-        val enteredWeight =
-            binding.jobTable.editC4
-                ?.text.toString().toDoubleOrNull() ?: 0.0
+        val enteredWeight =crmAdapter?.getTotalWeight()?:0.0
 
 
-        val result = WeightValidationUtils.validateWeight(
+
+        val result = Utils.WeightValidationUtils.validateWeight(
             motherWeight = motherWeight,
             totalChildWeight = enteredWeight,
-            scrapWeight = scrapWeight
+            scrapWeight = 0.0
         )
 
-        if (result is WeightResult.Error) {
+        if (result is Utils.WeightResult.Error) {
             Toasty.error(this, result.message).show()
             return
         }
 
-        val ironLoss = (result as WeightResult.Success).ironLoss
-
-
+        val ironLoss = (result as Utils.WeightResult.Success).ironLoss
+        val outputMaterial = crmAdapter?.getSelectedOutputMaterial() ?: ""
+        if (outputMaterial.isEmpty()) {
+            Toasty.warning(this, "Please select Output Material").show()
+            return
+        }
         val request = CRMTransactionRequest(
             crmTranId = tranId,
             crmPlanId = planId,
@@ -318,12 +357,14 @@ private var sourceStockId:Int=0
             locationId = locationId,
             sourceStockId = sourceStockId ?: 0,
             desiredThickness=enteredWeight,
-            Weight=null,
-            jobNumber = jobNumber,
+            weight=null,
+            jobNumber = binding.textJobNumber.text .toString() .replace("Job #", ""),
+            inputBarcode = motherBarcode,
+            inputWeight = motherWeight.toString(),
             barcode = barcode,
-
+            materialCode = outputMaterial,
             ironLossWeight = ironLoss,
-            scrapWeight = scrapWeight,
+            scrapWeight = 0.0,
             weightAfterCRM = enteredWeight,
 
             isCoilDivided = false,
@@ -334,7 +375,12 @@ private var sourceStockId:Int=0
 
             status = CompleteStatus,
             remarks = "CRM Transaction",
-            isPlanned = false
+            isPlanned = false,
+            process=selectedProcess,
+            machineName = selectedMachineName,
+            tamper = "",
+            grade=grade,
+            component = crmAdapter?.getComponents()?: emptyList(),
         )
 
 

@@ -32,7 +32,7 @@
         private var baseUrl: String = ""
         private var userName: String? = ""
         private var token: String? = ""
-//       private  var tenantCode:String?=""
+
         private  var userDetail: HashMap<String, Any?>?=null
         private var serverIpSharedPrefText: String? = null
         private var serverHttpPrefText: String? = null
@@ -65,6 +65,7 @@
 
                 token = userDetail!!["jwtToken"].toString()
                 userName = userDetail!!["userName"].toString()
+                tenantCode = userDetail!!["defaultTenantCode"].toString()
 //                tenantCode= userDetail!![SessionManager.Key_tenantCode].toString()
                 serverIpSharedPrefText = userDetail!![Constants.KEY_SERVER_IP].toString()
                 serverHttpPrefText = userDetail!![Constants.KEY_HTTP].toString()
@@ -121,22 +122,22 @@
                         binding.layoutBatchDetails.visibility = View.VISIBLE
 
                         binding.inCommanBatch.tvItemCode.text =
-                            "Item Code : ${stock.materialCode}"
+                            "${stock.materialCode}"
 
-                        binding.inCommanBatch.tvLength.text =
-                            "Length : ${stock.length}"
+                        binding.inCommanBatch.tvSupplierBatchNo.text =
+                            "${stock.supplierBatchNo}"
 
                         binding.inCommanBatch.tvGrade.text =
-                            "Grade : ${stock.grade}"
+                            "${stock.grade}"
 
                         binding.inCommanBatch.tvWidth.text =
-                            "Width : ${stock.width} MM"
+                            "${stock.width} MM"
 
                         binding.inCommanBatch.tvThickness.text =
-                            "Thickness : ${stock.thickness} MM"
+                            "${stock.thickness} MM"
 
                         binding.inCommanBatch.tvWeight.text =
-                            "Weight : ${stock.weight} KG"
+                            "${stock.weight} KG"
 
                         sourceStockId = stock.stockId
                         scannedBarcode = stock.barcode

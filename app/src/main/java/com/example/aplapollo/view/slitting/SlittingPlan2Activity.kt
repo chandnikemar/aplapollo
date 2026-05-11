@@ -100,6 +100,8 @@
                 Log.d("JWT_TOKEN_QC", "JWT Token = $token")
                 Log.d("Tanent_Code","Tenant Code= $tenantCode")
             }
+            locationId = intent.getIntExtra(LocationId, 0)
+            Log.d("Tanent_Code","Tenant Code= $locationId")
             var lastScanTime = 0L
             val SCAN_DELAY = 300L
             binding.etScanCoil.hint = "Scan here"

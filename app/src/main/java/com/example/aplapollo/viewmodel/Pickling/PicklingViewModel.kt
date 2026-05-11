@@ -41,6 +41,9 @@ class PicklingViewModel(
             MutableLiveData<Resource<PicklingTransactionResponse>> =
         MutableLiveData()
 
+    val picklingAddChildLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
 
 
     fun getOngoingPicklingJobs(locationId: Int) {
@@ -68,7 +71,15 @@ class PicklingViewModel(
     }
 
 
+    fun fetchPicklingAddChild(
+        picklingTransId: Int,
+        tenantCode: String
+    ) {
 
+        viewModelScope.launch {
+            safeCallPicklingAddChild(picklingTransId, tenantCode)
+        }
+    }
 
     private suspend fun safeApiCallOngoingPicklingJobs(locationId:Int) {
 
@@ -251,33 +262,43 @@ class PicklingViewModel(
         response: Response<ApiCommonResponse>
     ): Resource<String> {
 
-        var errorMessage = ""
+        return try {
 
-        if (response.isSuccessful) {
+            // ================= SUCCESS =================
+            if (response.isSuccessful && response.body() != null) {
 
-            response.body()?.let {
-
-                // If API returns message field
-                val msg = it.responseMessage ?: "Pickling completed successfully"
+                val msg =
+                    response.body()?.responseMessage
+                        ?: "Pickling completed successfully"
 
                 return Resource.Success(msg)
             }
 
-        } else if (response.errorBody() != null) {
+            // ================= ERROR =================
+            val errorBody = response.errorBody()?.string()
 
-            val errorObject = JSONObject(
-                response.errorBody()!!
-                    .charStream()
-                    .readText()
-            )
+            val errorMessage = if (!errorBody.isNullOrEmpty()) {
 
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
+                val json = JSONObject(errorBody)
+
+                // 🔥 Try multiple possible backend keys
+                json.optString("errorMessage",
+                    json.optString("message",
+                        json.optString("responseMessage",
+                            "Pickling process failed"
+                        )
+                    )
+                )
+
+            } else {
                 "Pickling process failed"
-            )
-        }
+            }
 
-        return Resource.Error(errorMessage)
+            Resource.Error(errorMessage)
+
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Unknown error")
+        }
     }
     private suspend fun safeCallPicklingTransactionById(
         picklingTranId: Int
@@ -316,7 +337,7 @@ class PicklingViewModel(
 
     private fun handlePicklingTransactionResponse(
         response: Response<PicklingTransactionResponse>
-    ): Resource<PicklingTransactionResponse> {
+    ): Resource<PicklingTransactionResponse>{
         if (response.isSuccessful) {
             response.body()?.let { return Resource.Success(it) }
         } else if (response.errorBody() != null) {
@@ -325,6 +346,83 @@ class PicklingViewModel(
             return Resource.Error(msg)
         }
         return Resource.Error("Failed to load pickling transaction")
+    }
+
+    private suspend fun safeCallPicklingAddChild(
+        picklingTransId: Int,
+        tenantCode: String
+    ) {
+
+        picklingAddChildLiveData.postValue(Resource.Loading())
+
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getPicklingAddChild(
+                        picklingTransId,
+                        tenantCode
+                    )
+
+                picklingAddChildLiveData.postValue(
+                    handlePicklingAddChildResponse(response)
+                )
+
+            } else {
+
+                picklingAddChildLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            picklingAddChildLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handlePicklingAddChildResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody = response.errorBody()?.charStream()?.readText()
+
+                val message = if (!errorBody.isNullOrEmpty()) {
+
+                    val json = JSONObject(errorBody)
+
+                    json.optString(
+                        Constants.HTTP_ERROR_MESSAGE,
+                        "Failed to add child"
+                    )
+
+                } else {
+                    "Server error: ${response.code()}"
+                }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(e.message ?: "Something went wrong")
+        }
     }
 }
 

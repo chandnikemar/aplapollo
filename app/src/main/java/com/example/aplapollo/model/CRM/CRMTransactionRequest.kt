@@ -1,7 +1,7 @@
 package com.example.aplapollo.model.CRM
 
 
-data class CRMTransactionRequest(
+data class CRMTransactionRequest    (
 
     val crmTranId: Int,
 
@@ -10,13 +10,15 @@ data class CRMTransactionRequest(
     val locationId: Int,
 
     val sourceStockId: Int,
-
+    val weight:Double?,
     val desiredThickness: Double?,   // decimal? → Double?
-val Weight:Double?,
+
     val jobNumber: String,
+    val inputBarcode:String?,
+    val inputWeight:String?,
 
         val barcode: String?,
-
+val materialCode:String?,
     val ironLossWeight: Double?,
 
     val scrapWeight: Double?,
@@ -32,8 +34,17 @@ val Weight:Double?,
     val completedDate: String?,      // DateTime? → String (recommended for API)
 
     val status: String,
-
     val remarks: String?,
+    val isPlanned :Boolean,
 
-    val isPlanned: Boolean?
+    val process: String?,
+    val machineName: String?,
+    val tamper: String?,
+    val grade: String?,
+    val component: List<ComponentsRequest>?
+)
+data class ComponentsRequest(
+    val MaterialCode: String,
+    val Weight: Double
+
 )

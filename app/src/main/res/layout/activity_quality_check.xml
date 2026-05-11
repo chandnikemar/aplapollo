@@ -93,7 +93,7 @@
 
                     <TableRow>
                         <TextView
-                            android:text="Net Weight (KG)"
+                            android:text="Net Weight (Tons)"
                             style="@style/QcLabel" />
                         <TextView
                             android:id="@+id/column2_row3"

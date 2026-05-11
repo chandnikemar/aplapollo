@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical">
+
+        <!-- MAIN COMPONENT ROW -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_component_item">
+
+            <!-- LEFT -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.4"
+                android:orientation="vertical">
+
+                <!-- COMPONENT CODE -->
+                <TextView
+                    android:id="@+id/tvComponentCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="COMP001"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <!-- DESCRIPTION -->
+                <TextView
+                    android:id="@+id/tvComponentDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Component Description"
+                    android:textColor="#757575"
+                    android:textSize="12sp"
+                    android:maxLines="2"
+                    android:ellipsize="end"/>
+
+            </LinearLayout>
+
+            <!-- WEIGHT -->
+            <EditText
+                android:id="@+id/etComponentWeight"
+                android:layout_width="75dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/edittext_background"
+                android:gravity="center"
+                android:hint="Wt."
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:padding="6dp"
+                android:textSize="13sp"/>
+
+            <!-- UOM -->
+            <Spinner
+                android:id="@+id/spinnerComponentUom"
+                android:layout_width="75dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/spinner_bg"
+                android:enabled="false"
+                android:paddingStart="8dp"
+                android:paddingEnd="18dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

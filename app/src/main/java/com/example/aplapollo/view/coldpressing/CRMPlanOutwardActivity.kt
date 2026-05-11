@@ -138,8 +138,8 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
                     binding.inCommanBatch.tvItemCode.text =
                         "Item Code : ${stock.materialCode}"
 
-                    binding.inCommanBatch.tvLength.text =
-                        "Length : ${stock.length}"
+                    binding.inCommanBatch.tvSupplierBatchNo.text =
+                        "SupplierBatchNo : ${stock.supplierBatchNo}"
 
                     binding.inCommanBatch.tvGrade.text =
                         "Grade : ${stock.grade}"
@@ -235,14 +235,18 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
 
             val request = CRMTransactionRequest(
                 crmTranId = 0,
+
                 tenantCode = tenantCode,
                 crmPlanId=0,
                 locationId=locationId,
                 sourceStockId=sourceStockId,
                 desiredThickness=enteredWidth,
-                Weight = null,
+                weight = null,
                 jobNumber="",
-                barcode="",
+                inputBarcode = null,
+                inputWeight = null,
+                barcode=scannedBarcode,
+                materialCode = null,
                 ironLossWeight=null,
                 scrapWeight=null,
                 weightAfterCRM=null,
@@ -250,9 +254,15 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
                 dividedCRMTranId=null,
                 completedBy =   "",
                 completedDate = null,
-                status="",
+                status="InProgress",
                 remarks="CRM Transaction",
-                isPlanned=false
+                isPlanned=false,
+                process=null,
+                machineName = null,
+                tamper = null,
+                grade=null,
+                component=null
+
             )
 
             crmViewModel.initiateCRMWithoutPlan(request)

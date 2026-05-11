@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Material (Big) -->
+    <TextView
+        android:id="@+id/tvMaterial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Material"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black" />
+
+    <!-- Description (Small font) -->
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description"
+        android:textSize="11sp"
+        android:textColor="#757575"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+</LinearLayout>
