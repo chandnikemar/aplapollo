@@ -42,6 +42,13 @@ class CRMViewModel(
     val initiateCRMWithoutPlanLiveData:
             MutableLiveData<Resource<CRMTransactionResponse>> =
         MutableLiveData()
+    val crmAddChildLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
+
+    val crmDeleteChildLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
     fun getCRMPlanDetailById( crmPlanId: Int) {
         viewModelScope.launch {
             safeApiCRMPlanDetailsById(crmPlanId)
@@ -60,6 +67,15 @@ class CRMViewModel(
             safeApiCRMPlanTranDetailsById(crmTranId)
         }
     }
+    fun fetchCrmAddChild(
+        crmTransId: Int,
+        tenantCode: String
+    ) {
+
+        viewModelScope.launch {
+            safeCallCrmAddChild(crmTransId, tenantCode)
+        }
+    }
     fun processCRM(
 
         request: CRMTransactionRequest
@@ -74,7 +90,175 @@ class CRMViewModel(
         }
     }
 
+    fun fetchCRMDeleteChild(
+        crmTransDetailsId: Int
+    ) {
 
+        viewModelScope.launch {
+
+            safeCallCRMDeleteChild(
+                crmTransDetailsId
+            )
+        }
+    }
+    private suspend fun safeCallCrmAddChild(
+        crmTransId: Int,
+        tenantCode: String
+    ) {
+
+        crmAddChildLiveData.postValue(Resource.Loading())
+
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getCRMAddChild(
+                        crmTransId,
+                        tenantCode
+                    )
+
+                crmAddChildLiveData.postValue(
+                    handleCrmAddChildResponse(response)
+                )
+
+            } else {
+
+                crmAddChildLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            crmAddChildLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handleCrmAddChildResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody = response.errorBody()?.charStream()?.readText()
+
+                val message = if (!errorBody.isNullOrEmpty()) {
+
+                    val json = JSONObject(errorBody)
+
+                    json.optString(
+                        Constants.HTTP_ERROR_MESSAGE,
+                        "Failed to add child"
+                    )
+
+                } else {
+                    "Server error: ${response.code()}"
+                }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(e.message ?: "Something went wrong")
+        }
+    }
+    private suspend fun safeCallCRMDeleteChild(
+        crmTransDetailsId: Int
+    ) {
+
+        crmDeleteChildLiveData.postValue(
+            Resource.Loading())
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getCRMDeleteChild(
+                        crmTransDetailsId
+                    )
+
+                crmDeleteChildLiveData.postValue(
+                    handleCRMDeleteChildResponse(response)
+                )
+
+            } else {
+
+                crmDeleteChildLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            crmDeleteChildLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handleCRMDeleteChildResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(
+                e.message ?: "Something went wrong"
+            )
+        }
+    }
 
     private suspend fun safeApiCallInitiateCRMWithoutPlan(
 

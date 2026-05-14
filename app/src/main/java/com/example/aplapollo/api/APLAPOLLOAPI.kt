@@ -4,7 +4,10 @@
 
     import HrSlittingStatusResponse
     import com.example.aplapollo.helper.Constants.ADD_Supplier
+    import com.example.aplapollo.helper.Constants.DeleteChildCRM
+    import com.example.aplapollo.helper.Constants.DeleteChildPickling
     import com.example.aplapollo.helper.Constants.GATE_Transaction
+    import com.example.aplapollo.helper.Constants.GET_ADDCRM_Child
     import com.example.aplapollo.helper.Constants.GET_ALL_Transporter_List
     import com.example.aplapollo.helper.Constants.GET_ActionType
     import com.example.aplapollo.helper.Constants.GET_BomInputCode
@@ -187,9 +190,18 @@
             @Query("picklingTransId") picklingTranId: Int,
             @Query("tenantCode") tenantCode: String
         ): Response<ApiCommonResponse>
-
+        @GET(DeleteChildPickling)
+        suspend fun getPicklingDeleteChild(
+            @Query("picklingTransDetailsId") picklingTransDetailsId: Int
+        ): Response<ApiCommonResponse>
 
         //CRM
+
+        @GET(GET_ADDCRM_Child)
+        suspend fun getCRMAddChild(
+            @Query("crmTransId") crmTransId: Int,
+            @Query("tenantCode") tenantCode: String
+        ): Response<ApiCommonResponse>
         @GET(GET_CRM_PlannedList)
         suspend fun getCRMPlannedList(
         ): Response<List<CRMPlanResponse>>
@@ -220,6 +232,10 @@
         suspend fun initiateCRMWithoutPlan(
             @Body request: CRMTransactionRequest
         ): Response<CRMTransactionResponse>
+        @GET(DeleteChildCRM)
+        suspend fun getCRmDeleteChild(
+            @Query("crmTransDetailsId") crmTransDetailsId: Int
+        ): Response<ApiCommonResponse>
         @POST(GET_PrintLabel)
         suspend fun printLabelBarcode(
             @Body request:List<PrintLabelBarcodeRequest>

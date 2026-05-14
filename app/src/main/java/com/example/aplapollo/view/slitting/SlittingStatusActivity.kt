@@ -87,7 +87,7 @@
             super.onCreate(savedInstanceState)
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             binding = DataBindingUtil.setContentView(this, R.layout.activity_slitting_status)
-            binding.idLayoutHeader.tvTitle.text = "Slitting Status"
+
 
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
@@ -152,7 +152,7 @@
 
     //        binding.tvBatchNumber.setText("${motherWeight}"+"${u}")
 
-
+            binding.idLayoutHeader.tvTitle.text = selectedProcess+"PROCESS"
             slittingStatusViewModel.getHrSlittingDetailsById(tranPlanId)
             var isExpanded = false
 
@@ -178,7 +178,7 @@
                         binding.recyclerSlitting.layoutManager = LinearLayoutManager(this)
 val inputBarcode=response?.motherBarcode
                         val materialCode = response?.materialCode ?: ""
-                        motherUom = response?.uoM ?: "Kg"
+                        motherUom = response?.uoM ?: "Tons"
                         val mUom = response?.uoM
                         inputMaterialCode = materialCode
                         binding.tvMotherCoil.setText(inputBarcode ?: "")
@@ -355,6 +355,10 @@ val inputBarcode=response?.motherBarcode
 
             val gradeInput = binding.etGrade.text.toString().trim()
 
+            if (gradeInput.isEmpty()) {
+                Toasty.error(this, "Grade is required").show()
+                return
+            }
             // =========================================================
             // WEIGHT CALCULATION ONLY
             // =========================================================
@@ -401,9 +405,7 @@ val inputBarcode=response?.motherBarcode
                 )
             }
 
-            // =========================================================
-            // REQUEST
-            // =========================================================
+
             val request = HrSlittingCompleteRequest(
                 HRSlittingTranId = tranPlanId,
                 TenantCode = tenantCode ?: "",
@@ -424,6 +426,8 @@ val inputBarcode=response?.motherBarcode
                 MachineName = selectedMachineName,
                 Tamper = "",
                 Grade = gradeInput,
+                AllowedScrapWeightKg=0.0,
+                AllowedToleranceWeightKg=0.0,
                 hrSlittingTransactionDetail = apiDetailsList
             )
 

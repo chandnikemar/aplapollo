@@ -49,9 +49,7 @@
         <activity
             android:name="com.example.aplapollo.view.ProductionEntry.InputProductionEntryActivity"
             android:exported="false" />
-        <activity
-            android:name="com.example.aplapollo.view.ProductionEntry.OutputProductionActivity"
-            android:exported="false" />
+
         <activity
             android:name="com.example.aplapollo.view.GP.GPOutwardActivity"
             android:exported="false" />

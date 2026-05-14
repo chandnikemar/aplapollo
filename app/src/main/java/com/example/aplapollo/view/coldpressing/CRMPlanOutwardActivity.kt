@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Constants.LocationId
-import com.example.aplapollo.helper.Constants.WithOutPlan
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
@@ -46,7 +45,10 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
     private var maxAllowedWidth: Double = 0.0
     private  var weight:Double=0.0
     private var coilThickness: Double = 0.0
-
+    private var headerTittle:String=""
+private var headerTittleCRCA:String=""
+    private var selectedProcessName: String = ""
+    private var selectedMachineName: String = ""
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +62,7 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
         slittingWithoutplanvViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingWithoutplanvViewModel::class.java]
         val viewModelProviderFactorys = CRMViewModelfactory(application, retrofitInstance)
         crmViewModel = ViewModelProvider(this, viewModelProviderFactorys)[CRMViewModel::class.java]
-        binding.idLayoutHeader.tvTitle.text = WithOutPlan
+
         session = SessionManager(this)
         userDetail = session.getUserDetails()
         binding.idLayoutHeader.ivBack.setOnClickListener {
@@ -81,7 +83,14 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
             Log.d("Tanent_Code","Tenant Code= $tenantCode")
         }
         locationId=intent.getIntExtra(LocationId,0)
-
+        headerTittle=intent.getStringExtra("FIRST_PAGECRFH")?:""
+        headerTittleCRCA=intent.getStringExtra("FIRST_PAGECRCA")?:""
+        binding.TvItemThickness.visibility=View.GONE
+        binding.idLayoutHeader.tvTitle.text =
+            headerTittleCRCA.ifEmpty {
+                headerTittle
+            }
+//        binding.idLayoutHeader.tvTitle.text = headerTittle
         binding.layoutBatchDetails.visibility = View.GONE
 
 
@@ -136,22 +145,22 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
                     binding.layoutBatchDetails.visibility = View.VISIBLE
 
                     binding.inCommanBatch.tvItemCode.text =
-                        "Item Code : ${stock.materialCode}"
+                        "${stock.materialCode}"
 
                     binding.inCommanBatch.tvSupplierBatchNo.text =
-                        "SupplierBatchNo : ${stock.supplierBatchNo}"
+                        "${stock.supplierBatchNo}"
 
                     binding.inCommanBatch.tvGrade.text =
-                        "Grade : ${stock.grade}"
+                        "${stock.grade}"
 
                     binding.inCommanBatch.tvWidth.text =
-                        "Width : ${stock.width} MM"
+                        "${stock.width}"
 
                     binding.inCommanBatch.tvThickness.text =
-                        "Thickness : ${stock.thickness} MM"
+                        "${stock.thickness}"
 
                     binding.inCommanBatch.tvWeight.text =
-                        "Weight : ${stock.weight} KG"
+                        "${stock.weight}"
                     sourceStockId = stock.stockId
                     scannedBarcode = stock.barcode
                     tenantCode=stock.tenantCode

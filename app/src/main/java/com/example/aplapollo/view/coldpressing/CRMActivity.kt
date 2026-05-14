@@ -4,7 +4,6 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -15,8 +14,6 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Constants.CrmTranJob
 import com.example.aplapollo.helper.Constants.LocationId
 import com.example.aplapollo.helper.Constants.LocationName
-import com.example.aplapollo.helper.Constants.SelectFromPlan
-import com.example.aplapollo.helper.Constants.WithOutPlan
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.viewmodel.crm.CRMViewModel
@@ -42,11 +39,15 @@ class CRMActivity : AppCompatActivity() {
     private lateinit var ongoingJobAdapter: OngoingCRMJobAdapter
     private var selectedProcessName: String = ""
     private var selectedMachineName: String = ""
+    private var headerTittle:String=""
+    private var completeTittle:String=""
+    private var headerTittleCRCA:String=""
+    private var completeTittleCRCA:String=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_crmactivity)
-        binding.idLayoutHeader.tvTitle.text = "Cold Pressing"
+
         supportActionBar?.hide()
 
         progress = ProgressDialog(this)
@@ -74,7 +75,11 @@ class CRMActivity : AppCompatActivity() {
         locationId = intent.getIntExtra(Constants.LocationId, -1)
         selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
         selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
-
+        headerTittle=intent.getStringExtra("FIRST_PAGECRFH")?:""
+        completeTittle=intent.getStringExtra("Completed_PAGECRFH")?:""
+        headerTittleCRCA=intent.getStringExtra("FIRST_PAGECRCA")?:""
+completeTittleCRCA=intent.getStringExtra("Completed_PAGECRCA")?:""
+        binding.idLayoutHeader.tvTitle.text = selectedProcessName+"ON GOING JOBS"
         Log.d("LOCATION_ID", "Received locationId = $locationId")
 
         if (locationId != -1) {
@@ -92,6 +97,7 @@ class CRMActivity : AppCompatActivity() {
             intent.putExtra("GRADE", selectedJob.grade)
             intent.putExtra("PROCESS_NAME", selectedProcessName)
             intent.putExtra("MACHINE_NAME", selectedMachineName)
+            intent.putExtra("Completed_PAGECRFH", completeTittle)
 
             startActivity(intent)
         }
@@ -128,37 +134,14 @@ class CRMActivity : AppCompatActivity() {
                 else -> {}
             }
         }
-
-        // ---------------- Dropdown (Plan / Without Plan) ----------------
-        val coilOptions = listOf(SelectFromPlan, WithOutPlan)
-
-        val coilAdapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_list_item_1,
-            coilOptions
-        )
-
-        binding.ddAddNewCoil.setAdapter(coilAdapter)
-
-        binding.ddAddNewCoil.setOnItemClickListener { _, _, position, _ ->
-
-            when (position) {
-
-                0 -> {
-                    val intent = Intent(this, CRMPlanActivity::class.java)
-                    intent.putExtra(LocationId, locationId)
-                    intent.putExtra(LocationName, locationName)
-                    startActivity(intent)
-                }
-
-                1 -> {
-                    val intent = Intent(this, CRMPlanOutwardActivity::class.java)
-                    intent.putExtra(LocationId, locationId)
-                    startActivity(intent)
-                }
-            }
+        binding.btnInProgress.setOnClickListener {
+            val intent = Intent(this, CRMPlanOutwardActivity::class.java)
+            intent.putExtra(LocationId, locationId)
+            intent.putExtra("FIRST_PAGECRFH", headerTittle)
+            startActivity(intent)
         }
     }
+
 
     override fun onResume() {
         super.onResume()

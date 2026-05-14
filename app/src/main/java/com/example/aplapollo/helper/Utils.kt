@@ -238,6 +238,7 @@ sealed class WeightResult {
 
     data class Error(val message: String) : WeightResult()
 }
+
 fun showErrorDialog(activity: Activity, message: String) {
 
     if (activity.isFinishing || activity.isDestroyed) return

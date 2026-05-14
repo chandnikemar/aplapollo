@@ -18,7 +18,7 @@ data class ProcessPicklingRequest(
     val inputBarcode: String? = null,
     val inputWeight: Int? = null,
     val ironLossWeight: Int? = null,
-    val scrapWeight: Int? = null,
+    val scrapWeight: Double? = null,
     val completedBy: String? = null,
     val completedDate: String? = null,
     val process: String? = null,

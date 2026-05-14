@@ -13,7 +13,6 @@
     import com.example.aplapollo.api.RetrofitInstance
     import com.example.aplapollo.helper.Constants
     import com.example.aplapollo.helper.Constants.LocationId
-    import com.example.aplapollo.helper.Constants.WithOutPlan
     import com.example.aplapollo.helper.Resource
     import com.example.aplapollo.helper.SessionManager
     import com.example.aplapollo.model.Slitting.HRSlittingTransactionDetailRequest
@@ -43,6 +42,8 @@
         private var transactionId:Int=0
         private var maxAllowedWidth: Double = 0.0
          private val MaterialCode: String? = null
+        private var selectedProcessName: String = ""
+        private var selectedMachineName: String = ""
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = DataBindingUtil.setContentView(this,R.layout.activity_slittingplan3)
@@ -53,8 +54,8 @@
                 RetrofitInstance.getInstance(applicationContext)
             val viewModelProviderFactory = SlittingWithoutplanViewModelfactory(application, retrofitInstance)
             slittingWithoutplanvViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingWithoutplanvViewModel::class.java]
-            binding.idLayoutHeader.tvTitle.text = WithOutPlan
-            session = SessionManager(this)
+
+                session = SessionManager(this)
             userDetail = session.getUserDetails()
             binding.idLayoutHeader.ivBack.setOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
@@ -75,7 +76,9 @@
                 Log.d("Tanent_Code","Tenant Code= $tenantCode")
             }
             locationId=intent.getIntExtra(LocationId,0)
-
+            selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
+            selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
+            binding.idLayoutHeader.tvTitle.text = selectedProcessName+"INWARD"
             binding.layoutBatchDetails.visibility = View.GONE
             binding.layoutWeightContainer.removeAllViews()
 
@@ -131,13 +134,13 @@
                             "${stock.grade}"
 
                         binding.inCommanBatch.tvWidth.text =
-                            "${stock.width} MM"
+                            "${stock.width}"
 
                         binding.inCommanBatch.tvThickness.text =
-                            "${stock.thickness} MM"
+                            "${stock.thickness}"
 
                         binding.inCommanBatch.tvWeight.text =
-                            "${stock.weight} KG"
+                            "${stock.weight}"
 
                         sourceStockId = stock.stockId
                         scannedBarcode = stock.barcode

@@ -46,7 +46,7 @@ class PicklingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
                 binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling)
-                binding.idLayoutHeader.tvTitle.text = "Pickling"
+
                 supportActionBar?.hide()
 
                 val retrofitInstance =
@@ -83,6 +83,7 @@ class PicklingActivity : AppCompatActivity() {
         selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
         selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
         Log.d("LOCATION_ID", "Received locationId = $locationId")
+        binding.idLayoutHeader.tvTitle.text = selectedProcessName+"ON GOING GOBS"
 
         if (locationId != -1) {
             picklingViewModel.getOngoingPicklingJobs(locationId)
@@ -102,7 +103,8 @@ class PicklingActivity : AppCompatActivity() {
             intent.putExtra("GRADE", selectedJob.grade)
             intent.putExtra("PROCESS_NAME", selectedProcessName)
             intent.putExtra("MACHINE_NAME", selectedMachineName)
-
+//            intent.putExtra(Constants.SourceStockId, selectedJob.)
+//            intent.putExtra(Constants.LocationId, selectedJob.locationId)
             startActivity(intent)
         }
 

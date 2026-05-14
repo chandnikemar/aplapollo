@@ -1,31 +1,60 @@
 package com.example.aplapollo.model.CRM
 
+import com.example.aplapollo.model.BomComponent
+import com.example.aplapollo.model.BomOutput
+
 data class CRMTransactionResponse(
-    val crmTranId: Int,
-    val crmPlanId: Int,
-    val locationId: Int,
-    val locationCode: String?,
-    val locantionName: String?,   // ⚠️ Keeping same spelling as API
-    val sourceStockId: Int,
-    val jobNumber: String,
-    val motherBarcode: String,
-    val motherCoilWeight: Double,
-    val materialCode: String,
-    val barcode: String,
-    val ironLossWeight: Double?,
-    val scrapWeight: Double?,
-    val weightAfterCRM: Double?,
-    val isCoilDivided: Boolean,
-    val dividedCRMTranId: Int?,
-    val completedBy: String?,
-    val completedDate: String?,  // Can convert to Date if needed
-    val status: String,
-    val remarks: String?,
-    val isActive: Boolean,
-    val createdBy: String,
-    val createdDate: String,
-    val modifiedBy: String?,
-    val modifiedDate: String?,
-    val tenantCode: String,
-    val tenantGroupCode: String?
+    val crmTranId: Int? = null,
+    val crmPlanId: Int? = null,
+    val locationId: Int? = null,
+    val locationCode: String? = null,
+    val locantionName: String? = null,   // ⚠️ Keeping same spelling as API
+    val sourceStockId: Int? = null,
+    val jobNumber: String? = null,
+    val motherBarcode: String? = null,
+    val motherCoilWeight: Double? = null,
+    val materialCode: String? = null,
+    val barcode: String? = null,
+    val ironLossWeight: Double? = null,
+    val scrapWeight: Double? = null,
+    val weightAfterCRM: Double?? = null,
+    val isCoilDivided: Boolean? = null,
+    val dividedCRMTranId: Int? = null,
+    val completedBy: String?= null,
+    val completedDate: String? = null,  // Can convert to Date if needed
+    val status: String? = null,
+    val remarks: String? = null,
+    val isActive: Boolean? = null,
+    val createdBy: String? = null,
+    val createdDate: String? = null,
+    val modifiedBy: String? = null,
+    val modifiedDate: String? = null,
+    val tenantCode: String? = null,
+    val tenantGroupCode: String? = null,
+    var crmTransactionDetails: MutableList<CRMTransactionDetailResponse>? = null
+)
+data class CRMTransactionDetailResponse(
+    val crmTransactionDetailsId: Int? = null,
+
+    val crmPlanId: Int? = null,
+    var barcode: String? = null,
+
+    val width: Double? = null,
+
+    var weightAfterCrm: Double? = null,
+
+    val weightTakenBy: String? = null,
+
+    val weightDateTime: String? = null,
+
+
+
+    var motherBarcode: String? = null,
+    var materialCode: String? = null,
+    var components: MutableList<BomComponent>? = mutableListOf(),
+
+
+
+    var selectedOutputMaterial: BomOutput? = null,
+    var isExpanded: Boolean = false
 )

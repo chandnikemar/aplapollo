@@ -40,26 +40,18 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Title -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Gate Entry Form"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp" />
                     <!-- Transporter Code (Dropdown with search) -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:hint="Transporter Code / Name"
+                        android:hint="Transporter Code "
                         app:endIconMode="none"
                         app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopStart="0dp"
+                        app:boxCornerRadiusTopEnd="0dp"
+                        app:boxCornerRadiusBottomStart="0dp"
+                        app:boxCornerRadiusBottomEnd="0dp">
 
                         <AutoCompleteTextView
                             android:id="@+id/etTransporterCode"
@@ -78,7 +70,8 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Transporter Name">
+                        android:hint="Transporter Name"
+                        android:layout_marginTop="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etTransporterName"

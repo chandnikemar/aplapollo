@@ -45,6 +45,10 @@ class PicklingViewModel(
             MutableLiveData<Resource<ApiCommonResponse>> =
         MutableLiveData()
 
+    val picklingDeleteChildLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
+
 
     fun getOngoingPicklingJobs(locationId: Int) {
         viewModelScope.launch {
@@ -80,7 +84,101 @@ class PicklingViewModel(
             safeCallPicklingAddChild(picklingTransId, tenantCode)
         }
     }
+    fun fetchPicklingDeleteChild(
+        picklingTransDetailsId: Int
+    ) {
 
+        viewModelScope.launch {
+
+            safeCallPicklingDeleteChild(
+                picklingTransDetailsId
+            )
+        }
+    }
+    private suspend fun safeCallPicklingDeleteChild(
+        picklingTransDetailsId: Int
+    ) {
+
+        picklingDeleteChildLiveData.postValue(
+            Resource.Loading()
+        )
+
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getPicklingDeleteChild(
+                        picklingTransDetailsId
+                    )
+
+                picklingDeleteChildLiveData.postValue(
+                    handlePicklingDeleteChildResponse(response)
+                )
+
+            } else {
+
+                picklingDeleteChildLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            picklingDeleteChildLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handlePicklingDeleteChildResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(
+                e.message ?: "Something went wrong"
+            )
+        }
+    }
     private suspend fun safeApiCallOngoingPicklingJobs(locationId:Int) {
 
         ongoingJobsLiveData.postValue(Resource.Loading())

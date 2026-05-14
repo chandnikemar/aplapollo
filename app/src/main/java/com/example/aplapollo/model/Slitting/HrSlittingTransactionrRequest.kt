@@ -20,6 +20,8 @@ data class HrSlittingCompleteRequest(
     val MachineName: String,
     val Tamper: String,
     val Grade: String,
+    val AllowedScrapWeightKg:Double?,
+    val AllowedToleranceWeightKg:Double?,
     val hrSlittingTransactionDetail: List<HrSlittingCompleteTransactionDetails>
 )
 data class HrSlittingCompleteTransactionDetails(

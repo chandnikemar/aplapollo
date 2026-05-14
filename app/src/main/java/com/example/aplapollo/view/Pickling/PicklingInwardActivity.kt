@@ -37,10 +37,12 @@ class PicklingInwardActivity : AppCompatActivity() {
     private var scannedBarcode: String? = null
     private  var tenantCode:String?=null
     private var transactionId:Int=0
+    private var selectedProcessName: String = ""
+    private var selectedMachineName: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_inward)
-        binding.idLayoutHeader.tvTitle.text = "HR Pickling Input"
+        binding.idLayoutHeader.tvTitle.text = ""
         supportActionBar?.hide()
         progress = ProgressDialog(this)
         progress.setMessage("Please Wait...")
@@ -72,7 +74,9 @@ class PicklingInwardActivity : AppCompatActivity() {
 
         locationId = intent.getIntExtra(LocationId, 0)
         Log.d("Tanent_Code","Tenant Code= $locationId")
-
+        selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
+        selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
+        binding.idLayoutHeader.tvTitle.text = selectedProcessName+"INWARD"
         binding.layoutBatchDetails.visibility = View.GONE
 
         picklingViewModel.picklingBarcodeLiveData.observe(this) { result ->
@@ -101,13 +105,13 @@ class PicklingInwardActivity : AppCompatActivity() {
                         "${data?.supplierBatchNo ?: "-"}"
 
                     binding.inPicklingBatch.tvWidth.text =
-                        "${data?.width ?: 0} MM"
+                        "${data?.width ?: 0}"
 
                     binding.inPicklingBatch.tvThickness.text =
-                        "${data?.thickness ?: 0} MM"
+                        "${data?.thickness ?: 0}"
 
                     binding.inPicklingBatch.tvWeight.text =
-                        "${data?.weight ?: 0} KG"
+                        "${data?.weight ?: 0}"
                     sourceStockId = data?.stockId!!
                     scannedBarcode = data?.barcode
                     tenantCode=data?.tenantCode
@@ -232,15 +236,15 @@ class PicklingInwardActivity : AppCompatActivity() {
            }
 
             val request = ProcessPicklingRequest(
-                picklingTranId = 0,
-                tenantCode=tenantCode,
+                picklingTranId = transactionId,
+                tenantCode =tenantCode,
                 locationId = locationId,
                 sourceStockId = sourceStockId,
                 jobNumber = "",
                 status = "",
                 remarks = "Pickling Proccess",
                 isDivided = false,
-                IsActive=true,
+                IsActive =true,
 
             )
 

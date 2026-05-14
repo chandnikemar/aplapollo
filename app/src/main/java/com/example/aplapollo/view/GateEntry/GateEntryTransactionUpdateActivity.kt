@@ -38,7 +38,7 @@ class GateEntryTransactionUpdateActivity : AppCompatActivity() {
             this,
             R.layout.activity_gate_entry_transaction_update
         )
-        binding.idLayoutHeader.tvTitle.text = "Gate Entry Update"
+        binding.idLayoutHeader.tvTitle.text = "Gate Entry Details"
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }

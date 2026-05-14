@@ -192,12 +192,27 @@ suspend fun getHrSlittingDetailsById(
 suspend fun getPicklingAddChild(
     picklingTransId: Int,
     tenantCode: String
-):Response<ApiCommonResponse> {
+):Response<ApiCommonResponse> =
 
-    return retrofitInstance
+    retrofitInstance
         .serviceApi()
         .getPicklingAddChild(picklingTransId,tenantCode)
-}
+    suspend fun getCRMAddChild(
+        crmTransId: Int,
+        tenantCode: String
+    ):Response<ApiCommonResponse> =
+
+        retrofitInstance
+            .serviceApi()
+            .getCRMAddChild(crmTransId,tenantCode)
+    suspend fun getPicklingDeleteChild(picklingTransDetailsId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getPicklingDeleteChild(picklingTransDetailsId)
+    suspend fun getCRMDeleteChild(crmTransDetailsId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getCRmDeleteChild(crmTransDetailsId)
     suspend fun getCRMPlannedList(
 
     ): Response<List<CRMPlanResponse>> =

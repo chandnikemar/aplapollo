@@ -23,8 +23,10 @@ class PicklingJobAdapter(
 
     private val jobList:
     MutableList<PicklingTransactionResponse>,
-
-    private val onDelete: (Int) -> Unit,
+    private val onDelete: (
+        position: Int,
+        item: PicklingTransactionResponse
+    ) -> Unit,
 
     private val onOutputClick: (Int) -> Unit
 
@@ -244,19 +246,33 @@ class PicklingJobAdapter(
                 onOutputClick(position)
             }
 
+        if (position == 0) {
+
+            b.btnDeleteJob.visibility = View.GONE
+
+        } else {
+
+            b.btnDeleteJob.visibility = View.VISIBLE
+        }
         // ======================================
         // DELETE
         // ======================================
-
         b.btnDeleteJob.setOnClickListener {
 
-            if (position < jobList.size) {
+            val adapterPosition = holder.adapterPosition
 
-                jobList.removeAt(position)
+            if (
+                adapterPosition != RecyclerView.NO_POSITION &&
+                adapterPosition < jobList.size
+            ) {
 
-                notifyItemRemoved(position)
+                val deletedItem =
+                    jobList[adapterPosition]
 
-                onDelete(position)
+                onDelete(
+                    adapterPosition,
+                    deletedItem
+                )
             }
         }
     }
@@ -375,4 +391,5 @@ class PicklingJobAdapter(
 
         return jobList
     }
+
 }

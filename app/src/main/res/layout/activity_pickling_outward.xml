@@ -63,26 +63,28 @@
                     android:layout_marginBottom="10dp"/>
 
                 <!-- TOP DETAILS -->
+                <!-- ================= Mother + Grade + Weight ================= -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layoutMotherCoilBatch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="6dp">
 
-                    <!-- Responsive Guidelines -->
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/guideline35"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.35"/>
-
+                    <!-- 60% left / 40% right -->
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline70"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.70"/>
+                        app:layout_constraintGuide_begin="236dp" />
+
+                    <!-- Split left into 2 -->
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline35"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_begin="142dp" />
 
                     <!-- Mother Barcode -->
                     <com.google.android.material.textfield.TextInputLayout
@@ -99,12 +101,13 @@
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/tvMotherCoil"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="40dp"
                             android:textColor="@color/black"
-                            android:padding="10dp"
+                            android:padding="8dp"
                             android:textSize="12sp"
                             android:focusable="false"
-                            android:clickable="false"/>
+                            android:clickable="false"
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Grade -->
@@ -113,18 +116,21 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:hint="Grade"
+                        app:hintTextColor="@color/grey"
                         app:boxBackgroundMode="outline"
                         app:layout_constraintStart_toEndOf="@id/guideline35"
                         app:layout_constraintEnd_toStartOf="@id/guideline70"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:layout_marginHorizontal="4dp">
+                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etGrade"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="40dp"
                             android:textColor="@color/black"
-                            android:padding="10dp"/>
+                            android:padding="8dp"
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Weight -->
@@ -136,17 +142,18 @@
                         app:boxBackgroundMode="outline"
                         app:layout_constraintStart_toStartOf="@id/guideline70"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil"
                         android:layout_marginStart="4dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/tvBatchNumber"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
+                            android:layout_height="40dp"
+                            android:textSize="10sp"
+                            android:gravity="center_vertical|end"
                             android:textColor="@color/black"
-                            android:padding="10dp"
-                            android:gravity="end|center_vertical"
-                            android:textSize="12sp"/>
+                            android:padding="4dp"
+                            android:maxLines="1"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -159,6 +166,22 @@
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never"
                     tools:listitem="@layout/dynamic_job_item"/>
+                <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layoutIronLoss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Iron Loss Weight">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etIronLossWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
 
                 <!-- ADD BUTTON -->
                 <LinearLayout

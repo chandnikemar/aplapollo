@@ -51,7 +51,9 @@ data class PicklingTransactionResponse(
 
     val tenantCode: String? = null,
 
-    val tenantGroupCode: String? = null
+    val tenantGroupCode: String? = null,
+    var localId: Long = System.currentTimeMillis(),
+   var isDefaultRow: Boolean = false
 )
 
 data class PicklingTransactionDetailResponse(
@@ -80,4 +82,5 @@ data class PicklingTransactionDetailResponse(
 
     var selectedOutputMaterial: BomOutput? = null,
     var isExpanded: Boolean = false
+
 )

@@ -1,206 +1,348 @@
 package com.example.aplapollo.adapter.Coldpressing
 
+import android.R
+import android.annotation.SuppressLint
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aplapollo.adapter.ComponentAdapter
 import com.example.aplapollo.model.BomComponent
 import com.example.aplapollo.model.BomOutput
-import com.example.aplapollo.model.CRM.ComponentsRequest
-import com.example.apolloapl.databinding.JoblistBinding
+import com.example.aplapollo.model.CRM.CRMTransactionDetailResponse
+import com.example.aplapollo.model.CRM.CRMTransactionResponse
+import com.example.apolloapl.databinding.DynamicJobItemBinding
 
 class CRMAdapter(
-    private val list: MutableList<CrmItem>,
-    private var bomOutputs: List<BomOutput>,
-    private val inputWeightTon: Double,
-    private val onWeightChanged: () -> Unit
-) : RecyclerView.Adapter<CRMAdapter.ViewHolder>() {
 
-    inner class ViewHolder(val binding: JoblistBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    private val context: Context,
 
-        var watcher: TextWatcher? = null
-        var componentAdapter: ComponentAdapter? = null
+    private val jobList:
+    MutableList<CRMTransactionResponse>,
+
+    private val onDelete: (
+        position: Int,
+        item: CRMTransactionResponse
+    ) -> Unit,
+
+    private val onOutputClick: (Int) -> Unit
+
+) : RecyclerView.Adapter<CRMAdapter.VH>() {
+
+    inner class VH(
+        val binding: DynamicJobItemBinding
+    ) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): VH {
+
+        val binding =
+            DynamicJobItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+
+        return VH(binding)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = JoblistBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return ViewHolder(binding)
-    }
+    override fun getItemCount(): Int =
+        jobList.size
 
-    override fun getItemCount() = list.size
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(
+        holder: VH,
+        position: Int
+    ) {
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
-        val item = list[position]
+        val item = jobList[position]
         val b = holder.binding
 
-        // ---------------- Barcode ----------------
-        b.tvBarcode.text = item.barcode
+        val unitList = listOf("Tons")
 
-        // ---------------- Weight ----------------
-        holder.watcher?.let { b.editC4.removeTextChangedListener(it) }
+        val spinnerAdapter = ArrayAdapter(
+            context,
+            R.layout.simple_spinner_item,
+            unitList
+        )
 
-        val value = if (item.weight > 0) item.weight.toString() else ""
-        b.editC4.setText(value)
-        b.editC4.setSelection(value.length)
+        spinnerAdapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        )
+
+        b.jobLayout.spinnerUnit.adapter = spinnerAdapter
+
+        // ======================================
+        // SAFE DETAIL
+        // ======================================
+
+        val detail =
+            getOrCreateDetail(item)
+
+        // ======================================
+        // BARCODE
+        // ======================================
+        b.jobLayout.tvBarcode.text =
+
+            if (
+                detail.barcode.isNullOrEmpty()
+            ) {
+
+                item.motherBarcode ?: "-"
+
+            } else {
+
+                detail.barcode
+            }
+
+        // ======================================
+        // OUTPUT MATERIAL
+        // ======================================
+        b.jobLayout.tvOutputMaterial.text =
+
+            detail.selectedOutputMaterial
+                ?.outputMaterial
+                ?: "Select Output Material"
+
+        // ======================================
+        // DESCRIPTION
+        // ======================================
+
+        b.jobLayout.tvOutputDesc.text =
+            detail.selectedOutputMaterial
+                ?.materialDescription
+                ?: "Select Output Material"
+
+        // ======================================
+        // WEIGHT
+        // ======================================
+
+        val oldWatcher =
+            b.jobLayout.editC4.tag as? TextWatcher
+
+        if (oldWatcher != null) {
+            b.jobLayout.editC4.removeTextChangedListener(oldWatcher)
+        }
+
+        b.jobLayout.editC4.setText(
+            if ((detail.weightAfterCrm ?: 0.0) == 0.0) ""
+            else detail.weightAfterCrm.toString()
+        )
 
         val watcher = object : TextWatcher {
+
             override fun afterTextChanged(s: Editable?) {
-                item.weight = s.toString().toDoubleOrNull() ?: 0.0
-                onWeightChanged()
+
+                detail.weightAfterCrm =
+                    s.toString().toDoubleOrNull() ?: 0.0
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {}
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {}
         }
 
-        b.editC4.addTextChangedListener(watcher)
-        holder.watcher = watcher
+        b.jobLayout.editC4.addTextChangedListener(watcher)
+        b.jobLayout.editC4.tag = watcher
 
-        // ---------------- Output Material ----------------
-        b.tvOutputMaterial.text =
-            item.selectedOutput?.outputMaterial ?: "Select Output Material"
+        // ======================================
+        // COMPONENT VISIBILITY
+        // ======================================
 
-        // ---------------- Expand ----------------
-        b.layoutExpand.visibility =
-            if (item.isExpanded && item.componentList.isNotEmpty())
-                View.VISIBLE
-            else
-                View.GONE
-        // ---------------- Component Recycler ----------------
-        if (holder.componentAdapter == null) {
+        if (detail.components.isNullOrEmpty()) {
 
-            holder.componentAdapter = ComponentAdapter(
-                list = item.componentList,
-                inputWeightTon = inputWeightTon
-            ) {
-                onWeightChanged()
-            }
-
-            b.recyclerComponent.layoutManager =
-                LinearLayoutManager(holder.itemView.context)
-
-            b.recyclerComponent.adapter = holder.componentAdapter
+            b.jobLayout.layoutExpand.visibility = View.GONE
+            b.jobLayout.recyclerComponent.visibility = View.GONE
 
         } else {
-            holder.componentAdapter?.updateList(item.componentList)
+
+            b.jobLayout.layoutExpand.visibility = View.VISIBLE
+            b.jobLayout.recyclerComponent.visibility = View.VISIBLE
         }
 
-        // ---------------- OUTPUT CLICK ----------------
-        b.tvOutputMaterial.setOnClickListener {
+        // ======================================
+        // COMPONENT RECYCLER
+        // ======================================
 
-            if (bomOutputs.isEmpty()) {
-                Toast.makeText(holder.itemView.context, "No BOM found", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        if (detail.components == null) {
+            detail.components = mutableListOf()
+        }
+
+        val componentAdapter =
+            ComponentAdapter(
+                detail.components
+                    ?: mutableListOf(),
+                inputWeightTon = detail.weightAfterCrm ?: 0.0
+            )
+
+        b.jobLayout.recyclerComponent.layoutManager =
+            LinearLayoutManager(context)
+
+        b.jobLayout.recyclerComponent.adapter =
+            componentAdapter
+
+        // ======================================
+        // OUTPUT CLICK
+        // ======================================
+
+        b.jobLayout.layoutOutputMaterial.setOnClickListener {
+            onOutputClick(position)
+        }
+        if (position == 0) {
+
+            b.btnDeleteJob.visibility = View.GONE
+
+        } else {
+
+            b.btnDeleteJob.visibility = View.VISIBLE
+        }
+        b.btnDeleteJob.setOnClickListener {
+
+            val adapterPosition = holder.adapterPosition
+
+            if (
+                adapterPosition != RecyclerView.NO_POSITION &&
+                adapterPosition < jobList.size
+            ) {
+
+                val deletedItem =
+                    jobList[adapterPosition]
+
+                onDelete(
+                    adapterPosition,
+                    deletedItem
+                )
             }
-
-            val names = bomOutputs.map { it.outputMaterial }
-
-            AlertDialog.Builder(holder.itemView.context)
-                .setItems(names.toTypedArray()) { _, index ->
-
-                    val selected = bomOutputs[index]
-
-                    item.selectedOutput = selected
-
-                    val newList = selected.boMComponent?.map { it.copy() }
-
-                    item.componentList.clear()
-                    if (newList != null) {
-                        item.componentList.addAll(newList)
-                    }
-
-                    // ✅ VERY IMPORTANT
-                    item.isExpanded = true
-
-                    // ✅ FORCE UI UPDATE
-                    notifyItemChanged(position)
-                }
-                .show()
         }
 
-        // ---------------- ROW CLICK ----------------
-        b.layoutHeader.setOnClickListener {
-            item.isExpanded = !item.isExpanded
-            notifyItemChanged(position)
-        }
+        // ======================================
+        // DELETE
+        // ======================================
+
+//        b.btnDeleteJob.setOnClickListener {
+//
+//            if (position < jobList.size) {
+//
+//                jobList.removeAt(position)
+//
+//                notifyItemRemoved(position)
+//
+//                onDelete(position)
+//            }
+//        }
     }
 
-    // ================= HELPERS =================
+    // =========================================
+    // SAFE DETAIL
+    // =========================================
 
-    fun getAllItems(): List<CrmItem> = list
+    private fun getOrCreateDetail(
+        item: CRMTransactionResponse
+    ): CRMTransactionDetailResponse {
 
-    fun getTotalWeight(): Double =
-        list.sumOf { it.weight }
+        if (item.crmTransactionDetails.isNullOrEmpty()) {
 
-    fun getSelectedOutputMaterial(): String =
-        list.firstOrNull()?.selectedOutput?.outputMaterial ?: ""
+            item.crmTransactionDetails =
+                mutableListOf(
 
-    fun getComponents(): List<ComponentsRequest> {
-        return list.flatMap { item ->
-            item.componentList
-                .filter {
-                    !it.componentCode.isNullOrBlank() && (it.weight ?: 0.0) > 0
-                }
-                .map {
-                    ComponentsRequest(
-                        MaterialCode = it.componentCode!!,
-                        Weight = it.weight ?: 0.0
+                    CRMTransactionDetailResponse(
+                        barcode = "",
+                        weightAfterCrm = 0.0,
+                        components = mutableListOf()
                     )
-                }
+                )
         }
+
+        return item.crmTransactionDetails!!.first()
     }
 
-    // 🔥 IMPORTANT: Create row using barcode
-    fun updateList(barcodes: List<String>) {
-        list.clear()
-        list.addAll(barcodes.map { CrmItem(barcode = it) })
+    // =========================================
+    // SET OUTPUT
+    // =========================================
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setSelectedOutput(
+        position: Int,
+        output: BomOutput
+    ) {
+
+        if (position >= jobList.size) return
+
+        val item = jobList[position]
+        val detail = getOrCreateDetail(item)
+
+        detail.selectedOutputMaterial = output
+
+        val componentList = mutableListOf<BomComponent>()
+
+        output.boMComponent?.forEach {
+
+            componentList.add(
+                BomComponent(
+                    boMComponentId = 0,
+                    boMOutputId = 0,
+                    componentCode = it.componentCode,
+                    materialDescription = it.materialDescription,
+                    weight = 0.0,
+                    Uom = "Kg"
+                )
+            )
+        }
+
+        detail.components = componentList
+
+        notifyItemChanged(position)
+    }
+
+    // =========================================
+    // ADD JOB
+    // =========================================
+
+    fun addJob() {
+
+        jobList.add(
+            CRMTransactionResponse(
+                crmTranId = 0,
+
+            )
+        )
+
+        notifyItemInserted(jobList.lastIndex)
+    }
+
+    // =========================================
+    // UPDATE LIST
+    // =========================================
+
+    fun updateList(list: List<CRMTransactionResponse>) {
+
+        jobList.clear()
+        jobList.addAll(list)
         notifyDataSetChanged()
     }
 
-    // 🔥 Apply BOM + auto show components
-    fun setBomOutputs(newOutputs: List<BomOutput>) {
-        bomOutputs = newOutputs
+    // =========================================
+    // GET LIST
+    // =========================================
 
-        if (list.isNotEmpty() && bomOutputs.isNotEmpty()) {
-
-            val first = bomOutputs.first()
-
-            list.forEach { item ->
-                item.selectedOutput = first
-
-                item.componentList.clear()
-                first.boMComponent?.let {
-                    item.componentList.addAll(
-                        it.map { it.copy() }
-                    )
-                }
-
-                item.isExpanded = true
-            }
-
-            notifyDataSetChanged()
-        }
+    fun getUpdatedList(): MutableList<CRMTransactionResponse> {
+        return jobList
     }
 }
-
-// ================= DATA MODEL =================
-
-data class CrmItem(
-    val barcode: String,
-    var weight: Double = 0.0,
-    var selectedOutput: BomOutput? = null,
-    var componentList: MutableList<BomComponent> = mutableListOf(),
-    var isExpanded: Boolean = false
-)

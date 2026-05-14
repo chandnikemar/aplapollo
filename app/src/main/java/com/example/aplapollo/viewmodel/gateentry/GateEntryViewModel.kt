@@ -60,7 +60,7 @@ class GateTransactionViewModel(
             safeApiCallGateEntryUpdate(gateTransactionId)
         }
     }
-    fun getTransporterList(){
+    fun getTransporterList() {
         viewModelScope.launch { safeApiCallTransporterList() }
     }
 

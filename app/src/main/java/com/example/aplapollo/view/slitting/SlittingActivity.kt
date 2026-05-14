@@ -4,13 +4,13 @@
             import android.content.Intent
             import android.os.Bundle
             import android.util.Log
-            import android.widget.ArrayAdapter
             import androidx.appcompat.app.AppCompatActivity
             import androidx.databinding.DataBindingUtil
             import androidx.lifecycle.ViewModelProvider
             import androidx.recyclerview.widget.LinearLayoutManager
             import com.example.aplapollo.adapter.Slitting.OngoingJobAdapter
             import com.example.aplapollo.api.RetrofitInstance
+            import com.example.aplapollo.helper.Constants
             import com.example.aplapollo.helper.Constants.BarcodeValue
             import com.example.aplapollo.helper.Constants.GradeV
             import com.example.aplapollo.helper.Constants.HrSlittingId
@@ -18,12 +18,10 @@
             import com.example.aplapollo.helper.Constants.JobId
             import com.example.aplapollo.helper.Constants.LocationId
             import com.example.aplapollo.helper.Constants.MotherWeightV
-            import com.example.aplapollo.helper.Constants.SelectFromPlan
             import com.example.aplapollo.helper.Constants.SourceStockId
             import com.example.aplapollo.helper.Constants.SupplierNo
             import com.example.aplapollo.helper.Constants.ThicknessV
             import com.example.aplapollo.helper.Constants.WidthId
-            import com.example.aplapollo.helper.Constants.WithOutPlan
             import com.example.aplapollo.helper.Resource
             import com.example.aplapollo.helper.SessionManager
             import com.example.aplapollo.viewmodel.slitting.SlittingViewModel
@@ -56,7 +54,7 @@
                     binding = DataBindingUtil.setContentView(this, R.layout.activity_slitting)
                     supportActionBar?.hide()
 
-                    binding.idLayoutHeader.tvTitle.text = "On Going Job"
+
 
                     progress = ProgressDialog(this)
                     progress.setMessage("Please Wait...")
@@ -83,7 +81,8 @@
 
                     val retrofitInstance = RetrofitInstance.getInstance(applicationContext)
                     val factory = SlittingViewModelfactory(application, retrofitInstance)
-                    slittingViewModel = ViewModelProvider(this, factory)[SlittingViewModel::class.java]
+                    slittingViewModel =
+                        ViewModelProvider(this, factory)[SlittingViewModel::class.java]
                     locationId = intent.getIntExtra(LocationId, -1)
 
                     Log.d("LOCATION_ID", "Received locationId = $locationId")
@@ -94,6 +93,7 @@
                     }
                     selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
                     selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
+                    binding.idLayoutHeader.tvTitle.text = selectedProcessName+"ON GOING JOBS"
 //                    slittingViewModel.getOngoingSlittingJobs(tenantCode.toString(),locationId)
                     ongoingJobAdapter = OngoingJobAdapter(emptyList()) { selectedJob ->
 
@@ -105,7 +105,10 @@
                         intent.putExtra(SourceStockId, selectedJob.sourceStockId)
                         intent.putExtra(LocationId, selectedJob.locationId)
 
-                        intent.putExtra(MotherWeightV, selectedJob.stockTransaction?.weight.toString())
+                        intent.putExtra(
+                            MotherWeightV,
+                            selectedJob.stockTransaction?.weight.toString()
+                        )
                         intent.putExtra(BarcodeValue, selectedJob.stockTransaction?.barcode)
                         intent.putExtra(SupplierNo, selectedJob.stockTransaction?.supplierBatchNo)
                         intent.putExtra(WidthId, selectedJob.stockTransaction?.width)
@@ -159,37 +162,42 @@
                         }
                     }
 
+//
+//                    val coilOptions = listOf(SelectFromPlan, WithOutPlan)
 
-                    val coilOptions = listOf(SelectFromPlan, WithOutPlan)
-
-                    val coilAdapter = ArrayAdapter(
-                        this,
-                        android.R.layout.simple_list_item_1,
-                        coilOptions
-                    )
-
-                    binding.ddAddNewCoil.setAdapter(coilAdapter)
-
-                    binding.ddAddNewCoil.setOnItemClickListener { _, _, position, _ ->
-
-                        when (position) {
-
-                            0 -> {
-                                val intent = Intent(this, SlittingPlan2Activity::class.java)
-                                intent.putExtra(LocationId, locationId)
-                                startActivity(intent)
-                            }
-
-                            1 -> {
-                                val intent = Intent(this, Slittingplan3Activity::class.java)
-                                intent.putExtra(LocationId, locationId)
-                                Log.d("LOCATION_ID", "Slittingplan3Activity locationId = $locationId")
-
-                                startActivity(intent)
-                            }
-                        }
+//                    val coilAdapter = ArrayAdapter(
+//                        this,
+//                        android.R.layout.simple_list_item_1,
+//                        coilOptions
+//                    )
+                    binding.btnInProgress.setOnClickListener {
+                        val intent = Intent(this, Slittingplan3Activity::class.java)
+                        intent.putExtra(Constants.LocationId, locationId)
+                        startActivity(intent)
                     }
                 }
+//                    binding.ddAddNewCoil.setAdapter(coilAdapter)
+//
+//                    binding.ddAddNewCoil.setOnItemClickListener { _, _, position, _ ->
+
+//                        when (position) {
+
+//                            0 -> {
+//                                val intent = Intent(this, SlittingPlan2Activity::class.java)
+//                                intent.putExtra(LocationId, locationId)
+//                                startActivity(intent)
+//                            }
+
+//                            0 -> {
+//                                val intent = Intent(this, Slittingplan3Activity::class.java)
+//                                intent.putExtra(LocationId, locationId)
+//                                Log.d("LOCATION_ID", "Slittingplan3Activity locationId = $locationId")
+//
+//                                startActivity(intent)
+//                            }
+//                        }
+//                    }
+//                }
 
                 override fun onResume() {
                     super.onResume()

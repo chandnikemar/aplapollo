@@ -290,10 +290,49 @@ class InputProductionEntryActivity : AppCompatActivity() {
                 intent.putExtra(Constants.LocationName, selectedLocationName)
                 intent.putExtra("PROCESS_NAME", selectedProcessName)
                 intent.putExtra("MACHINE_NAME", selectedMachineName)
+                intent.putExtra("FIRST_PAGECRFH", "CRFH INWARD")
+                intent.putExtra("Completed_PAGECRFH", "CRFH OUTWARD")
+
 
                 startActivity(intent)
             }
 
+            selectedProcessName.equals("CRCA", true) -> {
+
+                val intent = Intent(this, CRMActivity::class.java)
+
+                intent.putExtra(Constants.LocationId, selectedLocationId)
+                intent.putExtra(Constants.LocationName, selectedLocationName)
+                intent.putExtra("PROCESS_NAME", selectedProcessName)
+                intent.putExtra("MACHINE_NAME", selectedMachineName)
+                intent.putExtra("FIRST_PAGECRCA", "CRCA INWARD")
+                intent.putExtra("Completed_PAGECRCA", "CRCA OUTWARD")
+
+                startActivity(intent)
+            }
+            selectedProcessName.equals("GP", true) -> {
+
+                val intent = Intent(this, PicklingActivity::class.java)
+
+                intent.putExtra(Constants.LocationId, selectedLocationId)
+                intent.putExtra(Constants.LocationName, selectedLocationName)
+                intent.putExtra("PROCESS_NAME", selectedProcessName)
+                intent.putExtra("MACHINE_NAME", selectedMachineName)
+                intent.putExtra("FIRST_PAGE", " GP InWard")
+
+                startActivity(intent)
+            }
+            selectedProcessName.equals("Narrow Slitting", true) -> {
+
+                val intent = Intent(this, SlittingActivity::class.java)
+
+                intent.putExtra(Constants.LocationId, selectedLocationId)
+                intent.putExtra(Constants.LocationName, selectedLocationName)
+                intent.putExtra("PROCESS_NAME", selectedProcessName)
+                intent.putExtra("MACHINE_NAME", selectedMachineName)
+
+                startActivity(intent)
+            }
             else -> {
                 Toasty.info(this, "Select Valid Process").show()
             }

@@ -112,7 +112,8 @@ object Constants {
     const val GET_Ongoing_Pickl_Jobs = "Pickling/getOngoingPicklingJobs"
     const val GET_Pickling_By_Id = "Pickling/getPicklingByIdAsync"
     const val GET_Pick_AddChild="Pickling/addChild"
- 
+ const val DeleteChildPickling= "Pickling/deletePicklingTransDetail"
+    const val DeleteChildCRM=  "CRM/deleteCRMDetail"
 
 
     //CRM
@@ -125,6 +126,7 @@ object Constants {
     const val GET_CRM_BY_Id="CRM/getCRMByIdAsync"
     const val POST_CRMWithout_Plan="CRM/initiateCRMWithoutPlan"
     const val GET_PrintLabel= "PrintPRNDetails/printLabel"
+    const val GET_ADDCRM_Child="CRM/addChild"
 
     //Gate Entry
     const val ADD_Supplier="GateTransaction/addSuppilerItems"
