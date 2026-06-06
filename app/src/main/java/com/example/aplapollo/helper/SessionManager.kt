@@ -61,6 +61,7 @@ class SessionManager(context: Context) {
         roleName:String?,
         defaultTenantCode:String?,
 
+
     ) {
         editor.putBoolean(KEY_ISLOGGEDIN, true)
         //editor.putString(KEY_USERID, userId)

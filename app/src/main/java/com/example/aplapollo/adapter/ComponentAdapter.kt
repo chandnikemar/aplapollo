@@ -97,7 +97,7 @@ class ComponentAdapter(
 
                 val weight = s.toString().toDoubleOrNull() ?: 0.0
 
-                // ONLY ASSIGN VALUE (NO VALIDATION)
+
                 item.weight = weight
 
                 onComponentChanged?.invoke()
@@ -111,7 +111,7 @@ class ComponentAdapter(
         holder.watcher = watcher
     }
 
-    // ================= HELPERS =================
+
 
     fun getUpdatedList(): List<BomComponent> = list
 

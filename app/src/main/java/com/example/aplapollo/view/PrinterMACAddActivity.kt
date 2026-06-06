@@ -17,6 +17,11 @@ class PrinterMACAddActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPrinterMacaddBinding.inflate(layoutInflater)
         setContentView(binding.root)
+binding.idLayoutHeader.tvTitle.text="Printer Settings"
+        binding.idLayoutHeader.tvSubtitle.text="Configure your printer connection"
+        binding.idLayoutHeader.ivBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         // Load previously saved MAC address if any
         val savedMac = Utils.getSharedPrefs(this, Constants.KEY_PRINTER_MAC)

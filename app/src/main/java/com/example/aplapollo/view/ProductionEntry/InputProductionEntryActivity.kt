@@ -14,6 +14,7 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.LocationPaginationRequest
+import com.example.aplapollo.view.GP.GPActivity
 import com.example.aplapollo.view.Pickling.PicklingActivity
 import com.example.aplapollo.view.coldpressing.CRMActivity
 import com.example.aplapollo.view.slitting.SlittingActivity
@@ -47,7 +48,8 @@ class InputProductionEntryActivity : AppCompatActivity() {
         binding = ActivityInputProductionEntryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.idLayoutHeader.tvTitle.text = "Production Entry"
+        binding.idLayoutHeader.tvTitle.text = "Start Production Process"
+        binding.idLayoutHeader.tvSubtitle.text="Select Station, process and machine details"
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -77,8 +79,10 @@ class InputProductionEntryActivity : AppCompatActivity() {
         session = SessionManager(this)
         val user = session.getUserDetails()
         val userName = user["userName"] ?: ""
+        val plant=user[SessionManager.Key_tenantCode]
 
-        binding.textOperator.text = userName.toString()
+        binding.textOperator.setText(userName.toString())
+        binding.textPlant.setText(plant.toString())
         binding.dropdownProcess.isEnabled = false
         binding.machineName.isEnabled = false
         binding.machineRW.visibility = View.GONE
@@ -312,13 +316,13 @@ class InputProductionEntryActivity : AppCompatActivity() {
             }
             selectedProcessName.equals("GP", true) -> {
 
-                val intent = Intent(this, PicklingActivity::class.java)
+                val intent = Intent(this, GPActivity::class.java)
 
                 intent.putExtra(Constants.LocationId, selectedLocationId)
                 intent.putExtra(Constants.LocationName, selectedLocationName)
                 intent.putExtra("PROCESS_NAME", selectedProcessName)
                 intent.putExtra("MACHINE_NAME", selectedMachineName)
-                intent.putExtra("FIRST_PAGE", " GP InWard")
+              
 
                 startActivity(intent)
             }

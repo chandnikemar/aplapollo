@@ -1,12 +1,12 @@
     package com.example.aplapollo.view.slitting
 
+    import android.annotation.SuppressLint
     import android.app.ProgressDialog
     import android.os.Bundle
     import android.util.Log
     import android.view.View
     import android.widget.EditText
     import android.widget.ImageButton
-    import androidx.appcompat.app.AppCompatActivity
     import androidx.core.widget.addTextChangedListener
     import androidx.databinding.DataBindingUtil
     import androidx.lifecycle.ViewModelProvider
@@ -15,18 +15,28 @@
     import com.example.aplapollo.helper.Constants.LocationId
     import com.example.aplapollo.helper.Resource
     import com.example.aplapollo.helper.SessionManager
+    import com.example.aplapollo.helper.Utils
+    import com.example.aplapollo.helper.Utils.showErrorDialog
+    import com.example.aplapollo.model.PrintLabelBarcodeRequest
+    import com.example.aplapollo.model.Slitting.CoilSplitRequest
     import com.example.aplapollo.model.Slitting.HRSlittingTransactionDetailRequest
     import com.example.aplapollo.model.Slitting.InitiateSlittingWithoutPlanRequest
+    import com.example.aplapollo.view.BaseScanActivity
+    import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
+    import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
     import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanViewModelfactory
     import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanvViewModel
     import com.example.apolloapl.R
     import com.example.apolloapl.databinding.ActivitySlittingplan3Binding
+    import com.google.android.material.button.MaterialButton
     import es.dmoral.toasty.Toasty
 
-    class Slittingplan3Activity : AppCompatActivity() {
+    class Slittingplan3Activity : BaseScanActivity() {
         private lateinit var binding: ActivitySlittingplan3Binding
         private lateinit var slittingWithoutplanvViewModel: SlittingWithoutplanvViewModel
+        private lateinit var printlabelViewModel: PrintlabelViewModel
         private lateinit var progress: ProgressDialog
+
         private lateinit var session: SessionManager
         private var baseUrl: String = ""
         private var userName: String? = ""
@@ -41,12 +51,52 @@
         private  var tenantCode:String?=null
         private var transactionId:Int=0
         private var maxAllowedWidth: Double = 0.0
-         private val MaterialCode: String? = null
+
         private var selectedProcessName: String = ""
         private var selectedMachineName: String = ""
+        private var isEnteringWidth = false
+        override fun onBarcodeScanned(barcode: String) {
+
+            // Ignore scanner while entering width
+            if (isEnteringWidth) {
+                Log.d("SCAN_DEBUG", "Ignored scan while entering width")
+                return
+            }
+
+            runOnUiThread {
+
+                Log.d("SCAN_DEBUG", "Scanned Barcode = $barcode")
+
+                // Show scanned value in EditText
+                binding.commanInputRow.inputField.setText(barcode)
+
+                // Move cursor to end
+                binding.commanInputRow.inputField.setSelection(barcode.length)
+
+                // Save barcode
+                scannedBarcode = barcode
+
+                // Call API automatically
+                slittingWithoutplanvViewModel
+                    .getStockByBatchOrBarcode(barcode)
+            }
+        }
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             binding = DataBindingUtil.setContentView(this,R.layout.activity_slittingplan3)
+            binding.commanInputRow.inputField.apply {
+
+                requestFocus()
+
+                isFocusable = true
+                isFocusableInTouchMode = true
+
+                post {
+                    requestFocus()
+
+                }
+            }
             supportActionBar?.hide()
             progress = ProgressDialog(this)
             progress.setMessage("Please Wait...")
@@ -54,7 +104,9 @@
                 RetrofitInstance.getInstance(applicationContext)
             val viewModelProviderFactory = SlittingWithoutplanViewModelfactory(application, retrofitInstance)
             slittingWithoutplanvViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingWithoutplanvViewModel::class.java]
-
+            val viewModelProviderFactorys = QcprintlabelViewModelFactory(application, retrofitInstance)
+            printlabelViewModel =
+                ViewModelProvider(this, viewModelProviderFactorys)[PrintlabelViewModel::class.java]
                 session = SessionManager(this)
             userDetail = session.getUserDetails()
             binding.idLayoutHeader.ivBack.setOnClickListener {
@@ -78,13 +130,15 @@
             locationId=intent.getIntExtra(LocationId,0)
             selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
             selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
-            binding.idLayoutHeader.tvTitle.text = selectedProcessName+"INWARD"
-            binding.layoutBatchDetails.visibility = View.GONE
+            binding.idLayoutHeader.tvTitle.text = "$selectedProcessName Planning"
+            binding.idLayoutHeader.tvSubtitle.text="Generate production plans from scanned coils"
+//            binding.layoutBatchDetails.visibility = View.GONE
             binding.layoutWeightContainer.removeAllViews()
 
             binding.idLayoutHeader.ivBack.setOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
+            hidePlanningSection()
 
             binding.commanInputRow.btnSearch.setOnClickListener {
 
@@ -98,13 +152,46 @@
                 slittingWithoutplanvViewModel
                     .getStockByBatchOrBarcode( barcode)
             }
+            binding.commanInputRow.btnClear.setOnClickListener {
+                binding.commanInputRow.inputField.setText("")
 
+                sourceStockId = 0
+                scannedBarcode = null
+                transactionId = 0
+                maxAllowedWidth = 0.0
+
+                binding.commanInputRow.inputField.requestFocus()
+
+                binding.commanInputRow.inputField.setSelection(
+                    binding.commanInputRow.inputField.text.length
+                )
+            }
+            binding.btncClears.setOnClickListener {
+                hidePlanningSection()
+
+                binding.commanInputRow.inputField.setText("")
+
+                sourceStockId = 0
+                scannedBarcode = null
+                transactionId = 0
+                maxAllowedWidth = 0.0
+
+                binding.commanInputRow.inputField.requestFocus()
+
+                binding.commanInputRow.inputField.setSelection(
+                    binding.commanInputRow.inputField.text.length
+                )
+
+            }
             binding.btnAddPlan.setOnClickListener {
+                binding.cardWeight.visibility = View.VISIBLE
                 if (binding.layoutWeightContainer.childCount == 0) {
                     addWeightRow()
                 }
             }
-
+            binding.btnSlit.setOnClickListener {
+                showSlitDialog()
+            }
 
             slittingWithoutplanvViewModel.stockByBarcodeLiveData.observe(this) { resource ->
 
@@ -122,7 +209,8 @@
 
                         Log.d("SLITTING_PLAN_3", "Stock = $stock")
 
-                        binding.layoutBatchDetails.visibility = View.VISIBLE
+//                        binding.layoutBatchDetails.visibility = View.VISIBLE
+                        showPlanningSection()
 
                         binding.inCommanBatch.tvItemCode.text =
                             "${stock.materialCode}"
@@ -140,7 +228,7 @@
                             "${stock.thickness}"
 
                         binding.inCommanBatch.tvWeight.text =
-                            "${stock.weight}"
+                            "${stock.weight} "
 
                         sourceStockId = stock.stockId
                         scannedBarcode = stock.barcode
@@ -195,8 +283,76 @@
                         }
                     }
                 }
+            printlabelViewModel.barcodePrintLabelMutableLiveData.observe(this) { resource ->
 
+                when (resource) {
 
+                    is Resource.Loading -> {
+                        progress.show()
+                    }
+
+                    is Resource.Success -> {
+
+                        progress.dismiss()
+
+                        Toasty.success(
+                            this,
+                            "Barcode printed successfully",
+                            Toasty.LENGTH_SHORT
+                        ).show()
+
+                        Log.d("PRINT_SUCCESS", resource.data.toString())
+
+                        // OPTIONAL:
+                        // Call physical printer here
+
+                        // finish()
+                    }
+
+                    is Resource.Error -> {
+
+                        progress.dismiss()
+
+                        Toasty.error(
+                            this,
+                            resource.message ?: "Print failed",
+                            Toasty.LENGTH_SHORT
+                        ).show()
+
+                        Log.e("PRINT_ERROR", resource.message ?: "")
+                    }
+
+                    else -> {}
+                }
+            }
+
+            slittingWithoutplanvViewModel.coilSplitLiveData.observe(this) { result ->
+
+                when (result) {
+
+                    is Resource.Loading -> progress.show()
+
+                    is Resource.Success -> {
+                        progress.dismiss()
+                        showPrintDialog()
+                        Toasty.success(
+                            this,
+                            result.data?.responseMessage ?: "Coil split successful"
+                        ).show()
+
+                        val barcode = binding.commanInputRow.inputField.text.toString().trim()
+                        slittingWithoutplanvViewModel
+                            .getStockByBatchOrBarcode(barcode)
+                    }
+
+                    is Resource.Error -> {
+                        progress.dismiss()
+                        showErrorDialog(this,result.message ?: "Error")
+
+//                        Toasty.error(this, result.message ?: "Error").show()
+                    }
+                }
+            }
             binding.btncSaves.setOnClickListener {
 
                 if (sourceStockId == 0) {
@@ -206,7 +362,7 @@
                 val weights = getAllWeights()
 
                 if (weights.isEmpty() || weights.any { it.isBlank() }) {
-                    Toasty.warning(this, "Please enter weight").show()
+                    Toasty.warning(this, "Please enter width").show()
                     return@setOnClickListener
                 }
 
@@ -248,7 +404,7 @@
                     CompletedBy = "",
                     CompletedDate = "",
                     Status = "",
-
+process=selectedProcessName,
                     Remarks = "Slitting without plan",
 
                     hrSlittingTransactionDetail = buildTransactionDetails(transactionId)
@@ -257,15 +413,15 @@
                 slittingWithoutplanvViewModel
                     .initiateSlittingWithoutPlan( request)
             }
-            binding.btncClears.setOnClickListener {
-
-                binding.commanInputRow.inputField.text?.clear()
-                binding.layoutBatchDetails.visibility = View.GONE
-                binding.layoutWeightContainer.removeAllViews()
-
-                sourceStockId = 0
-                scannedBarcode = null
-            }
+//            binding.btncClears.setOnClickListener {
+//
+//                binding.commanInputRow.inputField.text?.clear()
+////                binding.layoutBatchDetails.visibility = View.GONE
+//                binding.layoutWeightContainer.removeAllViews()
+//
+//                sourceStockId = 0
+//                scannedBarcode = null
+//            }
 
 
        }
@@ -288,6 +444,19 @@
             }
 
             etWeight.isEnabled = true
+
+
+            etWeight.setOnFocusChangeListener { _, hasFocus ->
+
+                isEnteringWidth = hasFocus
+
+                if (hasFocus) {
+
+                    binding.commanInputRow.inputField.clearFocus()
+
+                }
+            }
+
             btnEdit.visibility = View.GONE
             btnAddMore.visibility = View.VISIBLE
 
@@ -310,7 +479,7 @@
                     return@addTextChangedListener
                 }
 
-                // ✅ Total check
+                // Total check
                 if (totalWidth > maxAllowedWidth) {
 
                     Toasty.error(
@@ -319,14 +488,15 @@
                     ).show()
 
                     etWeight.setText("")
-
+                }
             }
-
-        }
 
             btnEdit.setOnClickListener {
 
                 etWeight.isEnabled = true
+
+                binding.commanInputRow.inputField.clearFocus()
+
                 etWeight.requestFocus()
                 etWeight.setSelection(etWeight.text.length)
             }
@@ -336,6 +506,7 @@
                 val entered = etWeight.text.toString().toDoubleOrNull()
 
                 if (entered == null) {
+
                     Toasty.warning(this, "Enter valid width").show()
                     return@setOnClickListener
                 }
@@ -353,7 +524,7 @@
                     return@setOnClickListener
                 }
 
-                // ✅ Total check
+                // Total check
                 if (totalWidth > maxAllowedWidth) {
 
                     Toasty.error(
@@ -365,6 +536,7 @@
                 }
 
                 etWeight.isEnabled = false
+
                 btnAddMore.visibility = View.GONE
                 btnEdit.visibility = View.VISIBLE
 
@@ -430,6 +602,100 @@
             }
 
             return details
+        }
+        @SuppressLint("NewApi")
+        private fun showPrintDialog() {
+
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Print Label")
+                .setMessage("Do you want to print the split coil label?")
+                .setPositiveButton("Print") { _, _ ->
+                    val printRequestList = listOf(
+
+                        PrintLabelBarcodeRequest(
+                            barcode = "barcode",
+                            locationId = locationId,
+                            createdDate = Utils.getCurrentDateTimeISO(),
+                            createdBy = userName ?: ""
+                        )
+                    )
+
+                    Log.d("PRINT_REQUEST", printRequestList.toString())
+
+                    printlabelViewModel.printLabelBarcode(printRequestList)
+
+                    Toasty.success(
+                        this,
+                        "Printing Started"
+                    ).show()
+                }
+                .setNegativeButton("Skip", null)
+                .show()
+        }
+        private fun showSlitDialog() {
+
+            val dialogView = layoutInflater.inflate(R.layout.dialog_slit_input, null)
+
+//            val etWidth = dialogView.findViewById<EditText>(R.id.etWidth)
+            val etWeight = dialogView.findViewById<EditText>(R.id.etWeight)
+            val btnSubmit = dialogView.findViewById<MaterialButton>(R.id.btnSubmit)
+            val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
+
+            val dialog = android.app.AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            btnCancel.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            btnSubmit.setOnClickListener {
+
+//                val width = etWidth.text.toString().toDoubleOrNull()
+                val weight = etWeight.text.toString().toDoubleOrNull()
+
+//                if (width == null || weight == null) {
+//                    Toasty.warning(this, "Enter valid Width & Weight").show()
+//                    return@setOnClickListener
+//                }
+
+                if (sourceStockId == 0) {
+                    Toasty.warning(this, "Please scan coil first").show()
+                    return@setOnClickListener
+                }
+                val request = weight?.let { it1 ->
+                    CoilSplitRequest(
+                        StockId = sourceStockId,
+                        Weight = it1,
+
+                        Remark = "Slit from app",
+                        UserName = userName ?: "",
+                        TenantCode = tenantCode ?: ""
+                    )
+                }
+
+                if (request != null) {
+                    slittingWithoutplanvViewModel.coilSplit(request)
+                }
+
+                dialog.dismiss()
+            }
+
+            dialog.show()
+        }
+        private fun showPlanningSection() {
+            binding.cardBatch.visibility = View.VISIBLE
+            binding.layoutTopButtons.visibility = View.VISIBLE
+
+            binding.layoutActionButtons.visibility = View.VISIBLE
+        }
+
+        private fun hidePlanningSection() {
+            binding.cardBatch.visibility = View.GONE
+            binding.layoutTopButtons.visibility = View.GONE
+            binding.cardWeight.visibility = View.GONE
+            binding.layoutActionButtons.visibility = View.GONE
         }
 
     }

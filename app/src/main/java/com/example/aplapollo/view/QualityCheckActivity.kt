@@ -17,6 +17,8 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
+import com.example.aplapollo.helper.Utils.showErrorDialog
+import com.example.aplapollo.helper.Utils.todayDate
 import com.example.aplapollo.helper.ZebraPrinterHelper
 import com.example.aplapollo.model.QualityCheck.PrintLabelRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchData
@@ -63,8 +65,20 @@ class QualityCheckActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_quality_check)
+        binding.commanInputRow.inputField.apply {
 
+            requestFocus()
+
+            isFocusable = true
+            isFocusableInTouchMode = true
+
+            post {
+                requestFocus()
+
+            }
+        }
         binding.idLayoutHeader.tvTitle.text = "Quality Check"
+        binding.idLayoutHeader.tvSubtitle.text = "Scan Coil and Check the Quality"
 
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -76,12 +90,12 @@ class QualityCheckActivity : AppCompatActivity() {
 
 
         supportActionBar?.hide()
-            progress = ProgressDialog(this)
-            progress.setMessage("Please Wait...")
+        progress = ProgressDialog(this)
+        progress.setMessage("Please Wait...")
         val retrofitInstance =
             RetrofitInstance.getInstance(applicationContext)
-            val viewModelProviderFactory = QcViewModelFactory(application, retrofitInstance)
-            qcviewModel = ViewModelProvider(this, viewModelProviderFactory)[QCViewModel::class.java]
+        val viewModelProviderFactory = QcViewModelFactory(application, retrofitInstance)
+        qcviewModel = ViewModelProvider(this, viewModelProviderFactory)[QCViewModel::class.java]
         val printlabelviewModelProviderFactory=QcprintlabelViewModelFactory(application,retrofitInstance)
         qcPrintLabelViewModel =ViewModelProvider(this,printlabelviewModelProviderFactory)[PrintlabelViewModel::class.java]
         session = SessionManager(this)
@@ -100,24 +114,18 @@ class QualityCheckActivity : AppCompatActivity() {
 
             baseUrl = "$serverHttpPrefText://$serverIpSharedPrefText/"
 
-//            Log.d("SESSION_DEBUG", "User Details = $userDetail")
-//
-//            // ⭐ PRINT TOKEN HERE
-//            Log.d("JWT_TOKEN_QC", "JWT Token = $token")
-//            Log.d("Tanent_Code","Tenant Code= $tenantCode")
+
         }
         window.setSoftInputMode(
             android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
-        )
-
-
+        ) //Focus for Input Filed
 
 
 //        startService(intent)
-        binding.buttonLeft.visibility = View.GONE
-        binding.buttonRight.visibility = View.GONE
-        binding.btnReprint.visibility = View.GONE
-        binding.buttonPrintLabel.visibility = View.GONE
+        binding.layoutQcContainer.visibility = View.GONE
+        binding.layoutEmpty.visibility = View.VISIBLE
+        binding.layoutBarcodeSection.visibility = View.GONE
+        binding.rowRemarkSubmit.visibility = View.GONE
 
         Log.d("Tanent_Code","Tenant Code= $tenantCode")
 
@@ -130,21 +138,15 @@ class QualityCheckActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val request = QCFetchRequest(
+            clearPreviousQCData()
 
+            val request = QCFetchRequest(
                 coilBatchNumber = coilNumber,
-                tenantCode = tenantCode ?: ""
+                tenantCode = tenantCode
             )
 
-            val qcfectUrl = baseUrl + Constants.Get_GRNData
-            Log.d("QCDATAURL", "QC URL: $qcfectUrl")
-
-            qcviewModel.fetchQCData( request)
-            binding.buttonLeft.visibility = View.VISIBLE
-            binding.buttonRight.visibility = View.VISIBLE
-
+            qcviewModel.fetchQCData(request)
         }
-
 
 
         qcviewModel.qcFetchLiveData.observe(this) { response ->
@@ -159,15 +161,19 @@ class QualityCheckActivity : AppCompatActivity() {
 
                     if (data?.statusCode == 200 && data.responseObject != null) {
 
+                        binding.layoutEmpty.visibility = View.GONE
+                        binding.layoutQcContainer.visibility = View.VISIBLE
+
                         setQCDataToUI(data.responseObject)
 
-                        // ✅ Show Approve / Reject only on valid data
                         binding.buttonLeft.visibility = View.VISIBLE
                         binding.buttonRight.visibility = View.VISIBLE
 
                     } else {
-                        // ❌ Invalid batch number
-                        clearPreviousQCData()
+
+                        binding.layoutEmpty.visibility = View.VISIBLE
+                        binding.layoutQcContainer.visibility = View.GONE
+
                         showErrorMessage("Invalid Coil Batch Number")
                     }
 
@@ -204,16 +210,20 @@ class QualityCheckActivity : AppCompatActivity() {
 
                         generateBarcode(barcodeValue)
 
-                        // ✅ Keep both disabled after barcode generation
-                        binding.buttonLeft.isEnabled = false
-                        binding.buttonRight.isEnabled = false
+                        binding.layoutBarcodeSection.visibility = View.VISIBLE
+                        binding.buttonPrintLabel.visibility = View.VISIBLE
+
+                        binding.buttonLeft.visibility = View.GONE
+                        binding.buttonRight.visibility = View.GONE
+
+                        binding.rowRemarkSubmit.visibility = View.GONE
                         binding.buttonLeft.alpha = 0.5f
                         binding.buttonRight.alpha = 0.5f
 
                         showSubmitButton()
 
                     } else {
-                        // ❌ API success but no barcode
+
                         resetApproveRejectButtons()
                         showErrorMessage("Failed to get barcode")
                     }
@@ -270,32 +280,53 @@ class QualityCheckActivity : AppCompatActivity() {
                 }
 
                 is Resource.Error -> {
+
                     hideProgressBar()
 
+                    // ✅ Get barcode from API response
                     val barcode = response.data?.responseObject
 
+                    // ✅ Get proper error message
+                    val errorMessage =
+                        response.data?.errorMessage
+                            ?: response.message
+                            ?: "Something went wrong"
+
+                    // ✅ 409 Already Exists Case
                     if (!barcode.isNullOrEmpty()) {
 
-                        // ✅ 409 case → barcode exists
+                        Log.d("QC_BARCODE", "Existing Barcode = $barcode")
+
+                        // Show barcode image
                         generateBarcode(barcode)
 
-                        binding.btnReprint.visibility = View.VISIBLE
-                        binding.buttonLeft.visibility = View.GONE
-                        binding.buttonRight.visibility = View.GONE
+                        // Show barcode layout
+                        binding.layoutBarcodeSection.visibility = View.VISIBLE
+                        binding.barcodeContainer.visibility = View.VISIBLE
+
+                        // Show ONLY Reprint button
+//                        binding.btnReprint.visibility = View.VISIBLE
                         binding.buttonPrintLabel.visibility = View.GONE
 
-                        Toasty.info(
-                            this,
-                            response.message ?: "Barcode already exists",
-                            Toasty.LENGTH_SHORT
-                        ).show()
+                        // Hide approve/reject
+                        binding.buttonLeft.visibility = View.GONE
+                        binding.buttonRight.visibility = View.GONE
+
+                        // Hide remark layout
+                        binding.rowRemarkSubmit.visibility = View.GONE
+
+                        // Set barcode text
+                        binding.barcodeText.text = barcode
+
+                        // Show API message
+                        showErrorDialog(this,errorMessage)
 
                     } else {
-                        binding.barcodeContainer.visibility=View.VISIBLE
 
-                        binding.btnReprint.visibility = View.VISIBLE
-                        // ❌ real error → NO barcode
-                        showErrorMessage(response.message ?: "Something went wrong")
+                        // Real error
+                        binding.layoutBarcodeSection.visibility = View.GONE
+
+                        showErrorDialog(this,errorMessage)
                     }
                 }
 
@@ -305,50 +336,51 @@ class QualityCheckActivity : AppCompatActivity() {
 
         qcPrintLabelViewModel.qcPrintMutableLiveData.observe(this) { result ->
 
-            when (result) {
+                when (result) {
 
-                is Resource.Loading -> {
-                    Log.d("QC_PRINT", "API call loading")
-                }
-
-                is Resource.Success -> {
-
-                    val zpl = result.data?.responseObject
-                    Log.d("QC_PRINT", "ZPL = $zpl")
-
-                    if (zpl.isNullOrEmpty()) {
-                        Toast.makeText(this, "ZPL not received", Toast.LENGTH_SHORT).show()
-                        return@observe
+                    is Resource.Loading -> {
+                        Log.d("QC_PRINT", "API call loading")
                     }
 
-                    // ✅ Get printer MAC (use ONLY ONE source)
-                    val printerMac = Utils.getSharedPrefs(this,Constants.KEY_PRINTER_MAC)
-                    Log.d("QC_PRINT", "Printer MAC = $printerMac")
+                    is Resource.Success -> {
 
-                    if (printerMac.isNullOrEmpty()) {
-                        Toast.makeText(this, "Printer not configured", Toast.LENGTH_SHORT).show()
-                        return@observe
+                        val zpl = result.data?.responseObject
+                        Log.d("QC_PRINT", "ZPL = $zpl")
+
+                        if (zpl.isNullOrEmpty()) {
+                            Toast.makeText(this, "ZPL not received", Toast.LENGTH_SHORT).show()
+                            return@observe
+                        }
+
+                        // ✅ Get printer MAC (use ONLY ONE source)
+                        val printerMac = Utils.getSharedPrefs(this,Constants.KEY_PRINTER_MAC)
+                        Log.d("QC_PRINT", "Printer MAC = $printerMac")
+
+                        if (printerMac.isNullOrEmpty()) {
+                            Toast.makeText(this, "Printer not configured", Toast.LENGTH_SHORT).show()
+                            return@observe
+                        }
+
+                        // ✅ PRINT VIA FOREGROUND SERVICE
+                        ZebraPrinterHelper.printViaService(
+                            context = this,
+                            mac = printerMac,
+                            zpl = zpl
+                        )
+
+                        Toast.makeText(this, "Printing started", Toast.LENGTH_SHORT).show()
+                        goToHome()
                     }
 
-                    // ✅ PRINT VIA FOREGROUND SERVICE
-                    ZebraPrinterHelper.printViaService(
-                        context = this,
-                        mac = printerMac,
-                        zpl = zpl
-                    )
+                    is Resource.Error -> {
+                        Log.e("QC_PRINT", "API error: ${result.message}")
 
-                    Toast.makeText(this, "Printing started", Toast.LENGTH_SHORT).show()
-                    goToHome()
+                        Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    }
+
+                    else -> Unit
                 }
-
-                is Resource.Error -> {
-                    Log.e("QC_PRINT", "API error: ${result.message}")
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
-                }
-
-                else -> Unit
             }
-        }
 
 
         binding.buttonRight.setOnClickListener {
@@ -371,12 +403,6 @@ class QualityCheckActivity : AppCompatActivity() {
                 showErrorMessage("Please enter remark for rejection")
                 return@setOnClickListener
             }
-//            binding.buttonLeft.isEnabled = false
-//            binding.buttonLeft.alpha = 0.5f
-
-
-
-
 
             val request = QCStatusSubmissionRequest(
                 qcId = 0,
@@ -390,7 +416,7 @@ class QualityCheckActivity : AppCompatActivity() {
                     ?: "A",
                 netWeight = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
                 thickness = binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
-                length = binding.column2Row7.text.toString().toDoubleOrNull() ?: 0.0,
+                length = 0.0,
                 width = binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 grnNo = binding.column2Row8.text.toString(),
                 grnDate = binding.column2Row9.text.toString(),
@@ -417,17 +443,17 @@ class QualityCheckActivity : AppCompatActivity() {
             binding.rowRemarkSubmit.visibility = View.VISIBLE
 
             // Hide barcode row
-            binding.rowBarcode.visibility = View.GONE
+            binding.barcodeContainer.visibility = View.GONE
 
             // Hide normal submit button
-            binding.btnReprint.visibility = View.GONE
+//            binding.btnReprint.visibility = View.GONE
         }
 
-binding.commanInputRow.btnClear.setOnClickListener {
-    clearPreviousQCData()
-    binding.commanInputRow.inputField.text?.clear()
+        binding.commanInputRow.btnClear.setOnClickListener {
+            clearPreviousQCData()
+            binding.commanInputRow.inputField.text?.clear()
 
-}
+        }
         binding.buttonASubmit.setOnClickListener {
 
             val remarkText = binding.etRemark.text.toString().trim()
@@ -449,7 +475,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
                     ?: "A",
                 netWeight = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
                 thickness = binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
-                length = binding.column2Row7.text.toString().toDoubleOrNull() ?: 0.0,
+                length=0.0,
                 width = binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 grnNo = binding.column2Row8.text.toString(),
                 grnDate = binding.column2Row9.text.toString(),
@@ -464,36 +490,36 @@ binding.commanInputRow.btnClear.setOnClickListener {
 
         }
 
-        binding.btnReprint.setOnClickListener {
-            val barcode = binding.barcodeText.text.toString()
-
-            val request = PrintLabelRequest(
-                SupplierName  =  binding.column2Row1.text.toString(),
-                BarCode  = binding.barcodeText.text.toString(),
-                SupplierBatchNo  = binding.column2Row1.text.toString(),
-                MaterialCode  =  binding.column2RowMaterialCode.text.toString(),
-                Grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
-                    ?: "A",
-                Thickness  =  binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
-                Width  =  binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
-                GRNNumber  = binding.column2Row8.text.toString(),
-                GRNDate  = binding.column2Row9.text.toString(),
-                NetWeight  = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
-                CreatedBy = "",
-                CreatedDate = "2025-12-15T15:06:16"
-            )
-            Log.d("QC_PRINT", "Print button clicked")
-            Log.d("QC_PRINT", "Request = $request")
-
-            qcPrintLabelViewModel.printQcLabel(  request)
-        }
+//        binding.btnReprint.setOnClickListener {
+//            val barcode = binding.barcodeText.text.toString()
+//
+//            val request = PrintLabelRequest(
+//                SupplierName  =  binding.column2Row1.text.toString(),
+//                BarCode  = binding.barcodeText.text.toString(),
+//                SupplierBatchNo  = binding.column2Row1.text.toString(),
+//                MaterialCode  =  binding.column2RowMaterialCode.text.toString(),
+//                Grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
+//                    ?: "A",
+//                Thickness  =  binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
+//                Width  =  binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
+//                GRNNumber  = binding.column2Row8.text.toString(),
+//                GRNDate  = binding.column2Row9.text.toString(),
+//                NetWeight  = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
+//                CreatedBy = "",
+//                CreatedDate = "2025-12-15T15:06:16"
+//            )
+//            Log.d("QC_PRINT", "Print button clicked")
+//            Log.d("QC_PRINT", "Request = $request")
+//
+//            qcPrintLabelViewModel.printQcLabel(  request)
+//        }
 
 
         binding.buttonPrintLabel.setOnClickListener {
             val barcode = binding.barcodeText.text.toString()
 
             val request = PrintLabelRequest(
-                SupplierName  =  binding.column2Row1.text.toString(),
+                SupplierName  =  binding.column2Row2.text.toString(),
                 BarCode  = binding.barcodeText.text.toString(),
                 SupplierBatchNo  = binding.column2Row1.text.toString(),
                 MaterialCode  =  binding.column2RowMaterialCode.text.toString(),
@@ -504,8 +530,8 @@ binding.commanInputRow.btnClear.setOnClickListener {
                 GRNNumber  = binding.column2Row8.text.toString(),
                 GRNDate  = binding.column2Row9.text.toString(),
                 NetWeight  = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
-                CreatedBy = "",
-                CreatedDate = "2025-12-15T15:06:16"
+                CreatedBy = userName ?: "",
+                CreatedDate = todayDate
             )
             Log.d("QC_PRINT", "Print button clicked")
             Log.d("QC_PRINT", "Request = $request")
@@ -550,9 +576,11 @@ binding.commanInputRow.btnClear.setOnClickListener {
     }
 
     private fun clearPreviousQCData() {
-        binding.commanInputRow.inputField.text.clear()
+
+        binding.layoutQcContainer.visibility = View.GONE
+        binding.layoutEmpty.visibility = View.VISIBLE
         // Clear barcode
-        binding.rowBarcode.visibility = View.GONE
+        binding.barcodeContainer.visibility = View.GONE
         binding.barcodeImage.setImageBitmap(null)
         binding.barcodeText.text = ""
 
@@ -567,18 +595,18 @@ binding.commanInputRow.btnClear.setOnClickListener {
         binding.column2Row4.text = "--"
         binding.column2Row5.text = "--"
         binding.column2Row6.text = "--"
-        binding.column2Row7.text = "--"
+
         binding.column2Row8.text = "--"
         binding.column2Row9.text = "--"
         binding.column2RowMaterialCode.text = "--"
 
         // Hide buttons
-        binding.btnReprint.visibility = View.GONE
+//        binding.btnReprint.visibility = View.GONE
         binding.buttonPrintLabel.visibility = View.GONE
         binding.buttonLeft.visibility = View.GONE
         binding.buttonRight.visibility = View.GONE
 
-        binding.rowBarcode.visibility = View.GONE
+        binding.layoutBarcodeSection.visibility = View.GONE
         binding.barcodeContainer.visibility = View.GONE
         binding.barcodeImage.setImageBitmap(null)
         binding.barcodeText.text = ""
@@ -595,14 +623,24 @@ binding.commanInputRow.btnClear.setOnClickListener {
 
     private fun generateBarcode(data: String) {
         try {
+
             val bitMatrix: BitMatrix =
-                MultiFormatWriter().encode(data, BarcodeFormat.CODE_128, 600, 200)
+                MultiFormatWriter().encode(
+                    data,
+                    BarcodeFormat.CODE_128,
+                    600,
+                    200
+                )
+
             val barcodeEncoder = BarcodeEncoder()
             val bitmap: Bitmap = barcodeEncoder.createBitmap(bitMatrix)
+
+            binding.barcodeImage.visibility = View.VISIBLE
             binding.barcodeImage.setImageBitmap(bitmap)
+
             binding.barcodeText.text = data
 
-            binding.rowBarcode.visibility = View.VISIBLE
+            binding.layoutBarcodeSection.visibility = View.VISIBLE
             binding.barcodeContainer.visibility = View.VISIBLE
 
         } catch (e: Exception) {
@@ -612,7 +650,7 @@ binding.commanInputRow.btnClear.setOnClickListener {
 
 
     private fun showSubmitButton() {
-        binding.btnReprint.visibility = View.VISIBLE
+//        binding.btnReprint.visibility = View.VISIBLE
         binding.buttonPrintLabel.visibility = View.GONE
 
 
@@ -625,21 +663,21 @@ binding.commanInputRow.btnClear.setOnClickListener {
             showErrorMessage("No QC data found")
             return
         }
-        binding.rowBarcode.visibility = View.GONE
+        binding.barcodeImage.visibility = View.GONE
         binding.rowRemarkSubmit.visibility = View.GONE
-        binding.btnReprint.visibility = View.GONE
+//        binding.btnReprint.visibility = View.GONE
         binding.buttonPrintLabel.visibility = View.GONE
         binding.barcodeText.text = ""
         binding.barcodeImage.setImageBitmap(null)
         binding.apply {
-            rowBarcode.visibility = View.VISIBLE
+            barcodeImage.visibility = View.VISIBLE
             column2Row2.text = data.supplierName ?: "--"
             column2Row1.text = data.supplierBatchNo ?: "--"
             column2Row4.text = data.grade ?: "--"
             column2RowMaterialCode.text = data.materialCode ?: "--"
             column2Row5.text = data.thickness?.toString() ?: "--"
             column2Row6.text = data.width?.toString() ?: "--"
-            column2Row7.text = data.length?.toString() ?: "--"
+
             column2Row3.text = data.netWeightKg?.toString() ?: "--"
             column2Row8.text = data.grnNumber?.toString() ?: "--"
             column2Row9.text = data.grnDate?.substringBefore("T") ?: "--"
@@ -688,11 +726,32 @@ binding.commanInputRow.btnClear.setOnClickListener {
         }
         return super.dispatchKeyEvent(event)
     }
+    private fun clearUIData() {
 
+        binding.layoutBarcodeSection.visibility = View.GONE
+        binding.barcodeImage.setImageBitmap(null)
+        binding.barcodeText.text = ""
+
+        binding.etRemark.text.clear()
+        binding.rowRemarkSubmit.visibility = View.GONE
+
+        binding.column2Row1.text = "--"
+        binding.column2Row2.text = "--"
+        binding.column2Row3.text = "--"
+        binding.column2Row4.text = "--"
+        binding.column2Row5.text = "--"
+        binding.column2Row6.text = "--"
+        binding.column2Row8.text = "--"
+        binding.column2Row9.text = "--"
+        binding.column2RowMaterialCode.text = "--"
+
+//        binding.btnReprint.visibility = View.GONE
+        binding.buttonPrintLabel.visibility = View.GONE
+    }
     private fun handleScannedCoil(coilNumber: String) {
 
         Log.d("QC_SCANNER", "Scanned = $coilNumber")
-        clearPreviousQCData()
+        clearUIData()
         binding.commanInputRow.inputField.setText(coilNumber)
         Log.d("QC_INPUT", "Input text = ${binding.commanInputRow.inputField.text}")
         val request = QCFetchRequest(

@@ -16,6 +16,7 @@ data class BomResponse(
 data class BomOutput(
     val boMOutputId: Int? = null,
     val boMMasterId: Int? = null,
+
     val outputMaterial: String? = null,
     val materialDescription: String? = null,
     val boMComponent: List<BomComponent>? = emptyList()
@@ -25,7 +26,9 @@ data class BomOutput(
         val boMComponentId: Int,
         val boMOutputId: Int,
         val componentCode: String,
-       val  materialDescription :String?,
-        var weight:Double=0.0,
-        var Uom: String?
+        val materialDescription:String?,
+        var weight: Double =0.0,
+        var Uom: String?,
+        var isZincComponent:Boolean?=false,
+        var isDisabled: Boolean? = false
     )

@@ -449,7 +449,7 @@ private  var weight:Double=0.0
                 crmTranId = 0,
 
                 crmPlanId=selectedPlanDetail!!.crmPlanId,
-                tenantCode=tenantCode,
+//                tenantCode=tenantCode,
                 locationId=locationId,
                 sourceStockId=scannedStockId?:0,
                 weight =weight,
@@ -458,14 +458,14 @@ private  var weight:Double=0.0
                 jobNumber="",
                 inputBarcode = null,
                 inputWeight = null,
-                barcode=scannedBarcode,
+//                barcode=scannedBarcode,
                 materialCode = null,
                 ironLossWeight=null,
                 scrapWeight=null,
-                weightAfterCRM=null,
+//                weightAfterCRM=null,
 
                 isCoilDivided = false,
-                dividedCRMTranId=null,
+//                dividedCRMTranId=null,
                 completedBy = null,
                 completedDate=null,
                 status="InProgress",
@@ -475,7 +475,7 @@ private  var weight:Double=0.0
                 machineName = null,
                 tamper = null,
                 grade=null,
-                component=null
+                crmTransactionDetails =null
 
             )
 

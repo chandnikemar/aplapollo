@@ -6,10 +6,12 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F5F7FA"
         android:fillViewport="true"
         tools:context=".view.Slittingplan3">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -21,137 +23,238 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- INPUT ROW -->
-            <include
-                android:id="@+id/commanInputRow"
-                layout="@layout/comman_inputrow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <!-- BATCH DETAILS -->
-            <LinearLayout
-                android:id="@+id/layoutBatchDetails"
+            <!-- SCAN SECTION -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardScan"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:orientation="vertical"
-                android:padding="10dp"
-                app:layout_constraintTop_toBottomOf="@id/commanInputRow"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- TABLE -->
-                <include
-                    android:id="@+id/inCommanBatch"
-                    layout="@layout/comman_batchdetails"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <!-- DIVIDER -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="#DDDDDD" />
-
-                <!-- ADD PLAN BUTTON -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddPlan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    android:layout_gravity="end"
-                    android:text="+ Add Plan"
-                    android:textStyle="bold"
-                    app:cornerRadius="6dp"
-                    app:backgroundTint="@color/colorPrimary" />
-
-                <!-- WEIGHT + PLUS -->
-                <HorizontalScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
-                    android:scrollbars="none">
-
-                    <LinearLayout
-                        android:id="@+id/layoutWeightContainer"
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                         android:layout_marginEnd="12dp"
-                      />
+                        android:text="Scan Coil Barcode"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#1E293B"
+                        android:paddingBottom="8dp"/>
 
-                </HorizontalScrollView>
-                <!-- SAVE / CLEAR BUTTONS -->
-                <LinearLayout
-                    android:id="@+id/layoutActionButtons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btncSaves"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:text="Save"
-                        android:textAllCaps="false"
-                        android:textColor="@android:color/white"
-                        app:backgroundTint="@color/green"
-                        android:layout_marginEnd="8dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btncClears"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:text="Clear"
-                        android:textAllCaps="false"
-                        android:textColor="@android:color/white"
-                        app:backgroundTint="@color/orange"
-                        android:layout_marginStart="8dp" />
+                    <include
+                        android:id="@+id/commanInputRow"
+                        layout="@layout/comman_inputrow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
+            </com.google.android.material.card.MaterialCardView>
 
-                <!--            <LinearLayout-->
-<!--                android:id="@+id/layoutActionButtons"-->
+            <!-- BATCH DETAILS CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:visibility="gone"
+                android:id="@+id/cardBatch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/cardScan"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Batch Details"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#1E293B"/>
+
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@color/colorPrimary"/>
+
+                    <include
+                        android:id="@+id/inCommanBatch"
+                        layout="@layout/comman_batchdetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"/>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+<!--            <HorizontalScrollView-->
 <!--                android:layout_width="match_parent"-->
 <!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:gravity="center"-->
-<!--                android:layout_marginTop="20dp">-->
+<!--                android:layout_marginTop="12dp"-->
+<!--                android:scrollbars="none">-->
 
-<!--                <androidx.appcompat.widget.AppCompatButton-->
-<!--                    android:id="@+id/btnSave"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="48dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="Save"-->
-<!--                    android:textAllCaps="false"-->
-<!--                    android:textColor="@android:color/white"-->
-<!--                    android:background="@drawable/button_generate"-->
-<!--                    android:layout_marginEnd="8dp"/>-->
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/layoutWeightContainer"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_marginEnd="12dp"-->
+<!--                    />-->
 
-<!--                <androidx.appcompat.widget.AppCompatButton-->
-<!--                    android:id="@+id/btnClear"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="48dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="Clear"-->
-<!--                    android:textAllCaps="false"-->
-<!--                    android:textColor="@android:color/white"-->
-<!--                    android:background="@drawable/button_clear"-->
-<!--                    android:layout_marginStart="8dp"/>-->
-<!--            </LinearLayout>-->
+<!--            </HorizontalScrollView>-->
+
+            <!-- PLAN ACTIONS -->
+            <LinearLayout  android:visibility="gone"
+                android:id="@+id/layoutTopButtons"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/cardBatch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddPlan"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="➕ Add Plan"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:cornerRadius="12dp"
+                    app:iconGravity="textStart"
+                    app:backgroundTint="@color/colorPrimary"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSlit"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:text="✂ Start Slitting"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="@color/green"/>
+
             </LinearLayout>
+
+            <!-- WEIGHT SECTION -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardWeight"
+                android:layout_width="0dp"
+                android:visibility="gone"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/layoutTopButtons"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Slitting Plan"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#1E293B"/>
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/layoutWeightContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"/>
+
+                    </HorizontalScrollView>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOTTOM ACTIONS -->
+            <LinearLayout
+                android:id="@+id/layoutActionButtons"
+                android:visibility="gone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/cardWeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btncSaves"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_weight="1"
+                    android:text="Save Plan"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="@color/green"/>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="36dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:background="#D0D5DD" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btncClears"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_weight="1"
+                    android:text="Reset"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="@color/orange"/>
+
+            </LinearLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </ScrollView>
+
 </layout>

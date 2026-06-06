@@ -1,286 +1,260 @@
 package com.example.aplapollo.adapter.Slitting
 
 import HrSlittingStatusTransactionDetail
+import android.R
+import android.app.Activity
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Typeface
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.aplapollo.adapter.ComponentAdapter
-import com.example.aplapollo.adapter.OutputDialogAdapter
+import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.BomComponent
 import com.example.aplapollo.model.BomOutput
-import com.example.aplapollo.model.Slitting.ComponentRequest
-import com.example.apolloapl.R
-import com.example.apolloapl.databinding.JoblistBinding
+import com.example.apolloapl.databinding.DynamicJobItemBinding
 
 class SlittingStatusAdapter(
+
     private val context: Context,
-    private val list: List<HrSlittingStatusTransactionDetail>,
+    private val list: MutableList<HrSlittingStatusTransactionDetail>,
     private val getBomOutputs: () -> List<BomOutput>,
-    private val inputWeightTon: Double,
-    private val onWeightChanged: (() -> Unit)? = null
-) : RecyclerView.Adapter<SlittingStatusAdapter.ViewHolder>() {
 
-    private val weightMap = mutableMapOf<Int, Double>()
-    private val componentMap = mutableMapOf<Int, MutableList<BomComponent>>()
-    private val adapterMap = mutableMapOf<Int, ComponentAdapter>()
-    private val selectedOutputMap = mutableMapOf<Int, BomOutput>()
+    private val onAddClick: (Int, HrSlittingStatusTransactionDetail) -> Unit,
+    private val onDeleteClick: (Int, HrSlittingStatusTransactionDetail) -> Unit
 
-    private val uomMap = mutableMapOf<Int, String>()
-    private val units = listOf("Select", "Kg", "Tons")
+) : RecyclerView.Adapter<SlittingStatusAdapter.VH>() {
 
-    private var expandedPosition = -1
-
-    inner class ViewHolder(val binding: JoblistBinding) :
+    inner class VH(val binding: DynamicJobItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        var watcher: TextWatcher? = null
+
+        var weightWatcher: TextWatcher? = null
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = JoblistBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        return VH(
+            DynamicJobItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         )
-        return ViewHolder(binding)
     }
 
-    override fun getItemCount() = list.size
+    override fun getItemCount(): Int = list.size
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: VH, position: Int) {
 
         val item = list[position]
         val b = holder.binding
-        val rowId = item.hrSlittingTranDtlId
 
-        // ---------------- Barcode ----------------
-        b.tvBarcode.text = item.barcode ?: "No Barcode"
+        // =========================
+        // UNIT SPINNER
+        // =========================
 
-        // ---------------- Weight ----------------
-        holder.watcher?.let { b.editC4.removeTextChangedListener(it) }
+        val unitList = listOf("Tons")
 
-        val value = weightMap[rowId] ?: item.weighAfterSlitting ?: 0.0
-        b.editC4.setText(if (value == 0.0) "" else value.toString())
+        val spinnerAdapter = ArrayAdapter(
+            context,
+            R.layout.simple_spinner_item,
+            unitList
+        )
+
+        spinnerAdapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        )
+
+        b.jobLayout.spinnerUnit.adapter = spinnerAdapter
+
+        // =========================
+        // BARCODE
+        // =========================
+
+        b.jobLayout.tvBarcode.text = item.barcode
+
+        // =========================
+        // WEIGHT
+        // =========================
+
+        holder.weightWatcher?.let {
+            b.jobLayout.editC4.removeTextChangedListener(it)
+        }
+
+        b.jobLayout.editC4.setText(
+            if ((item.weighAfterSlitting ?: 0.0) == 0.0)
+                ""
+            else
+                item.weighAfterSlitting.toString()
+        )
 
         val watcher = object : TextWatcher {
+
             override fun afterTextChanged(s: Editable?) {
-                val weight = s.toString().toDoubleOrNull() ?: 0.0
-                weightMap[rowId] = weight
-                onWeightChanged?.invoke()
-                validateComponentLimit(rowId) // ✅ validate on weight change
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        }
 
-        b.editC4.addTextChangedListener(watcher)
-        holder.watcher = watcher
+                val currentPos = holder.adapterPosition
 
-        // ---------------- UOM Spinner ----------------
-        val adapter = object : ArrayAdapter<String>(
-            context,
-            android.R.layout.simple_spinner_item,
-            units
-        ) {
-            override fun isEnabled(position: Int) = position != 0
+                if (currentPos != RecyclerView.NO_POSITION) {
 
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent) as TextView
-                view.setTextColor(if (position == 0) Color.GRAY else Color.BLACK)
-                view.setTypeface(null, if (position == 0) Typeface.NORMAL else Typeface.BOLD)
-                return view
-            }
-
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent) as TextView
-                view.setTextColor(if (position == 0) Color.GRAY else Color.BLACK)
-                return view
-            }
-        }
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        b.spinnerUnit.adapter = adapter
-        if (!uomMap.containsKey(rowId)) {
-            uomMap[rowId] = "Tons"
-        }
-        val selectedUom = uomMap[rowId] ?: "Tons"
-        val index = units.indexOf(selectedUom)
-        b.spinnerUnit.setSelection(if (index >= 0) index else 0)
-
-        b.spinnerUnit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
-
-                if (pos == 0) return
-
-                val selectedUnit = units[pos]
-                uomMap[rowId] = selectedUnit
-                b.editC4.hint = "Weight ($selectedUnit)"
-
-                (parent?.getChildAt(0) as? TextView)?.apply {
-                    setTextColor(Color.BLACK)
-                    setTypeface(null, Typeface.BOLD)
+                    list[currentPos].weighAfterSlitting =
+                        s.toString().toDoubleOrNull() ?: 0.0
                 }
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
-        // ---------------- Output Material ----------------
-        val selectedOutput = selectedOutputMap[rowId]
-        b.tvOutputMaterial.text = selectedOutput?.outputMaterial ?: "Select Output Material"
-        b.tvOutputDesc.text = selectedOutput?.materialDescription
-
-        val isExpanded = position == expandedPosition
-        b.layoutExpand.visibility = if (isExpanded) View.VISIBLE else View.GONE
-
-        b.tvOutputMaterial.setOnClickListener {
-
-            val dialogView = LayoutInflater.from(context)
-                .inflate(R.layout.dialog_output_material, null)
-
-            val recycler = dialogView.findViewById<RecyclerView>(R.id.recyclerOutput)
-
-            val dialog = android.app.AlertDialog.Builder(context)
-                .setView(dialogView)
-                .create()
-
-            val outputs = getBomOutputs()
-
-            recycler.layoutManager = LinearLayoutManager(context)
-
-            recycler.adapter = OutputDialogAdapter(outputs) { selected ->
-
-                selectedOutputMap[rowId] = selected
-
-                val newList = selected.boMComponent
-                    ?.map { it.copy(  materialDescription = it.materialDescription ?: "",
-                                       Uom =  "Kg") }
-                    ?.toMutableList() ?: mutableListOf()
-
-                componentMap[rowId] = newList
-
-                adapterMap[rowId] = ComponentAdapter(
-                    list = newList,
-                    inputWeightTon = inputWeightTon
-                ) {
-                    validateComponentLimit(rowId)
-                }
-
-                notifyItemChanged(position)
-                dialog.dismiss()
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
             }
 
-            dialog.show()
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+            }
         }
 
-        // ---------------- Expand ----------------
-        b.layoutHeader.setOnClickListener {
-            val old = expandedPosition
-            expandedPosition = if (isExpanded) -1 else position
+        b.jobLayout.editC4.addTextChangedListener(watcher)
+        holder.weightWatcher = watcher
 
-            if (old != -1) notifyItemChanged(old)
-            notifyItemChanged(position)
+        // =========================
+        // COMPONENT VISIBILITY
+        // =========================
+
+        if (item.components.isNullOrEmpty()) {
+
+            b.jobLayout.layoutExpand.visibility = View.GONE
+            b.jobLayout.recyclerComponent.visibility = View.GONE
+
+        } else {
+
+            b.jobLayout.layoutExpand.visibility = View.VISIBLE
+            b.jobLayout.recyclerComponent.visibility = View.VISIBLE
         }
 
-        // ---------------- Component Recycler ----------------
-        val compList = componentMap[rowId] ?: mutableListOf()
-        componentMap[rowId] = compList
+        // =========================
+        // OUTPUT MATERIAL
+        // =========================
 
-        val compAdapter = adapterMap[rowId] ?: ComponentAdapter(
-            list = compList,
-            inputWeightTon = inputWeightTon
-        ) {
-            validateComponentLimit(rowId)
-        }.also {
-            adapterMap[rowId] = it
-        }
-        b.recyclerComponent.layoutManager = LinearLayoutManager(context)
-        b.recyclerComponent.adapter = compAdapter
-    }
+        b.jobLayout.tvOutputMaterial.text =
+            item.selectedOutput?.outputMaterial
+                ?: "Select Output Material"
 
+        b.jobLayout.tvOutputDesc.text =
+            item.selectedOutput?.materialDescription
+                ?: "Select Output Material"
 
-    private fun validateComponentLimit(rowId: Int) {
+        b.jobLayout.layoutOutputMaterial.setOnClickListener {
 
-        val outputWeight = weightMap[rowId] ?: 0.0
-        val outputUom = uomMap[rowId] ?: "Kg"
+            val bomList = getBomOutputs()
 
-        val components = componentMap[rowId] ?: return
+            if (bomList.isEmpty()) {
 
-        // ✅ Convert output to KG
-        val outputWeightKg = when (outputUom.lowercase()) {
-
-            "tons", "ton" -> outputWeight * 1000
-
-            else -> outputWeight
-        }
-
-        // ✅ Components already in KG
-        val totalComponentKg = components.sumOf { it.weight }
-
-        // ✅ Validation
-        if (totalComponentKg > outputWeightKg) {
-
-            Toast.makeText(
-                context,
-                "Component weight cannot exceed Output weight",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        // ✅ 5% validation from Input material
-        val maxAllowedKg = (inputWeightTon * 1000) * 0.05
-
-        if (totalComponentKg > maxAllowedKg) {
-
-            Toast.makeText(
-                context,
-                "Component weight cannot exceed ${
-                    String.format("%.2f", maxAllowedKg)
-                } Kg (5% of Input Material)",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-    // ---------------- API Helpers ----------------
-
-    fun getComponentsForRow(rowId: Int): List<ComponentRequest> {
-        return componentMap[rowId]
-            ?.filter { it.weight > 0 && it.componentCode.isNotBlank() }
-            ?.map {
-                ComponentRequest(
-                    MaterialCode = it.componentCode.trim(),
-                    MaterilDesc= it.materialDescription.toString(),
-                    Weight = it.weight,
-                    Uom = "Kg",
+                Utils.showErrorDialog(
+                    context as Activity,
+                    "BOM data not available yet"
                 )
-            } ?: emptyList()
+
+                return@setOnClickListener
+            }
+
+            Utils.showSearchableOutputDialog(
+                activity = context as Activity,
+                items = bomList
+            ) { selected ->
+
+                item.selectedOutput = selected
+
+                item.components =
+                    selected.boMComponent?.map {
+
+                        BomComponent(
+                            boMComponentId = 0,
+                            boMOutputId = 0,
+                            componentCode = it.componentCode,
+                            materialDescription = it.materialDescription ?: "",
+                            weight = 0.0,
+                            Uom = "Kg"
+                        )
+
+                    }?.toMutableList() ?: mutableListOf()
+
+                val pos = holder.adapterPosition
+
+                if (pos != RecyclerView.NO_POSITION) {
+                    notifyItemChanged(pos)
+                }
+            }
+        }
+
+        // =========================
+        // COMPONENT RECYCLER
+        // =========================
+
+        val componentList = item.components ?: mutableListOf()
+
+        b.jobLayout.recyclerComponent.layoutManager =
+            LinearLayoutManager(context)
+
+        b.jobLayout.recyclerComponent.adapter =
+            ComponentAdapter(
+                componentList,
+                inputWeightTon = item.weighAfterSlitting ?: 0.0
+            ) {}
+
+        b.jobLayout.recyclerComponent.visibility =
+            if (
+                item.selectedOutput != null &&
+                componentList.isNotEmpty()
+            ) View.VISIBLE
+            else View.GONE
+        // =========================
+        // DELETE BUTTON
+        // =========================
+
+        if (position == 0) {
+            b.btnDeleteJob.visibility = View.GONE
+        } else {
+            b.btnDeleteJob.visibility = View.VISIBLE
+        }
+
+        b.btnDeleteJob.setOnClickListener {
+            onDeleteClick(position, item)
+        }
+    }
+
+    fun getUpdatedList(): MutableList<HrSlittingStatusTransactionDetail> {
+        return list
+    }
+
+    fun getTotalOutputWeight(): Double {
+
+        return list.sumOf {
+            it.weighAfterSlitting ?: 0.0
+        }
     }
 
     fun getSelectedOutputMaterial(rowId: Int): String {
-        return selectedOutputMap[rowId]?.outputMaterial ?: "Ton"
+
+        return list.find {
+            it.hrSlittingTranDtlId == rowId
+        }?.selectedOutput?.outputMaterial ?: ""
     }
 
-    fun getUpdatedTransactionDetails(): List<HrSlittingStatusTransactionDetail> {
-        return list.map {
-            val id = it.hrSlittingTranDtlId
-            it.weighAfterSlitting = weightMap[id] ?: 0.0
-            it
+    fun getTotalComponentWeight(): Double {
+
+        return list.sumOf { item ->
+
+            item.components.sumOf { comp ->
+                comp.weight ?: 0.0
+            }
         }
-    }
-    fun getTotalOutputWeight(): Double {
-        return list.sumOf { it.weighAfterSlitting ?: 0.0 }
-    }
-    fun getSelectedUom(rowId: Int): String {
-        return uomMap[rowId] ?: "Kg"
     }
 }

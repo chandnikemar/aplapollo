@@ -4,103 +4,77 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/bgcolor"
-        >
+        android:layout_height="72dp"
+        android:paddingHorizontal="8dp">
 
-    <ImageView
-        android:id="@+id/ivBackOrLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_margin="5dp"
-        android:adjustViewBounds="true"
-        android:padding="5dp"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/kvisibilitylogo" />
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/tv_sub_heading"
-        android:visibility="gone"
-        android:layout_margin="5dp"
-        android:padding="10dp"
-        android:textColor="?attr/colorOnSurface"
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/ivBackOrLogo"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/kvisibilitylogo" />
 
-        android:textStyle="bold"
-        android:text="title"
-        app:layout_constraintStart_toEndOf="@+id/ivBackOrLogo"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        <!-- Logout Button -->
+        <LinearLayout
+            android:id="@+id/logouticon"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_circle_white_20"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Profile name -->
-        <TextView
-            android:id="@+id/profileTXt"
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                app:srcCompat="@drawable/ic_logout" />
+
+        </LinearLayout>
+
+        <!-- User Info -->
+        <LinearLayout
+            android:id="@+id/userSection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Chandni"
-            android:textColor="@color/black"
-            android:textSize="@dimen/tv_text"
+            android:layout_marginEnd="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/printerStatusContainer"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/logouticon"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Printer icon with status indicator -->
-        <FrameLayout
-            android:id="@+id/printerStatusContainer"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/logouticon">
+            <!-- User Initial -->
+            <TextView
+                android:id="@+id/tvAvatar"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_circle_blue"
+                android:gravity="center"
+                android:text="C"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <!-- Printer icon (UNCHANGED COLOR) -->
-            <ImageView
-                android:id="@+id/ivPrinter"
+            <!-- User Name -->
+            <TextView
+                android:id="@+id/profileTXt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:maxLines="1"
+                android:text="Chandni"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="6dp"
-                android:scaleType="centerInside"
-                app:srcCompat="@drawable/printer_white_on" />
+        </LinearLayout>
 
-            <!-- Status dot -->
-            <View
-                android:id="@+id/viewPrinterStatus"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:background="@drawable/bg_status_red" />
-
-
-        </FrameLayout>
-
-
-        <ImageView
-        android:id="@+id/logouticon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:adjustViewBounds="true"
-        android:padding="10dp"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_logout_black" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:background="?attr/colorOutline"
-        />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

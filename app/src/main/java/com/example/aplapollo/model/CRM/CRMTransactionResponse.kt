@@ -17,11 +17,14 @@ data class CRMTransactionResponse(
     val barcode: String? = null,
     val ironLossWeight: Double? = null,
     val scrapWeight: Double? = null,
-    val weightAfterCRM: Double?? = null,
+    val weightAfterCRM: Double? = null,
     val isCoilDivided: Boolean? = null,
     val dividedCRMTranId: Int? = null,
     val completedBy: String?= null,
-    val completedDate: String? = null,  // Can convert to Date if needed
+    val completedDate: String? = null,
+    val allowedScrapWeightKg: Double?= null,
+    val allowedToleranceWeightKg: Double?=null,
+    val allowedOutputWeightInTons:Double?=null,// Can convert to Date if needed
     val status: String? = null,
     val remarks: String? = null,
     val isActive: Boolean? = null,

@@ -100,9 +100,6 @@ class PicklingJobAdapter(
                 detail.barcode
             }
 
-        // ======================================
-        // OUTPUT MATERIAL
-        // ======================================
 
         b.jobLayout.tvOutputMaterial.text =
 
@@ -110,9 +107,6 @@ class PicklingJobAdapter(
                 ?.outputMaterial
                 ?: "Select Output Material"
 
-        // ======================================
-        // DESCRIPTION
-        // ======================================
 
         b.jobLayout.tvOutputDesc.text =
 
@@ -254,9 +248,7 @@ class PicklingJobAdapter(
 
             b.btnDeleteJob.visibility = View.VISIBLE
         }
-        // ======================================
-        // DELETE
-        // ======================================
+
         b.btnDeleteJob.setOnClickListener {
 
             val adapterPosition = holder.adapterPosition
@@ -277,9 +269,7 @@ class PicklingJobAdapter(
         }
     }
 
-    // =========================================
-    // SAFE DETAIL
-    // =========================================
+
 
     private fun getOrCreateDetail(
         item: PicklingTransactionResponse
@@ -310,9 +300,6 @@ class PicklingJobAdapter(
             .first()
     }
 
-    // =========================================
-    // SET OUTPUT
-    // =========================================
 
     @SuppressLint("NotifyDataSetChanged")
     fun setSelectedOutput(
@@ -326,21 +313,10 @@ class PicklingJobAdapter(
 
         val detail = getOrCreateDetail(item)
 
-        // =========================
-        // DO NOT CHANGE BARCODE
-        // =========================
 
-        // detail.barcode = output.outputMaterial   ❌ REMOVE THIS
-
-        // =========================
-        // ONLY SET OUTPUT MATERIAL
-        // =========================
 
         detail.selectedOutputMaterial = output
 
-        // =========================
-        // COMPONENTS
-        // =========================
 
         val componentList =
             mutableListOf<BomComponent>()
@@ -364,27 +340,7 @@ class PicklingJobAdapter(
         notifyItemChanged(position)
     }
 
-    // =========================================
-    // ADD JOB
-    // =========================================
 
-    fun addJob() {
-
-        jobList.add(
-
-            PicklingTransactionResponse(
-                picklingTranId = 0
-            )
-        )
-
-        notifyItemInserted(
-            jobList.lastIndex
-        )
-    }
-
-    // =========================================
-    // UPDATED LIST
-    // =========================================
 
     fun getUpdatedList():
             MutableList<PicklingTransactionResponse> {

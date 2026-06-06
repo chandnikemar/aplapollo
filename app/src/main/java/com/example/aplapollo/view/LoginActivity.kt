@@ -21,7 +21,7 @@ import com.example.apolloapl.databinding.ActivityLoginBinding
 import es.dmoral.toasty.Toasty
 
 
-class LoginActivity : AppCompatActivity() {
+class   LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
     private lateinit var progress: ProgressDialog
@@ -92,6 +92,7 @@ class LoginActivity : AppCompatActivity() {
                                 resultResponse.refreshToken,
                                 resultResponse.roleName,
                                 resultResponse.defaultTenantCode,
+
                             )
                             Utils.setSharedPrefsBoolean(
                                 this@LoginActivity,

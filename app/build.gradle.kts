@@ -74,6 +74,7 @@ android {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+            implementation("androidx.gridlayout:gridlayout:1.1.0")
 
             // ================= NAVIGATION =================
 
@@ -138,4 +139,7 @@ android {
             androidTestImplementation(
                 "androidx.test.espresso:espresso-core:3.6.1"
             )
+
+            implementation ("com.google.android.material:material:1.11.0")
+
         }

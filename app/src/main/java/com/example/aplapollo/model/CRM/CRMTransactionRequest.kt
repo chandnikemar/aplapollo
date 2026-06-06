@@ -1,50 +1,80 @@
 package com.example.aplapollo.model.CRM
 
+data class CRMTransactionRequest(
 
-data class CRMTransactionRequest    (
+    val crmTranId: Int? = null,
 
-    val crmTranId: Int,
+    val crmPlanId: Int? = null,
 
-    val crmPlanId: Int,
-    val tenantCode: String?,
-    val locationId: Int,
+    val locationId: Int? = null,
 
-    val sourceStockId: Int,
-    val weight:Double?,
-    val desiredThickness: Double?,   // decimal? → Double?
+    val sourceStockId: Int? = null,
 
-    val jobNumber: String,
-    val inputBarcode:String?,
-    val inputWeight:String?,
+    val weight: Double? = null,
 
-        val barcode: String?,
-val materialCode:String?,
-    val ironLossWeight: Double?,
+    val desiredThickness: Double? = null,
 
-    val scrapWeight: Double?,
+    val jobNumber: String? = null,
 
-    val weightAfterCRM: Double?,
+    val inputBarcode: String? = null,
 
-    val isCoilDivided: Boolean,
+    val inputWeight: Double? = null,
 
-    val dividedCRMTranId: Int?,
+    val materialCode: String? = null,
 
-    val completedBy: String?,
+    val ironLossWeight: Double? = null,
 
-    val completedDate: String?,      // DateTime? → String (recommended for API)
+    val scrapWeight: Double? = null,
 
-    val status: String,
-    val remarks: String?,
-    val isPlanned :Boolean,
+    val isCoilDivided: Boolean? = null,
 
-    val process: String?,
-    val machineName: String?,
-    val tamper: String?,
-    val grade: String?,
-    val component: List<ComponentsRequest>?
+    val completedBy: String? = null,
+
+    val completedDate: String? = null,
+
+    val status: String? = null,
+
+    val remarks: String? = null,
+
+    val isPlanned: Boolean? = null,
+
+    val process: String? = null,
+
+    val machineName: String? = null,
+
+    val tamper: String? = null,
+
+    val grade: String? = null,
+
+    val crmTransactionDetails:
+    MutableList<CRMTransactionDetailRequest>? = null
 )
-data class ComponentsRequest(
-    val MaterialCode: String,
-    val Weight: Double
 
+data class CRMTransactionDetailRequest(
+
+    val crmTransactionDetailsId: Int? = null,
+
+    val barcode: String? = null,
+
+    val materialCode: String? = null,
+
+    val weightAfterCRM: Double? = null,
+
+    val uoM: String? = null,
+
+    val weightTakenBy: String? = null,
+
+    val weightDateTime: String? = null,
+
+    val crmComponent:
+    MutableList<CRMComponentRequest>? = null
+)
+
+data class CRMComponentRequest(
+
+    val MaterialCode: String? = null,
+
+    val Weight: Double? = null,
+
+    val Uom: String? = null
 )

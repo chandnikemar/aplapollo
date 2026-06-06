@@ -3,7 +3,7 @@ package com.example.aplapollo.model.Pickling
 import com.example.aplapollo.model.BomComponent
 import com.example.aplapollo.model.BomOutput
 
-data class ProcessPicklingRequest(
+data class ProcessPicklingRequest   (
 
     val picklingTranId: Int? = null,
     val tenantCode: String?,
@@ -16,8 +16,8 @@ data class ProcessPicklingRequest(
     val IsActive: Boolean? = null,
 
     val inputBarcode: String? = null,
-    val inputWeight: Int? = null,
-    val ironLossWeight: Int? = null,
+    val inputWeight: Double? = null,
+    val ironLossWeight: Double? = null,
     val scrapWeight: Double? = null,
     val completedBy: String? = null,
     val completedDate: String? = null,

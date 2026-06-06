@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.Utils
+import com.example.aplapollo.model.ApiCommonResponse
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
 import com.example.aplapollo.model.Slitting.HrSlittingPlanResponse
@@ -81,13 +82,13 @@ class SlittingViewModel(
         request: InitiateSlittingRequest
     ) {
         viewModelScope.launch {
-            safeApiCallInitiateSlitting( request)
+            safeApiCallInitiateSlitting(request)
         }
     }
 
-    fun getOngoingSlittingJobs(tenantCode:String,locationId: Int) {
+    fun getOngoingSlittingJobs(locationId: Int,process: String) {
         viewModelScope.launch {
-            safeApiCallOngoingJobs(tenantCode,locationId)
+            safeApiCallOngoingJobs(locationId,process)
         }
     }
 
@@ -339,14 +340,14 @@ private suspend fun safeApiCallInitiateSlitting(
         return Resource.Error(errorMessage)
     }
     //=========================================================================================
-    private suspend fun safeApiCallOngoingJobs(tenantCode: String,locationId: Int) {
+    private suspend fun safeApiCallOngoingJobs(locationId: Int,process:String) {
 
         ongoingJobsLiveData.postValue(Resource.Loading())
 
         try {
             if (Utils.hasInternetConnection(getApplication())) {
 
-                val response = aplRepository.getOngoingJobs(tenantCode ,locationId)
+                val response = aplRepository.getOngoingJobs(locationId,process)
 
                 // 🔥 DEBUG
                 Log.d("API_DEBUG", "Response Code = ${response.code()}")
@@ -385,6 +386,87 @@ private suspend fun safeApiCallInitiateSlitting(
             val error = response.errorBody()?.string()
             Resource.Error(error ?: "Failed to load ongoing jobs")
         }
+    }
+    //=======================================================================================
+    val deleteSlittingTranLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
+    fun deleteSlittingTransaction(
+        HRSlittingTranId: Int
+    ) {
+        viewModelScope.launch {
+            safeApiCallDeleteSlittingTransaction(
+                HRSlittingTranId
+            )
+        }
+    }
+    private suspend fun safeApiCallDeleteSlittingTransaction(
+        HRSlittingTranId: Int
+    ) {
+
+        deleteSlittingTranLiveData.postValue(
+            Resource.Loading()
+        )
+
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getSlittingTransactionDelete(
+                        HRSlittingTranId
+                    )
+
+                deleteSlittingTranLiveData.postValue(
+                    handleDeleteSlittingTransactionResponse(
+                        response
+                    )
+                )
+
+            } else {
+
+                deleteSlittingTranLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            deleteSlittingTranLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handleDeleteSlittingTransactionResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        var errorMessage = ""
+
+        if (response.isSuccessful) {
+
+            response.body()?.let {
+
+                return Resource.Success(it)
+            }
+
+        } else if (response.errorBody() != null) {
+
+            val errorObject = JSONObject(
+                response.errorBody()!!
+                    .charStream()
+                    .readText()
+            )
+
+            errorMessage = errorObject.optString(
+                Constants.HTTP_ERROR_MESSAGE,
+                "Failed to delete transaction"
+            )
+        }
+
+        return Resource.Error(errorMessage)
     }
 
 }

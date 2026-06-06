@@ -8,6 +8,15 @@
     <color name="secondaryColor">#F8A931</color>
     <color name="secondaryDark">#E28F0E</color>
     <color name="secondaryLight">#FFD18A</color>
+    <color name="bgcolor">#F4F8FA</color>
+
+    <color name="text_dark">#0F172A</color>
+
+    <color name="text_light">#64748B</color>
+
+    <color name="text_hint">#94A3B8</color>
+
+    <color name="light_border">#DCE7EC</color>
 <!--    <color name="secondaryColor">#004f8c</color>-->
     <color name="secondaryLightColor">#5ea9f0</color>
 <!--    <color name="primaryColor">#1976D2</color>-->
@@ -22,7 +31,7 @@
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
     <color name="grey">#9A9A9A</color>
-    <color name="bgcolor">#FFFFFF</color>
+
     <color name="green">#FF4CAF50</color>
     <color name="lightblue">#F8FCFF</color>
     <color name="colorPrimary2">#EBBD34</color>
@@ -43,7 +52,7 @@
     <color name="recent_transaction">#026399</color>
     <color name="light_grey">#FFAAAAAA</color>
     <color name="transparent_grey">#26AAAAAA</color>
-    <color name="greyLight">#E6E6E6</color>
+
     <color name="rippleColor">#253F70</color>
     <color name="rippleColorRed">#253F70</color>
     <color name="transparent">#00FFFFFF</color>
@@ -84,7 +93,32 @@
 
 <color name="surface_light">#FFFFFF</color>
 <color name="surface_dark">#121A2B</color>
+    <!-- ===================================================== -->
+    <!-- TEXT COLORS -->
+    <!-- ===================================================== -->
 
-<color name="text_light">#1A1A1A</color>
-<color name="text_dark">#EAEAF0</color>
+    <color name="textDark">#0F172A</color>
+    <color name="textLight">#64748B</color>
+    <color name="textHint">#94A3B8</color>
+
+    <!-- ===================================================== -->
+    <!-- BORDER / DIVIDER -->
+    <!-- ===================================================== -->
+
+    <color name="borderColor">#DCE7EC</color>
+    <color name="dividerColor">#E5E7EB</color>
+    <!-- ===================================================== -->
+    <!-- LIGHT BACKGROUNDS -->
+    <!-- ===================================================== -->
+
+    <color name="lightBlueBg">#F8FCFF</color>
+    <color name="greyLight">#EEEEEE</color>
+    <color name="offWhite">#F8FAFC</color>
+    <!-- ===================================================== -->
+    <!-- BACKGROUND COLORS -->
+    <!-- ===================================================== -->
+
+    <color name="bgColor">#F4F8FA</color>
+    <color name="surfaceColor">#FFFFFF</color>
+    <color name="cardBackground">#FFFFFF</color>
 </resources>

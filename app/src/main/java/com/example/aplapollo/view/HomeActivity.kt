@@ -1,23 +1,22 @@
 package com.example.aplapollo.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.view.View
+import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
-import com.example.aplapollo.view.GP.GPActivity
+import com.example.aplapollo.helper.Utils.getWifiMacAddress
 import com.example.aplapollo.view.GateEntry.GateEntryTransactionActivity
-import com.example.aplapollo.view.Pickling.PicklingActivity
 import com.example.aplapollo.view.ProductionEntry.InputProductionEntryActivity
-import com.example.aplapollo.view.coldpressing.CRMActivity
-import com.example.aplapollo.view.slitting.SlittingActivity
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityHomeBinding
-
+import java.net.NetworkInterface
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
@@ -29,8 +28,27 @@ class HomeActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         session = SessionManager(this)
         val username = Utils.getSharedPrefs(this, Constants.KEY_USER_NAME)
-        binding.idLayoutHeader.profileTXt.text = username
-        binding.idLayoutHeader.printerStatusContainer.visibility=View.GONE
+        binding.profileTXt.text = username
+        NetworkInterface.getNetworkInterfaces().toList().forEach { intf ->
+
+            val mac = intf.hardwareAddress?.joinToString(":") {
+                "%02X".format(it)
+            } ?: "N/A"
+
+            Log.d("NETWORK", "${intf.name} -> $mac")
+        }
+        Log.d("TC26_MAC", getWifiMacAddress())
+        val deviceId = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+        Log.d("DEVICE_ID", deviceId)
+        printDeviceInfo()
+//        if (username != null) {
+//            binding.tvAvatar.text =
+//                username.trim().first().uppercaseChar().toString()
+//        }
+//        binding.idLayoutHeader..visibility=View.GONE
 //        updatePrinterIndicator()
 
 //        binding.rvSummary.layoutManager =
@@ -38,32 +56,22 @@ class HomeActivity : AppCompatActivity() {
 //        binding.rvSummary.adapter = SummaryAdapter(summaryList)
 
 
-        binding.card1.setOnClickListener {
+        binding.cardGateEntry.setOnClickListener {
             startActivity(Intent(this@HomeActivity, GateEntryTransactionActivity::class.java))
         }
-        binding.card2.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, QualityCheckActivity::class.java))
+        binding.cardQuality.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, QualityCheckHistoryActivity::class.java))
         }
-        binding.card3.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, SlittingActivity::class.java))
+
+//        }
+        binding.cardProduction.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, InputProductionEntryActivity::class.java))
         }
-        binding.card4.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, PicklingActivity ::class.java))
-        }
-        binding.card5.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, CRMActivity ::class.java))
-        }
-        binding.card6.setOnClickListener {
-            startActivity(Intent(this@HomeActivity, GPActivity ::class.java))
-        }
-        binding.card7.setOnClickListener {
-            startActivity(Intent(this@HomeActivity,InputProductionEntryActivity ::class.java))
-        }
-        binding.card8.setOnClickListener {
+        binding.cardPrinter.setOnClickListener {
             startActivity(Intent(this@HomeActivity, PrinterMACAddActivity::class.java))
         }
-        binding.card9.setOnClickListener{
-            startActivity(Intent(this@HomeActivity,AdminActivity::class.java))
+        binding.cardAdmin.setOnClickListener {
+            startActivity(Intent(this@HomeActivity, AdminActivity::class.java))
         }
 
 //        binding.idLayoutHeader.ivPrinter.setOnClickListener {
@@ -86,7 +94,7 @@ class HomeActivity : AppCompatActivity() {
 //        }
 
         // Logout
-        binding.idLayoutHeader.logouticon.setOnClickListener {
+        binding.logouticon.setOnClickListener {
             showLogoutPopup()
         }
     }
@@ -130,6 +138,38 @@ class HomeActivity : AppCompatActivity() {
         finish()
     }
 
+
+    fun printDeviceInfo() {
+
+        val androidId = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+
+        Log.d("DEVICE_INFO", "ANDROID_ID = $androidId")
+
+        Log.d("DEVICE_INFO", "MANUFACTURER = ${Build.MANUFACTURER}")
+        Log.d("DEVICE_INFO", "MODEL = ${Build.MODEL}")
+        Log.d("DEVICE_INFO", "DEVICE = ${Build.DEVICE}")
+        Log.d("DEVICE_INFO", "PRODUCT = ${Build.PRODUCT}")
+        Log.d("DEVICE_INFO", "BRAND = ${Build.BRAND}")
+
+        try {
+                NetworkInterface.getNetworkInterfaces().toList().forEach { intf ->
+
+                    val mac = intf.hardwareAddress?.joinToString(":") {
+                        "%02X".format(it)
+                    } ?: "N/A"
+
+                    Log.d(
+                        "DEVICE_INFO",
+                        "Interface=${intf.name}, MAC=$mac"
+                    )
+                }
+        } catch (e: Exception) {
+            Log.e("DEVICE_INFO", e.message ?: "")
+        }
+    }
 }
 
 //data class SummaryItem(

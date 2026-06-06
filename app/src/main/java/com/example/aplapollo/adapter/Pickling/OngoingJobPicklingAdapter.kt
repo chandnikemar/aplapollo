@@ -1,117 +1,198 @@
 package com.example.aplapollo.adapter.Pickling
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TableLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
 import com.example.apolloapl.R
+import com.google.android.material.button.MaterialButton
 
-class OngoingJobPicklingAdapter(
+class PicklingOngoingAdapter(
 
-    private var jobList: List<PicklingJobInProgressResponse>,
 
-    private val onItemClick: (PicklingJobInProgressResponse) -> Unit
+    private val jobList: MutableList<PicklingJobInProgressResponse>,
+        private val onDeleteClick: (PicklingJobInProgressResponse) -> Unit,
+    private val onItemClick: (PicklingJobInProgressResponse) -> Unit,
+    private val onReprintClick: (PicklingJobInProgressResponse) -> Unit
 
-) : RecyclerView.Adapter<OngoingJobPicklingAdapter.JobViewHolder>() {
+) : RecyclerView.Adapter<PicklingOngoingAdapter.JobViewHolder>() {
 
     inner class JobViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
-        val tvBarcode: TextView =
-            itemView.findViewById(R.id.tvBarcodeNo)
+        val tvBarcode: TextView = itemView.findViewById(R.id.tvBarcodeNo)
+        val tvDate: TextView = itemView.findViewById(R.id.tvDate)
+        val tvWidth: TextView = itemView.findViewById(R.id.tvWidth)
+        val tvThickness: TextView = itemView.findViewById(R.id.tvThickness)
+        val tvGrade: TextView = itemView.findViewById(R.id.tvGrade)
+        val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
 
-        val tvWidth: TextView =
-            itemView.findViewById(R.id.tvWidth)
+        val btnAction: MaterialButton = itemView.findViewById(R.id.btnAction)
 
-        val tvThickness: TextView =
-            itemView.findViewById(R.id.tvThickness)
-
-        val tvGrade: TextView =
-            itemView.findViewById(R.id.tvGrade)
-
-        val container: TableLayout =
-            itemView.findViewById(R.id.commanBatchDetails)
-
-        val divider: View? =
-            itemView.findViewById(R.id.divider)
+        val ivEye: MaterialButton? = itemView.findViewById(R.id.ivEye)
+        val ivDelete: MaterialButton? = itemView.findViewById(R.id.btnDelete)
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): JobViewHolder {
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JobViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_ongoing_job, parent, false)
 
         return JobViewHolder(view)
     }
 
-    override fun onBindViewHolder(
-        holder: JobViewHolder,
-        position: Int
-    ) {
+    override fun getItemCount(): Int = jobList.size
+
+    override fun onBindViewHolder(holder: JobViewHolder, position: Int) {
 
         val job = jobList[position]
         val context = holder.itemView.context
 
-        // ✅ Bind data directly
-        holder.tvBarcode.text = job.barcode ?: "-"
+        val child = job.picklingJobDetailsResponses?.firstOrNull()
+        val status = job.status ?: ""
+        val isCompleted = status.equals("Completed", true)
 
-        holder.tvWidth.text =
-            job.width?.toString() ?: "-"
+        // =========================
+        // DATA
+        // =========================
+        holder.tvBarcode.text = job?.barcode ?:  "-"
+        holder.tvDate.text = Utils.formatDate(job.createdDateTime)
+        holder.tvWidth.text = if (job.width > 0) job.width.toString() else "-"
+        holder.tvThickness.text = if (job.thickness > 0) job.thickness.toString() else "-"
+        holder.tvGrade.text = job.grade ?: "-"
+        holder.tvStatus.text = status
 
-        holder.tvThickness.text =
-            job.thickness?.toString() ?: "-"
+        // =========================
+        // COMPLETED UI STATE
+        // =========================
+        holder.ivEye?.visibility = if (isCompleted) View.VISIBLE else View.GONE
+//            holder.ivDelete?.visibility = if (isCompleted) View.GONE else View.VISIBLE
 
-        holder.tvGrade.text =
-            job.grade ?: "-"
+        holder.itemView.alpha = if (isCompleted) 0.6f else 1.0f
 
+        // disable click for completed
+        holder.itemView.isClickable = !isCompleted
+        holder.itemView.isFocusable = !isCompleted
 
-        // ✅ Highlight first item
-        if (position == 0) {
+        // =========================
+        // ACTION BUTTON
+        // =========================
+        when (status.lowercase()) {
 
-            holder.container.setBackgroundColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.job_highlight
-                )
-            )
+            "inprogress" -> {
+                holder.btnAction.visibility = View.VISIBLE
+                holder.btnAction.text = "Delete"
+                holder.btnAction.setIconResource(android.R.drawable.ic_menu_delete)
 
-            holder.itemView.isEnabled = true
-            holder.itemView.isClickable = true
+                holder.btnAction.backgroundTintList =
+                    ColorStateList.valueOf(
+                        ContextCompat.getColor(context, android.R.color.holo_red_dark)
+                    )
+            }
 
-            holder.itemView.setOnClickListener {
+            "completed" -> {
+                holder.btnAction.visibility = View.VISIBLE
+                holder.btnAction.text = "Print"
+                holder.btnAction.setIconResource(android.R.drawable.ic_menu_revert)
+
+                holder.btnAction.backgroundTintList =
+                    ColorStateList.valueOf(
+                        ContextCompat.getColor(context, android.R.color.holo_blue_dark)
+                    )
+            }
+
+            else -> holder.btnAction.visibility = View.GONE
+        }
+
+        // =========================
+        // CLICK EVENTS
+        // =========================
+
+        holder.itemView.setOnClickListener {
+            if (!isCompleted) {
                 onItemClick(job)
             }
+        }
+
+        holder.btnAction.setOnClickListener {
+            when (status.lowercase()) {
+
+                "inprogress" -> onDeleteClick(job)
+
+                "completed" -> onReprintClick(job)
+            }
+        }
+
+        holder.ivEye?.setOnClickListener {
+            if (isCompleted) {
+                showCompletedDialog(context, job)
+            }
+        }
+
+        holder.ivDelete?.setOnClickListener {
+            if (!isCompleted) {
+                onDeleteClick(job)
+            }
+        }
+    }
+
+
+    @SuppressLint("ResourceType")
+    private fun showCompletedDialog(
+        context: Context,
+        job: PicklingJobInProgressResponse
+    ) {
+
+        val dialog = LayoutInflater.from(context)
+            .inflate(R.layout.dialog_completed_job, null)
+
+        val tvBarcode = dialog.findViewById<TextView>(R.id.tvBarcode)
+        val tvWeight = dialog.findViewById<TextView>(R.id.tvWeight)
+        val btnOk = dialog.findViewById<MaterialButton>(R.id.btnOk)
+
+        val child = job.picklingJobDetailsResponses?: emptyList()
+
+        if (child.isEmpty()) {
+
+            tvBarcode.text = "-"
+            tvWeight.text = "-"
 
         } else {
 
-            holder.container.setBackgroundColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.grey_light
-                )
-            )
+            tvBarcode.text = child.joinToString("\n") {
+                it.barcode ?: "-"
+            }
 
-            holder.itemView.isEnabled = false
-            holder.itemView.isClickable = false
+            tvWeight.text = child.joinToString("\n") {
+                "${it.weight ?: 0.0} Ton"
+            }
         }
 
-        holder.divider?.visibility = View.VISIBLE
+        val alert = AlertDialog.Builder(context)
+            .setView(dialog)
+            .create()
+
+        btnOk.setOnClickListener {
+            alert.dismiss()
+        }
+
+        alert.show()
     }
 
-    override fun getItemCount(): Int = jobList.size
-
-
-    // ✅ Update list
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<PicklingJobInProgressResponse>) {
 
-        jobList = newList
+        jobList.clear()
+
+        jobList.addAll(newList)
+
         notifyDataSetChanged()
     }
 }

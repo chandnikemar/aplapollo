@@ -5,8 +5,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
-        <!-- Header -->
+        android:background="#F4F7FC">
+
+        <!-- ================= HEADER ================= -->
         <include
             android:id="@+id/idLayoutHeader"
             layout="@layout/action_bar_comman_hedaer_layout"
@@ -16,168 +17,209 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Main Card -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- ================= CONTENT ================= -->
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            android:background="@color/white"
+            android:fillViewport="true"
+            android:clipToPadding="false"
             app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
-                android:background="@color/lightblue">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
 
-                    <!-- Transporter Code (Dropdown with search) -->
-                    <com.google.android.material.textfield.TextInputLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="Transporter Code "
-                        app:endIconMode="none"
-                        app:boxBackgroundMode="outline"
-                        app:boxCornerRadiusTopStart="0dp"
-                        app:boxCornerRadiusTopEnd="0dp"
-                        app:boxCornerRadiusBottomStart="0dp"
-                        app:boxCornerRadiusBottomEnd="0dp">
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                        <AutoCompleteTextView
-                            android:id="@+id/etTransporterCode"
+                        <!-- ================= TITLE SECTION ================= -->
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:paddingTop="14dp"
-                            android:paddingBottom="14dp"
-                            android:inputType="text"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
-                    <!-- Transporter -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Transporter Name"
-                        android:layout_marginTop="12dp">
+                            <ImageView
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
+                                android:background="@drawable/bg_chip_light"
+                                android:padding="10dp"
+                                android:src="@drawable/ic_gate"
+                                app:tint="@color/primaryDark" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etTransporterName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
 
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Transport Details"
+                                    android:textColor="#111827"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
 
-                    <!-- Vehicle -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Vehicle No"
-                        android:layout_marginTop="12dp">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Enter transporter and vehicle information"
+                                    android:textColor="#6B7280"
+                                    android:textSize="12sp" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etVehicleNo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            </LinearLayout>
 
-                    <!-- LR No -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="LR No"
-                        android:layout_marginTop="12dp">
+                        </LinearLayout>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etLrNo"
+                        <!-- ================= TRANSPORTER CODE ================= -->
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:maxLength="15" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:layout_marginTop="24dp"
+                            android:hint="Transporter Code"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
+                            app:boxStrokeColor="@color/primaryDark"
+                            app:startIconDrawable="@drawable/ic_code"
+                            app:startIconTint="@color/primaryDark">
 
-                    <!-- Generate Button -->
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnSubmit"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:text="Generate Gate Entry"
-                        android:layout_marginTop="16dp"
-                        android:background="@drawable/button_generate"
-                        android:textColor="@android:color/white" />
+                            <AutoCompleteTextView
+                                android:id="@+id/etTransporterCode"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
 
-                    <!-- Gate Entry No -->
+                                android:inputType="text"
+                                android:minHeight="54dp"
+                                android:paddingStart="4dp"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp"
+                                android:textColor="#111827"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- ================= TRANSPORTER NAME ================= -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="Transporter Name"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
+                            app:boxStrokeColor="@color/primaryDark"
+                            app:startIconDrawable="@drawable/ic_transporter"
+                            app:startIconTint="@color/primaryDark">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etTransporterName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="54dp"
+                                android:paddingStart="4dp"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp"
+                                android:textColor="#111827"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- ================= VEHICLE NUMBER ================= -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="Vehicle Number"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
+                            app:boxStrokeColor="@color/primaryDark"
+                            app:startIconDrawable="@drawable/ic_truck"
+                            app:startIconTint="@color/primaryDark">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etVehicleNo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="54dp"
+                                android:paddingStart="4dp"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp"
+                                android:textColor="#111827"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- ================= LR NUMBER ================= -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="LR Number"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp"
+                            app:boxStrokeColor="@color/primaryDark"
+                            app:startIconDrawable="@drawable/ic_receipt"
+                            app:startIconTint="@color/primaryDark">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etLrNo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number"
+                                android:maxLength="15"
+                                android:minHeight="54dp"
+                                android:paddingStart="4dp"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp"
+                                android:textColor="#111827"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- ================= SUBMIT BUTTON ================= -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSubmit"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
+                            android:layout_marginTop="28dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:text="Generate Gate Entry"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@color/primaryDark"
+                            app:cornerRadius="14dp"
+                            app:icon="@drawable/ic_check"
+                            app:iconGravity="textStart"
+                            app:iconPadding="10dp"
+                            app:iconTint="@null"
+                            />
+
+                    </LinearLayout>
 
 
-                    <!-- Coil Section -->
-<!--                    <LinearLayout-->
-<!--                        android:id="@+id/layoutCoilSection"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:orientation="vertical"-->
-<!--                        android:visibility="gone"-->
-<!--                        android:layout_marginTop="16dp">-->
 
-<!--                        <com.google.android.material.textfield.TextInputLayout-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:hint="Coil No">-->
-
-<!--                            <com.google.android.material.textfield.TextInputEditText-->
-<!--                                android:id="@+id/etCoilNo"-->
-<!--                                android:layout_width="match_parent"-->
-<!--                                android:layout_height="wrap_content" />-->
-<!--                        </com.google.android.material.textfield.TextInputLayout>-->
-
-<!--                        <androidx.appcompat.widget.AppCompatButton-->
-<!--                            android:id="@+id/btnAddCoil"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="48dp"-->
-<!--                            android:text="Add Coil"-->
-<!--                            android:layout_marginTop="8dp"-->
-<!--                            android:background="@drawable/button_generate"-->
-<!--                            android:textColor="@android:color/white" />-->
-
-<!--                        <androidx.recyclerview.widget.RecyclerView-->
-<!--                            android:id="@+id/rvCoilList"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:layout_marginTop="10dp"-->
-<!--                            android:visibility="gone" />-->
-
-<!--                        <androidx.appcompat.widget.AppCompatButton-->
-<!--                            android:id="@+id/btnFinalSubmit"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="48dp"-->
-<!--                            android:text="Submit All Coils"-->
-<!--                            android:layout_marginTop="10dp"-->
-<!--                            android:background="@drawable/button_generate"-->
-<!--                            android:textColor="@android:color/white" />-->
-<!--                    </LinearLayout>-->
-
-                    <!-- ================= HISTORY SECTION ================= -->
-
-
-
-
-
-                </LinearLayout>
-
-            </ScrollView>
-
-        </com.google.android.material.card.MaterialCardView>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

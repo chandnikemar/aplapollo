@@ -3,7 +3,6 @@ package com.example.aplapollo.view
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,10 +27,19 @@ class AdminActivity : AppCompatActivity() {
         user = session.getUserDetails()
         serverIpSharedPrefText = user["serverIp"].toString()
         serverHttpPrefText = user["http"].toString()
-        binding.idLayoutHeader.titleText.visibility= View.VISIBLE
-        binding.idLayoutHeader.titleText.setText("Admin Settings")
-        binding.idLayoutHeader.profileTXt.visibility= View.GONE
-        binding.idLayoutHeader.logouticon.visibility= View.GONE
+        binding.idLayoutHeader.tvTitle.text= "Server Configuration"
+        binding.idLayoutHeader.tvSubtitle.text="Configure API server connection settings"
+        binding.idLayoutHeader.ivBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
+//        binding.idLayoutHeader.titleText.setText("Admin Settings")
+//        binding.idLayoutHeader.tvAvatar.text =
+//            binding.idLayoutHeader.profileTXt.text.toString()
+//                .firstOrNull()
+//                ?.uppercase() ?: "U"
+//        binding.idLayoutHeader.profileTXt.visibility= View.GONE
+//        binding.idLayoutHeader.logouticon.visibility= View.GONE
         binding.edServerIp.setText(serverIpSharedPrefText)
         if (serverHttpPrefText.toString() == "null") {
             binding.edHttp.setText("")

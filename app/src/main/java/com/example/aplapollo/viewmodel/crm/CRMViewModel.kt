@@ -1,6 +1,7 @@
 package com.example.aplapollo.viewmodel.crm
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -49,6 +50,10 @@ class CRMViewModel(
     val crmDeleteChildLiveData:
             MutableLiveData<Resource<ApiCommonResponse>> =
         MutableLiveData()
+    val crmDeleteLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
+
     fun getCRMPlanDetailById( crmPlanId: Int) {
         viewModelScope.launch {
             safeApiCRMPlanDetailsById(crmPlanId)
@@ -67,15 +72,15 @@ class CRMViewModel(
             safeApiCRMPlanTranDetailsById(crmTranId)
         }
     }
-    fun fetchCrmAddChild(
-        crmTransId: Int,
-        tenantCode: String
-    ) {
+        fun fetchCrmAddChild(
+            crmTransId: Int,
+            tenantCode: String
+        ) {
 
-        viewModelScope.launch {
-            safeCallCrmAddChild(crmTransId, tenantCode)
+            viewModelScope.launch {
+                safeCallCrmAddChild(crmTransId, tenantCode)
+            }
         }
-    }
     fun processCRM(
 
         request: CRMTransactionRequest
@@ -84,9 +89,9 @@ class CRMViewModel(
             safeApiCallInitiateSlitting( request)
         }
     }
-    fun getOngoingCRMJobs( locationId: Int) {
+    fun getOngoingCRMJobs( locationId: Int,process: String) {
         viewModelScope.launch {
-            safeApiCallOngoingCRMJobs(locationId)
+            safeApiCallOngoingCRMJobs(locationId,process)
         }
     }
 
@@ -98,6 +103,17 @@ class CRMViewModel(
 
             safeCallCRMDeleteChild(
                 crmTransDetailsId
+            )
+        }
+    }
+    fun fetchCRMDelete(
+        crmTranId: Int
+    ) {
+
+        viewModelScope.launch {
+
+            safeCallCRMDelete(
+                crmTranId
             )
         }
     }
@@ -291,8 +307,7 @@ class CRMViewModel(
         response: Response<CRMTransactionResponse>
     ): Resource<CRMTransactionResponse> {
 
-        var errorMessage = "Failed to initiate slitting"
-
+        var errorMessage = ""
         if (response.isSuccessful) {
             response.body()?.let {
                 return Resource.Success(it)
@@ -305,13 +320,11 @@ class CRMViewModel(
 
             errorMessage = errorObject.optString(
                 Constants.HTTP_ERROR_MESSAGE,
-                errorMessage
+                "Failed to Process Crm"
             )
         }
-
         return Resource.Error(errorMessage)
     }
-
 
     //  ==============================================================================
     private suspend fun safeApiCallInitiateSlitting(
@@ -347,27 +360,47 @@ class CRMViewModel(
         response: Response<ApiCommonResponse>
     ): Resource<ApiCommonResponse>? {
 
-        var errorMessage = ""
+        return try {
 
-        if (response.isSuccessful) {
-            response.body()?.let {
-                return Resource.Success(it)
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+                    Resource.Success(it)
+                } ?: Resource.Error("Empty response")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()?.string()
+
+                Log.e("CRM_ERROR_BODY", errorBody ?: "NULL")
+
+                val errorMessage =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        JSONObject(errorBody)
+                            .optString(
+                                "errorMessage",
+                                "Failed to Process CRM"
+                            )
+
+                    } else {
+
+                        "Failed to Process CRM"
+                    }
+
+                Resource.Error(errorMessage)
             }
-        } else if (response.errorBody() != null) {
 
-            val errorObject = JSONObject(
-                response.errorBody()!!.charStream().readText()
-            )
+        } catch (e: Exception) {
 
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                "Failed to initiate slitting"
+            Log.e("CRM_EXCEPTION", e.message.toString())
+
+            Resource.Error(
+                e.message ?: "Unknown Error"
             )
         }
-
-        return Resource.Error(errorMessage)
     }
-
     private suspend fun safeApiCRMPlanDetailsById(
 
         crmPlanId: Int
@@ -400,26 +433,50 @@ class CRMViewModel(
         response: Response<CRMPlanResponse>
     ): Resource<CRMPlanResponse> {
 
-        var errorMessage = ""
+        return try {
 
-        if (response.isSuccessful) {
-            response.body()?.let {
-                return Resource.Success(it)
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
             }
-        } else if (response.errorBody() != null) {
 
-            val errorObject = JSONObject(
-                response.errorBody()!!.charStream().readText()
-            )
+        } catch (e: Exception) {
 
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                "Failed to load slitting details"
+            Resource.Error(
+                e.message ?: "Something went wrong"
             )
         }
-
-        return Resource.Error(errorMessage)
     }
+
     private suspend fun safeApiCRMPlanTranDetailsById(
 
         crmTranId: Int
@@ -454,19 +511,46 @@ class CRMViewModel(
 
         var errorMessage = ""
 
-        if (response.isSuccessful) {
-            response.body()?.let {
-                return Resource.Success(it)
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
             }
-        } else if (response.errorBody() != null) {
 
-            val errorObject = JSONObject(
-                response.errorBody()!!.charStream().readText()
-            )
+        } catch (e: Exception) {
 
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                "Failed to load slitting details"
+            Resource.Error(
+                e.message ?: "Something went wrong"
             )
         }
 
@@ -578,25 +662,53 @@ class CRMViewModel(
 
         var errorMessage = ""
 
-        if (response.isSuccessful) {
-            response.body()?.let {
-                return Resource.Success(it)
-            }
-        } else if (response.errorBody() != null) {
+        return try {
 
-            val errorObject = JSONObject(
-                response.errorBody()!!.charStream().readText()
-            )
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                "Failed to load slitting plan"
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(
+                e.message ?: "Something went wrong"
             )
         }
 
         return Resource.Error(errorMessage)
     }
    // =========================
-   private suspend fun safeApiCallOngoingCRMJobs( locationId: Int) {
+   private suspend fun safeApiCallOngoingCRMJobs( locationId: Int,process: String) {
 
        ongoingJobsLiveData.postValue(Resource.Loading())
 
@@ -605,7 +717,7 @@ class CRMViewModel(
            if (Utils.hasInternetConnection(getApplication())) {
 
                val response =
-                   aplRepository.getOngoingCRMJobs(locationId)
+                   aplRepository.getOngoingCRMJobs(locationId,process)
 
                ongoingJobsLiveData.postValue(
                    handleOngoingJobsResponse(response)
@@ -656,5 +768,88 @@ class CRMViewModel(
         }
 
         return Resource.Error(errorMessage)
+    }
+    //=========================================================================================================
+    private suspend fun safeCallCRMDelete(
+        crmTranId: Int
+    ) {
+
+        crmDeleteLiveData.postValue(
+            Resource.Loading())
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getCRMTransactionDelete(
+                        crmTranId
+                    )
+
+                crmDeleteLiveData.postValue(
+                    handleCRMDeleteResponse(response)
+                )
+
+            } else {
+
+                crmDeleteLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            crmDeleteLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handleCRMDeleteResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(
+                e.message ?: "Something went wrong"
+            )
+        }
     }
 }

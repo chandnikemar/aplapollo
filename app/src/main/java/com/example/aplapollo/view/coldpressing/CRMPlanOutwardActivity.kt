@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
@@ -16,6 +14,7 @@ import com.example.aplapollo.helper.Constants.LocationId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
+import com.example.aplapollo.view.BaseScanActivity
 import com.example.aplapollo.viewmodel.crm.CRMViewModel
 import com.example.aplapollo.viewmodel.crm.CRMViewModelfactory
 import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanViewModelfactory
@@ -24,7 +23,7 @@ import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityCrmplanOutwardBinding
 import es.dmoral.toasty.Toasty
 
-class CRMPlanOutwardActivity : AppCompatActivity() {
+class CRMPlanOutwardActivity : BaseScanActivity() {
     private lateinit var binding: ActivityCrmplanOutwardBinding
     private lateinit var slittingWithoutplanvViewModel: SlittingWithoutplanvViewModel
     private  lateinit var crmViewModel: CRMViewModel
@@ -49,10 +48,42 @@ class CRMPlanOutwardActivity : AppCompatActivity() {
 private var headerTittleCRCA:String=""
     private var selectedProcessName: String = ""
     private var selectedMachineName: String = ""
+    override fun onBarcodeScanned(barcode: String) {
+
+        runOnUiThread {
+
+            Log.d("SCAN_DEBUG", "Scanned Barcode = $barcode")
+
+
+            binding.commanInputRow.inputField.setText(barcode)
+
+
+            binding.commanInputRow.inputField.setSelection(barcode.length)
+
+
+            scannedBarcode = barcode
+
+            // Call API automatically
+
+        }
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_crmplan_outward)
+        binding.commanInputRow.inputField.apply {
+
+            requestFocus()
+
+            isFocusable = true
+            isFocusableInTouchMode = true
+
+            post {
+                requestFocus()
+
+            }
+        }
+
         supportActionBar?.hide()
         progress = ProgressDialog(this)
         progress.setMessage("Please Wait...")
@@ -85,12 +116,12 @@ private var headerTittleCRCA:String=""
         locationId=intent.getIntExtra(LocationId,0)
         headerTittle=intent.getStringExtra("FIRST_PAGECRFH")?:""
         headerTittleCRCA=intent.getStringExtra("FIRST_PAGECRCA")?:""
-        binding.TvItemThickness.visibility=View.GONE
-        binding.idLayoutHeader.tvTitle.text =
-            headerTittleCRCA.ifEmpty {
-                headerTittle
-            }
-//        binding.idLayoutHeader.tvTitle.text = headerTittle
+        selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
+        selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
+//        binding.TvItemThickness.visibility=View.GONE
+        binding.idLayoutHeader.tvTitle.text="$selectedProcessName Planning"
+        binding.idLayoutHeader.tvSubtitle.text="Generate production plans from scanned coils"
+
         binding.layoutBatchDetails.visibility = View.GONE
 
 
@@ -111,20 +142,20 @@ private var headerTittleCRCA:String=""
                 .getStockByBatchOrBarcode( barcode)
         }
 
-        binding.etDesiredThickness.addTextChangedListener {
-
-            val entered = it.toString().toDoubleOrNull() ?: return@addTextChangedListener
-
-            if (entered >= coilThickness) {
-
-                Toasty.error(
-                    this,
-                    "Thickness must be less than $coilThickness mm"
-                ).show()
-
-                binding.etDesiredThickness.setText("")
-            }
-        }
+//        binding.etDesiredThickness.addTextChangedListener {
+//
+//            val entered = it.toString().toDoubleOrNull() ?: return@addTextChangedListener
+//
+//            if (entered >= coilThickness) {
+//
+//                Toasty.error(
+//                    this,
+//                    "Thickness must be less than $coilThickness mm"
+//                ).show()
+//
+//                binding.etDesiredThickness.setText("")
+//            }
+//        }
 
         slittingWithoutplanvViewModel.stockByBarcodeLiveData.observe(this) { resource ->
 
@@ -139,27 +170,35 @@ private var headerTittleCRCA:String=""
                     progress.dismiss()
 
                     val stock = resource.data ?: return@observe
+                    if (stock == null) {
 
+                        Toasty.error(
+                            this,
+                            "No transaction data found"
+                        ).show()
+
+                        return@observe
+                    }
                     Log.d("CRM_WithoutPLAN_3", "Stock = $stock")
 
                     binding.layoutBatchDetails.visibility = View.VISIBLE
-
-                    binding.inCommanBatch.tvItemCode.text =
+binding.layoutActionButtons.visibility=View.VISIBLE
+                    binding.inCRMBatch.tvItemCode.text =
                         "${stock.materialCode}"
 
-                    binding.inCommanBatch.tvSupplierBatchNo.text =
+                    binding.inCRMBatch.tvSupplierBatchNo.text =
                         "${stock.supplierBatchNo}"
 
-                    binding.inCommanBatch.tvGrade.text =
+                    binding.inCRMBatch.tvGrade.text =
                         "${stock.grade}"
 
-                    binding.inCommanBatch.tvWidth.text =
+                    binding.inCRMBatch.tvWidth.text =
                         "${stock.width}"
 
-                    binding.inCommanBatch.tvThickness.text =
+                    binding.inCRMBatch.tvThickness.text =
                         "${stock.thickness}"
 
-                    binding.inCommanBatch.tvWeight.text =
+                    binding.inCRMBatch.tvWeight.text =
                         "${stock.weight}"
                     sourceStockId = stock.stockId
                     scannedBarcode = stock.barcode
@@ -170,11 +209,11 @@ private var headerTittleCRCA:String=""
                     coilThickness = stock.thickness ?: 0.0
 
 
-                    Toasty.success(this, "Stock fetched successfully").show()
-                }
+                                   }
 
                 is Resource.Error -> {
                     progress.dismiss()
+
                     Log.e("SLITTING_PLAN_3", "Error = ${resource.message}")
                     Toasty.error(this, resource.message ?: "Error").show()
                 }
@@ -197,7 +236,7 @@ private var headerTittleCRCA:String=""
 
                         Toasty.success(
                             this,
-                            "CRM initiated successfully"
+                            "initiated successfully"
                         ).show()
                         Log.d("CRM_WithoutPLAN_3", """
                     API Success
@@ -212,7 +251,7 @@ private var headerTittleCRCA:String=""
 
                         Toasty.error(
                             this,
-                            resource.message ?: "Failed to initiate CRM"
+                            resource.message ?: "Failed to initiate"
                         ).show()
                     }
                 }
@@ -226,51 +265,51 @@ private var headerTittleCRCA:String=""
                 return@setOnClickListener
             }
 
-            val enteredWidth =
-                binding.etDesiredThickness.text.toString().toDoubleOrNull()
+//            val enteredWidth =
+//                binding.etDesiredThickness.text.toString().toDoubleOrNull()
 
-            if (enteredWidth == null || enteredWidth <= 0) {
-                Toasty.warning(this, "Please enter valid Thickness").show()
-                return@setOnClickListener
-            }
+//            if (enteredWidth == null || enteredWidth <= 0) {
+//                Toasty.warning(this, "Please enter valid Thickness").show()
+//                return@setOnClickListener
+//            }
 
-            if (enteredWidth > maxAllowedWidth) {
-                Toasty.error(
-                    this,
-                    "Thickness cannot be greater than $maxAllowedWidth mm"
-                ).show()
-                return@setOnClickListener
-            }
+//            if (enteredWidth > maxAllowedWidth) {
+//                Toasty.error(
+//                    this,
+//                    "Thickness cannot be greater than $maxAllowedWidth mm"
+//                ).show()
+//                return@setOnClickListener
+//            }
 
             val request = CRMTransactionRequest(
                 crmTranId = 0,
 
-                tenantCode = tenantCode,
+//                tenantCode = tenantCode,
                 crmPlanId=0,
                 locationId=locationId,
                 sourceStockId=sourceStockId,
-                desiredThickness=enteredWidth,
+                desiredThickness=0.0,
                 weight = null,
                 jobNumber="",
                 inputBarcode = null,
                 inputWeight = null,
-                barcode=scannedBarcode,
+//                barcode=scannedBarcode,
                 materialCode = null,
                 ironLossWeight=null,
                 scrapWeight=null,
-                weightAfterCRM=null,
+//                weightAfterCRM=null,
                 isCoilDivided = false,
-                dividedCRMTranId=null,
-                completedBy =   "",
+//                dividedCRMTranId=null,
+                completedBy ="",
                 completedDate = null,
                 status="InProgress",
-                remarks="CRM Transaction",
+                remarks="Transaction",
                 isPlanned=false,
-                process=null,
+                process=selectedProcessName,
                 machineName = null,
                 tamper = null,
                 grade=null,
-                component=null
+                crmTransactionDetails =null
 
             )
 
@@ -280,7 +319,7 @@ private var headerTittleCRCA:String=""
 
             binding.commanInputRow.inputField.text?.clear()
             binding.layoutBatchDetails.removeAllViews()
-            binding.etDesiredThickness.text?.clear()
+//            binding.etDesiredThickness.text?.clear()
 
             // Hide batch details
             binding.layoutBatchDetails.visibility = View.GONE
@@ -303,7 +342,7 @@ private var headerTittleCRCA:String=""
 
             binding.commanInputRow.inputField.text?.clear()
             binding.layoutBatchDetails.removeAllViews()
-            binding.etDesiredThickness.text?.clear()
+//            binding.etDesiredThickness.text?.clear()
 
             // Hide batch details
             binding.layoutBatchDetails.visibility = View.GONE

@@ -49,10 +49,12 @@ class PicklingViewModel(
             MutableLiveData<Resource<ApiCommonResponse>> =
         MutableLiveData()
 
-
-    fun getOngoingPicklingJobs(locationId: Int) {
+    val picklingDeleteLiveData:
+            MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
+    fun getOngoingPicklingJobs(locationId: Int,process: String) {
         viewModelScope.launch {
-            safeApiCallOngoingPicklingJobs(locationId)
+            safeApiCallOngoingPicklingJobs(locationId,process)
         }
     }
     fun fetchPicklingBarcodeData(code: String?) {
@@ -61,12 +63,12 @@ class PicklingViewModel(
             safeCallPicklingBarcode(code)
         }
     }
-    fun submitPickling(request: ProcessPicklingRequest) {
+        fun submitPickling(request: ProcessPicklingRequest) {
 
-        viewModelScope.launch {
-            safeSubmitPickling(request)
+            viewModelScope.launch {
+                safeSubmitPickling(request)
+            }
         }
-    }
     fun fetchPicklingTransactionById(picklingTranId: Int) {
 
         viewModelScope.launch {
@@ -92,6 +94,17 @@ class PicklingViewModel(
 
             safeCallPicklingDeleteChild(
                 picklingTransDetailsId
+            )
+        }
+    }
+    fun fetchPicklingDelete(
+        picklingTranId: Int
+    ) {
+
+        viewModelScope.launch {
+
+            safeCallPicklingDelete(
+                picklingTranId
             )
         }
     }
@@ -179,7 +192,7 @@ class PicklingViewModel(
             )
         }
     }
-    private suspend fun safeApiCallOngoingPicklingJobs(locationId:Int) {
+    private suspend fun safeApiCallOngoingPicklingJobs(locationId:Int,process:String) {
 
         ongoingJobsLiveData.postValue(Resource.Loading())
 
@@ -188,7 +201,7 @@ class PicklingViewModel(
             if (Utils.hasInternetConnection(getApplication())) {
 
                 val response =
-                    aplRepository.getOngoingPicklingJobs(locationId)
+                    aplRepository.getOngoingPicklingJobs(locationId, process )
 
                 ongoingJobsLiveData.postValue(
                     handleOngoingJobsResponse(response)
@@ -398,53 +411,53 @@ class PicklingViewModel(
             Resource.Error(e.message ?: "Unknown error")
         }
     }
-    private suspend fun safeCallPicklingTransactionById(
-        picklingTranId: Int
-    ) {
+        private suspend fun safeCallPicklingTransactionById(
+            picklingTranId: Int
+        ) {
 
-        picklingTransactionLiveData.postValue(Resource.Loading())
+            picklingTransactionLiveData.postValue(Resource.Loading())
 
-        try {
+            try {
 
-            if (Utils.hasInternetConnection(getApplication())) {
+                if (Utils.hasInternetConnection(getApplication())) {
 
-                val response =
-                    aplRepository.getPicklingTransactionById(picklingTranId)
+                    val response =
+                        aplRepository.getPicklingTransactionById(picklingTranId)
+
+                    picklingTransactionLiveData.postValue(
+                        handlePicklingTransactionResponse(response)
+                    )
+
+                } else {
+
+                    picklingTransactionLiveData.postValue(
+                        Resource.Error(Constants.NO_INTERNET)
+                    )
+                }
+
+            } catch (t: Throwable) {
 
                 picklingTransactionLiveData.postValue(
-                    handlePicklingTransactionResponse(response)
-                )
-
-            } else {
-
-                picklingTransactionLiveData.postValue(
-                    Resource.Error(Constants.NO_INTERNET)
+                    Resource.Error(
+                        t.message ?: Constants.CONFIG_ERROR
+                    )
                 )
             }
-
-        } catch (t: Throwable) {
-
-            picklingTransactionLiveData.postValue(
-                Resource.Error(
-                    t.message ?: Constants.CONFIG_ERROR
-                )
-            )
         }
-    }
 
 
-    private fun handlePicklingTransactionResponse(
-        response: Response<PicklingTransactionResponse>
-    ): Resource<PicklingTransactionResponse>{
-        if (response.isSuccessful) {
-            response.body()?.let { return Resource.Success(it) }
-        } else if (response.errorBody() != null) {
-            val errorObject = JSONObject(response.errorBody()!!.charStream().readText())
-            val msg = errorObject.optString(Constants.HTTP_ERROR_MESSAGE, "Failed to load pickling transaction")
-            return Resource.Error(msg)
+        private fun handlePicklingTransactionResponse(
+            response: Response<PicklingTransactionResponse>
+        ): Resource<PicklingTransactionResponse>{
+            if (response.isSuccessful) {
+                response.body()?.let { return Resource.Success(it) }
+            } else if (response.errorBody() != null) {
+                val errorObject = JSONObject(response.errorBody()!!.charStream().readText())
+                val msg = errorObject.optString(Constants.HTTP_ERROR_MESSAGE, "Failed to load pickling transaction")
+                return Resource.Error(msg)
+            }
+            return Resource.Error("Failed to load pickling transaction")
         }
-        return Resource.Error("Failed to load pickling transaction")
-    }
 
     private suspend fun safeCallPicklingAddChild(
         picklingTransId: Int,
@@ -522,7 +535,93 @@ class PicklingViewModel(
             Resource.Error(e.message ?: "Something went wrong")
         }
     }
+    //=============================================================================================
+    private suspend fun safeCallPicklingDelete(
+        picklingTranId: Int
+    ) {
+
+        picklingDeleteLiveData.postValue(
+            Resource.Loading()
+        )
+
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response =
+                    aplRepository.getPicklingTransactionDelete(
+                        picklingTranId
+                    )
+
+                picklingDeleteLiveData.postValue(
+                    handlePicklingDeleteResponse(response)
+                )
+
+            } else {
+
+                picklingDeleteLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            picklingDeleteLiveData.postValue(
+                Resource.Error(
+                    t.message ?: Constants.CONFIG_ERROR
+                )
+            )
+        }
+    }
+    private fun handlePicklingDeleteResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return try {
+
+            if (response.isSuccessful) {
+
+                response.body()?.let {
+
+                    return Resource.Success(it)
+                }
+
+                Resource.Error("Empty response from server")
+
+            } else {
+
+                val errorBody =
+                    response.errorBody()
+                        ?.charStream()
+                        ?.readText()
+
+                val message =
+                    if (!errorBody.isNullOrEmpty()) {
+
+                        val json = JSONObject(errorBody)
+
+                        json.optString(
+                            Constants.HTTP_ERROR_MESSAGE,
+                            "Failed to delete child"
+                        )
+
+                    } else {
+
+                        "Server error: ${response.code()}"
+                    }
+
+                Resource.Error(message)
+            }
+
+        } catch (e: Exception) {
+
+            Resource.Error(
+                e.message ?: "Something went wrong"
+            )
+        }
+    }
 }
+
 
 
 

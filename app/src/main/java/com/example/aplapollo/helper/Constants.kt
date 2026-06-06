@@ -23,7 +23,7 @@ object Constants {
     const val SHARED_PREF = "mahindra_yard_shared_pref"
     const val SERVER_IP = "server_ip"
     const val KEY_ISLOGGEDIN = "isLoggedIn"
-    const val KEY_PRINTER_MAC = "KEY_PRINTER_MAC"
+
     const val KEY_PRINTER_CONNECTED="KEY_PRINTER_CONNECTED"
 
 
@@ -41,7 +41,8 @@ object Constants {
     const val KEY_IS_LOGGED_IN = "loggedIn"
     const val KEY_Refresh_Token = "refreshToken"
     const val KEY_COORDINATE = "location_coordinates"
-
+    const val KEY_PRINTER_MAC = "KEY_PRINTER_MAC"
+    const val KEY_DEVICE_WIFI_MAC = "KEY_DEVICE_WIFI_MAC"
     private const val PRINTER_MAC = "AB:3F:A4:CF:89:AD"
     const val SESSION_EXPIRED = "SESSION_EXPIRED"
 
@@ -96,6 +97,12 @@ object Constants {
     const val  Get_HRSlitting_Scan="HRSlittingPlan/validateAgainstPlan"
     const val Get_AllItemAgainstPlan= "HRSlittingPlan/getAllItemAgainstPlan"   // come for crm ans slitting
     const val Get_SubmitSlit_From_Plan= "HRSlitting/initiateSlitting"
+    const val GET_DELETE_TRANSACTION="HRSlitting/deleteHRSlittingTransaction"
+    const val GET_Slitting_Add="HRSlitting/addChild"
+    const val GET_Slitting_Delete="HRSlitting/deleteHRSlittingTransDetail"
+    const val GET_ConfigsKey="ApplicationConfig/getConfigsByKey"
+    const val GET_RegisterConfig="ApplicationConfig/registerConfig"
+const val GET_SlitCoil="StockTransaction/coilSplit"
 
     //on Going
     const val  Get_OnGoing="HRSlitting/getOngoingHRSlittingJobs"
@@ -112,9 +119,16 @@ object Constants {
     const val GET_Ongoing_Pickl_Jobs = "Pickling/getOngoingPicklingJobs"
     const val GET_Pickling_By_Id = "Pickling/getPicklingByIdAsync"
     const val GET_Pick_AddChild="Pickling/addChild"
- const val DeleteChildPickling= "Pickling/deletePicklingTransDetail"
-    const val DeleteChildCRM=  "CRM/deleteCRMDetail"
-
+    const val DeleteChildPickling= "Pickling/deletePicklingTransDetail"
+    const val GET_PicklingDelete="Pickling/deletePicklingTransaction"
+    const val GET_CrmDelete="CRM/deleteCRMTransaction"
+    const val GET_GPDelete="Galvanizing/deleteGalvanizingTransaction"
+//GP
+    const val GET_Ongoing_GP="Galvanizing/getOngoingGalvanizingJobs"
+    const val GET_Initiate_GP="Galvanizing/processGalvanizing"
+    const val GET_GPDetail_Id="Galvanizing/getGalvanizingById"
+    const val GET_GPDelete_Child="Galvanizing/deleteGalvanizingTransDetail"
+    const val GET_GpAdd_Child="Galvanizing/addChild"
 
     //CRM
 
@@ -127,6 +141,7 @@ object Constants {
     const val POST_CRMWithout_Plan="CRM/initiateCRMWithoutPlan"
     const val GET_PrintLabel= "PrintPRNDetails/printLabel"
     const val GET_ADDCRM_Child="CRM/addChild"
+    const val GET_Delete_Child="CRM/deleteCRMDetail"
 
     //Gate Entry
     const val ADD_Supplier="GateTransaction/addSuppilerItems"
@@ -138,7 +153,11 @@ object Constants {
     const val GET_ActionType="ActionTypeMaster/getAllActionType"
     const val GET_ProcessMachine="ProcessMachineMapping/getProcessMchineById"
     const val GET_BomInputCode="BOM/getBoMByInputCode"
-
+    const val GET_GpBOmComponent="BOM/getBomcomponents"
+    const val GET_ALL_GRADE="GradeAndGSM/getAllGrade"
+    const val GET_ALL_GSM="GradeAndGSM/getAllGSM"
+    const val GET_QCHistory="QC/getAllQcTransaction"
+    const val GET_CoilSlit="StockTransaction/coilSplit"
 
 
     //change password
@@ -163,6 +182,7 @@ const val LocationId = "LOCATION_ID"
     const val BarcodeValue="BARCODE"
     const val MaterialCode="MaterialCode"
     const val PicklingId="PICKLING_ID"
+
     const val WidthId= "WIDTH"
     const val  HrSlittingId="HrSlitting_planID"
     const val SourceStockId="Source_StockID"

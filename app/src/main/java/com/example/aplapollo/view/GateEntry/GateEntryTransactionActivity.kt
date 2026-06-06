@@ -3,6 +3,7 @@ package com.example.aplapollo.view.GateEntry
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -33,6 +34,7 @@ class GateEntryTransactionActivity : AppCompatActivity() {
         )
 
         binding.idLayoutHeader.tvTitle.text = "Gate Entry Transaction"
+        binding.idLayoutHeader.tvSubtitle.text="Recent Gate Entries"
         binding.idLayoutHeader.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -73,7 +75,16 @@ class GateEntryTransactionActivity : AppCompatActivity() {
 
                     val list = response.data ?: emptyList()
                     adapter.updateList(list)
+                    if (list.isEmpty()) {
 
+                        binding.layoutEmptyState.visibility = View.VISIBLE
+                        binding.rvGateEntryHistory.visibility = View.GONE
+
+                    } else {
+
+                        binding.layoutEmptyState.visibility = View.GONE
+                        binding.rvGateEntryHistory.visibility = View.VISIBLE
+                    }
 
                 }
 

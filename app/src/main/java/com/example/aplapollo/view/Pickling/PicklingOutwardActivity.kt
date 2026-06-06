@@ -5,14 +5,12 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.aplapollo.adapter.OutputDialogAdapter
 import com.example.aplapollo.adapter.PicklingJobAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
@@ -20,15 +18,18 @@ import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.helper.Utils.showErrorDialog
-import com.example.aplapollo.model.BomOutput
+import com.example.aplapollo.helper.Utils.showSearchableOutputDialog
 import com.example.aplapollo.model.Pickling.PicklingComponent
 import com.example.aplapollo.model.Pickling.PicklingTransactionDetail
 import com.example.aplapollo.model.Pickling.PicklingTransactionResponse
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
+import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModel
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModelfactory
 import com.example.aplapollo.viewmodel.bommaster.BomInputCodeViewModelfactory
 import com.example.aplapollo.viewmodel.bommaster.BomViewModel
+import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
+import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityPicklingOutwardBinding
 import es.dmoral.toasty.Toasty
@@ -44,7 +45,7 @@ class PicklingOutwardActivity :
 
     private lateinit var picklingViewModel:
             PicklingViewModel
-
+    private lateinit var printlabelViewModel: PrintlabelViewModel
     private lateinit var bomViewModel:
             BomViewModel
 
@@ -80,6 +81,7 @@ class PicklingOutwardActivity :
     private lateinit var selectedProcess: String
     private lateinit var selectedMachineName: String
     private var pendingDeletePosition = -1
+    private  var jobId:String=""
     // =========================================
     // ON CREATE
     // =========================================
@@ -104,6 +106,7 @@ class PicklingOutwardActivity :
             onBackPressedDispatcher.onBackPressed()
         }
         binding.recyclerOutput.isNestedScrollingEnabled = false
+
 //        setContentView(binding.root)
         adapter = PicklingJobAdapter(
             this,
@@ -143,9 +146,6 @@ class PicklingOutwardActivity :
                 pendingPosition =
                     position
 
-                // ======================
-                // CALL BOM API
-                // ======================
 
                 bomViewModel.getBom(
                     inputMaterialCode
@@ -159,6 +159,7 @@ class PicklingOutwardActivity :
             adapter
 
         init()
+        printlabelViewModel.getGrades()
 
 //        setupRecycler()
 
@@ -176,15 +177,79 @@ class PicklingOutwardActivity :
             submitPickling()
         }
         binding.btnAddJob.setOnClickListener{
-            adapter.addJob()
-            binding.recyclerOutput.scrollToPosition(
-                adapter.itemCount - 1
+            picklingViewModel.fetchPicklingAddChild(
+                transactionId,
+                tenantCode
             )
+//            adapter.addJob()
+//            binding.recyclerOutput.scrollToPosition(
+//                adapter.itemCount - 1
+//            )
             updateUI()
         }
 
         updateUI()
+        binding.btnPrintBarcode.setOnClickListener {
 
+            val updatedList =
+                adapter.getUpdatedList()
+
+            if (updatedList.isEmpty()) {
+
+                Toasty.error(
+                    this,
+                    "No barcode available for printing",
+                    Toasty.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            val printRequestList =
+                updatedList.mapNotNull { item ->
+
+                    val detail =
+                        item.picklingTransactionDetails
+                            ?.firstOrNull()
+
+                    val barcode =
+                        detail?.barcode ?: return@mapNotNull null
+
+                    PrintLabelBarcodeRequest(
+
+                        barcode = barcode,
+
+                        locationId = locationId,
+
+                        createdDate =
+                        Utils.getCurrentDateTimeISO(),
+
+                        createdBy =
+                        session.getUserDetails()["userName"]
+                            .toString()
+                    )
+                }
+
+            if (printRequestList.isEmpty()) {
+
+                Toasty.error(
+                    this,
+                    "No valid barcode found",
+                    Toasty.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            Log.d(
+                "PRINT_REQUEST",
+                printRequestList.toString()
+            )
+
+            // API CALL
+            printlabelViewModel
+                .printLabelBarcode(printRequestList)
+        }
 
     }
 
@@ -219,7 +284,7 @@ class PicklingOutwardActivity :
         locationId = intent.getIntExtra(Constants.LocationId, 0)
         selectedProcess = intent.getStringExtra("PROCESS_NAME") ?: ""
         selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
-        binding.idLayoutHeader.tvTitle.text = selectedProcess+"PROCESS"
+        binding.idLayoutHeader.tvTitle.text = "$selectedProcess Process"
         val retrofit =
             RetrofitInstance
                 .getInstance(
@@ -244,6 +309,8 @@ class PicklingOutwardActivity :
                 )
             )[BomViewModel::class.java]
 
+        printlabelViewModel =
+            ViewModelProvider(this, QcprintlabelViewModelFactory(application, retrofit))[PrintlabelViewModel::class.java]
     }
 
 
@@ -281,6 +348,7 @@ class PicklingOutwardActivity :
 
                         locationId = response.locationId ?: 0
                         sourceStockId = response.sourceStockId ?: 0
+                        jobId=response.jobNumber?:""
                         val mUom = response?.uoM
                         inputBarcode =
                             response.motherBarcode ?: ""
@@ -294,8 +362,7 @@ class PicklingOutwardActivity :
                         binding.textInputMaterial.text =
                             inputMaterialCode
 
-                        binding.textJobNumber.text =
-                            response.jobNumber ?: ""
+                     binding.textJobNumber.text ="Job#$jobId"
 
                         binding.tvMotherCoil.setText(
                             inputBarcode
@@ -303,14 +370,12 @@ class PicklingOutwardActivity :
 
                         binding.tvBatchNumber.setText(
                             String.format(
-                                "%.2f %s",
+                                "%.3f %s",
                                 motherWeight,
-                                mUom.toString()
+                                 "Tons"
                             )
                         )
-                        // =====================================
-                        // RECYCLER LIST
-                        // =====================================
+
 
                         jobList.clear()
 
@@ -410,9 +475,17 @@ class PicklingOutwardActivity :
                             pendingPosition != -1
                         ) {
 
-                            showOutputDialog(
-                                outputs
+                            showSearchableOutputDialog(
+                                activity = this,
+                                items = outputs
                             )
+                            { selected ->
+
+                                adapter.setSelectedOutput(
+                                    pendingPosition,
+                                    selected
+                                )
+                            }
                         }
                     }
 
@@ -423,20 +496,13 @@ class PicklingOutwardActivity :
 
                         Log.e("API_ERROR", errorMsg)
 
-                        Utils.showErrorDialog(this, errorMsg)
-                        Toasty.error(
-                            this,
-                            res.message ?: "Error"
-                        ).show()
+                        showErrorDialog(this, errorMsg)
+
                     }
 
                     else -> {}
                 }
             }
-        // =========================================
-// ADD CHILD API
-// =========================================
-
         picklingViewModel
             .picklingAddChildLiveData
             .observe(this) { res ->
@@ -495,6 +561,8 @@ class PicklingOutwardActivity :
                         this,
                         res.data ?: "Saved Successfully"
                     ).show()
+
+                    finish()
                 }
 
                 is Resource.Error -> {
@@ -560,53 +628,92 @@ class PicklingOutwardActivity :
                 else -> {}
             }
         }
+
+//            printlabelViewModel.barcodePrintLabelMutableLiveData.observe(this) { resource ->
+//
+//                when (resource) {
+//
+//                    is Resource.Loading -> {
+//                        progress.show()
+//                    }
+//
+//                    is Resource.Success -> {
+//
+//                        progress.dismiss()
+//
+//                        Toasty.success(
+//                            this,
+//                            "Barcode printed successfully",
+//                            Toasty.LENGTH_SHORT
+//                        ).show()
+//
+//                        Log.d("PRINT_SUCCESS", resource.data.toString())
+//
+//                        // OPTIONAL:
+//                        // Call physical printer here
+//
+//                        // finish()
+//                    }
+//
+//                    is Resource.Error -> {
+//
+//                        progress.dismiss()
+//
+//                        Toasty.error(
+//                            this,
+//                            resource.message ?: "Print failed",
+//                            Toasty.LENGTH_SHORT
+//                        ).show()
+//
+//                        Log.e("PRINT_ERROR", resource.message ?: "")
+//                    }
+//
+//                    else -> {}
+//                }
+//            }
+        printlabelViewModel.gradeLiveData.observe(this) { res ->
+
+            when (res) {
+
+                is Resource.Loading -> {
+
+                    progress.show()
+                }
+
+                is Resource.Success -> {
+
+                    progress.dismiss()
+
+                    val gradeList =
+                        res.data?.map {
+                            it.grade ?: ""
+                        } ?: emptyList()
+
+                    val gradeAdapter = ArrayAdapter(
+                        this,
+                        android.R.layout.simple_dropdown_item_1line,
+                        gradeList
+                    )
+
+                    binding.etGrade.setAdapter(gradeAdapter)
+                }
+
+                is Resource.Error -> {
+
+                    progress.dismiss()
+
+                    Toasty.error(
+                        this,
+                        res.message ?: "Failed to load grades"
+                    ).show()
+                }
+
+                else -> {}
+            }
+        }
         }
 
 
-    // =========================================
-    // OUTPUT DIALOG
-    // =========================================
-
-    private fun showOutputDialog(
-        outputs: List<BomOutput>
-    ) {
-
-        val dialog =
-            AlertDialog.Builder(this)
-                .create()
-
-        val view =
-            layoutInflater.inflate(
-                R.layout.dialog_output_material,
-                null
-            )
-
-        val recycler =
-            view.findViewById<
-                    RecyclerView>(
-                R.id.recyclerOutput
-            )
-
-        recycler.layoutManager =
-            LinearLayoutManager(this)
-
-        recycler.adapter =
-            OutputDialogAdapter(
-                outputs
-            ) { selected ->
-
-                adapter.setSelectedOutput(
-                    pendingPosition,
-                    selected
-                )
-
-                dialog.dismiss()
-            }
-
-        dialog.setView(view)
-
-        dialog.show()
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun submitPickling() {
@@ -627,6 +734,10 @@ class PicklingOutwardActivity :
             showErrorDialog(this, "Grade is required")
             return
         }
+        if (ironLossWeight.toString().isEmpty()) {
+            showErrorDialog(this, "IronLoss Weight is required")
+            return
+        }
 
 
         if (updatedList.isEmpty()) {
@@ -634,7 +745,6 @@ class PicklingOutwardActivity :
             return
         }
 
-        // ================= JOB VALIDATION =================
 
         for ((index, job) in updatedList.withIndex()) {
 
@@ -642,170 +752,121 @@ class PicklingOutwardActivity :
                 job.picklingTransactionDetails
                     ?.firstOrNull()
 
-            // Output material validation
-            if (detail?.selectedOutputMaterial == null) {
 
-                showErrorDialog(
-                    this,
-                    "Please select Output Material for Job ${index + 1}"
-                )
-                return
-            }
-
-            // Output weight validation
-            val outputWeight =
-                detail.weightAfterPickling ?: 0.0
-
-            if (outputWeight <= 0.0) {
-
-                showErrorDialog(
-                    this,
-                    "Enter output weight for Job ${index + 1}"
-                )
-                return
-            }
-
-            // Component validation
-            if (detail.components.isNullOrEmpty()) {
-
-                showErrorDialog(
-                    this,
-                    "Components are missing for Job ${index + 1}"
-                )
-                return
-            }
 
             // Component weight validation
             val hasEmptyWeight =
-                detail.components!!.any {
+                detail?.components!!.any {
                     (it.weight ?: 0.0) <= 0.0
                 }
 
-            if (hasEmptyWeight) {
-
-                showErrorDialog(
-                    this,
-                    "Enter component weight for Job ${index + 1}"
-                )
-                return
-            }
-
-            // OPTIONAL:
-            // Total component weight should match output weight
 
             val totalComponentWeight =
-                detail.components!!.sumOf {
+                detail?.components!!.sumOf {
                     it.weight ?: 0.0
                 }
-        }
 
-        // ================= SCRAP CALCULATION =================
 
-        val scrap =
-            motherWeight -
-                    updatedList.sumOf {
-                        it.picklingTransactionDetails
-                            ?.firstOrNull()
-                            ?.weightAfterPickling
-                            ?: 0.0
+            val scrap =
+                motherWeight -
+                        updatedList.sumOf {
+                            it.picklingTransactionDetails
+                                ?.firstOrNull()
+                                ?.weightAfterPickling
+                                ?: 0.0
+                        }
+
+            // ================= REQUEST BUILD =================
+
+            val detailList = mutableListOf<PicklingTransactionDetail>()
+
+            updatedList.forEach { job ->
+
+                job.picklingTransactionDetails?.forEach { detail ->
+
+                    val componentList =
+                        mutableListOf<PicklingComponent>()
+
+                    detail.components?.forEach { comp ->
+
+                        componentList.add(
+                            PicklingComponent(
+                                materialCode = comp.componentCode,
+                                weight = comp.weight ?: 0.0,
+                                uoM = comp.Uom ?: "Kg"
+                            )
+                        )
                     }
 
-        // ================= REQUEST BUILD =================
+                    detailList.add(
+                        PicklingTransactionDetail(
+                            picklingTransactionDetailsId =
+                            detail.picklingTransactionDetailsId ?: 0,
 
-        val detailList = mutableListOf<PicklingTransactionDetail>()
+                            barcode =
+                            detail.barcode ?: "",
 
-        updatedList.forEach { job ->
+                            materialCode =
+                            detail.selectedOutputMaterial?.outputMaterial ?: "",
 
-            job.picklingTransactionDetails?.forEach { detail ->
+                            width = 0,
 
-                val componentList =
-                    mutableListOf<PicklingComponent>()
+                            weightAfterPickling =
+                            detail.weightAfterPickling ?: 0.0,
 
-                detail.components?.forEach { comp ->
+                            uoM = "Tons",
 
-                    componentList.add(
-                        PicklingComponent(
-                            materialCode = comp.componentCode,
-                            weight = comp.weight ?: 0.0,
-                            uoM = comp.Uom ?: "Kg"
+                            weightTakenBy = "",
+
+                            weightDateTime =
+                            Utils.getCurrentDateTimeISO(),
+
+                            picklingComponent =
+                            componentList
                         )
                     )
                 }
-
-                detailList.add(
-                    PicklingTransactionDetail(
-                        picklingTransactionDetailsId =
-                        detail.picklingTransactionDetailsId ?: 0,
-
-                        barcode =
-                        detail.barcode ?: "",
-
-                        materialCode =
-                        detail.selectedOutputMaterial?.outputMaterial ?: "",
-
-                        width = 0,
-
-                        weightAfterPickling =
-                        detail.weightAfterPickling ?: 0.0,
-
-                        uoM = "Tons",
-
-                        weightTakenBy = "",
-
-                        weightDateTime =
-                        Utils.getCurrentDateTimeISO(),
-
-                        picklingComponent =
-                        componentList
-                    )
-                )
             }
+
+            // ================= FINAL REQUEST =================
+
+            val request = ProcessPicklingRequest(
+
+                picklingTranId = transactionId,
+                tenantCode = tenantCode,
+                locationId = locationId,
+                sourceStockId = sourceStockId,
+                jobNumber = jobId,
+                status = "Completed",
+                remarks = "Pickling is completed",
+                isDivided = false,
+                IsActive = true,
+                inputBarcode = inputBarcode,
+                inputWeight = motherWeight,
+                ironLossWeight = ironLossWeight,
+                scrapWeight = totalComponentWeight,
+
+                completedBy =
+                session.getUserDetails()["userName"].toString(),
+
+                completedDate =
+                Utils.getCurrentDateTimeISO(),
+
+                process = selectedProcess,
+                machineName = selectedMachineName,
+                tamper = "",
+
+                grade = gradeInput,
+
+                PicklingTransactionDetails = detailList
+            )
+
+            Log.d("FINAL_REQUEST", request.toString())
+
+            // ================= API CALL =================
+
+            picklingViewModel.submitPickling(request)
         }
-
-        // ================= FINAL REQUEST =================
-
-        val request = ProcessPicklingRequest(
-
-            picklingTranId = transactionId,
-            tenantCode = tenantCode,
-            locationId = locationId,
-            sourceStockId = sourceStockId,
-
-            jobNumber = binding.textJobNumber.text.toString(),
-
-            status = "Completed",
-            remarks = "Pickling is completed",
-
-            isDivided = false,
-            IsActive = true,
-
-            inputBarcode = inputBarcode,
-            inputWeight = motherWeight.toInt(),
-
-            ironLossWeight = ironLossWeight.toInt(),
-
-            scrapWeight = scrap,
-
-            completedBy =
-            session.getUserDetails()["userName"].toString(),
-
-            completedDate =
-            Utils.getCurrentDateTimeISO(),
-
-            process = selectedProcess,
-            machineName = selectedMachineName,
-            tamper = "",
-
-            grade = gradeInput,
-
-            PicklingTransactionDetails = detailList
-        )
-
-        Log.d("FINAL_REQUEST", request.toString())
-
-        // ================= API CALL =================
-
-        picklingViewModel.submitPickling(request)
     }
     private fun updateUI() {
 

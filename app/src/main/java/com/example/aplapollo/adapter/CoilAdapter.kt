@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.apolloapl.R
 
 class CoilAdapter(
-    private val coilList: MutableList<String>
+    private val coilList: MutableList<String>,
+    private val savedCoilList: MutableList<String>
 ) : RecyclerView.Adapter<CoilAdapter.CoilViewHolder>() {
 
-    inner class CoilViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CoilViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
 
         val tvCoilNo: TextView =
             itemView.findViewById(R.id.tvCoilNo)
@@ -37,30 +39,51 @@ class CoilAdapter(
         position: Int
     ) {
 
-        val coil = coilList[position]
+        val coil = coilList?.get(position)
 
         holder.tvCoilNo.text = coil
 
-        // ✅ Delete Coil
+
+        if (savedCoilList.contains(coil)) {
+
+            holder.btnDelete.visibility = View.GONE
+
+            // Disable click
+            holder.btnDelete.isEnabled = false
+
+        } else {
+
+            // New coil → allow delete
+            holder.btnDelete.visibility = View.VISIBLE
+            holder.btnDelete.isEnabled = true
+        }
+
         holder.btnDelete.setOnClickListener {
+
+
+            if (savedCoilList.contains(coil)) {
+                return@setOnClickListener
+            }
 
             val adapterPosition = holder.adapterPosition
 
             if (adapterPosition != RecyclerView.NO_POSITION) {
 
-                coilList.removeAt(adapterPosition)
+                coilList?.removeAt(adapterPosition)
 
                 notifyItemRemoved(adapterPosition)
 
-                notifyItemRangeChanged(
-                    adapterPosition,
-                    coilList.size
-                )
+                coilList?.let { it1 ->
+                    notifyItemRangeChanged(
+                        adapterPosition,
+                        it1.size
+                    )
+                }
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return coilList.size
+        return coilList?.size ?: 0
     }
 }

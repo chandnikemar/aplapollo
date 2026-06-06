@@ -9,12 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.aplapollo.adapter.CoilAdapter
+import com.example.aplapollo.adapter.GateEntry.AddedCoilAdapter
 import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.GateEntry.CoilSubmitRequest
 import com.example.aplapollo.model.GateEntry.Coils
+import com.example.aplapollo.model.GateEntry.GateTransactionItem
 import com.example.aplapollo.viewmodel.gateentry.GateEntryViewModelFactory
 import com.example.aplapollo.viewmodel.gateentry.GateTransactionViewModel
 import com.example.apolloapl.R
@@ -29,6 +32,9 @@ class GateEntryTransactionUpdateActivity : AppCompatActivity() {
     private var gateTransactionId: Int = 0
     private lateinit var adapter: CoilAdapter
     private val coilList = mutableListOf<String>()
+    private val savedCoilList = mutableListOf<String>()
+    private val gateTransactionItems =
+        mutableListOf<GateTransactionItem>()
 
     private var gateEntryNo: String = ""
     @SuppressLint("SetTextI18n")
@@ -59,13 +65,67 @@ class GateEntryTransactionUpdateActivity : AppCompatActivity() {
             gateTransactionViewModel.getGateEntryUpdate(gateTransactionId)
         }
 
-        adapter = CoilAdapter(coilList)
+        adapter = CoilAdapter(
+            coilList,
+            savedCoilList
+        )
         binding.rvCoilList.layoutManager =
             LinearLayoutManager(this)
         binding.rvCoilList.adapter = adapter
         binding.rvCoilList.isNestedScrollingEnabled = false
 
         binding.btnFinalSubmit.visibility = View.GONE
+        binding.btnView.setOnClickListener {
+
+            val activeItems = gateTransactionItems.filter {
+                it.isActive == true
+            }
+
+            Log.d(
+                "AddedCoilsDialog",
+                "Active Coil Count: ${activeItems.size}"
+            )
+
+            activeItems.forEach {
+
+                Log.d(
+                    "AddedCoilsDialog",
+                    "CoilBatch: ${it.coilBatch}"
+                )
+            }
+
+            if (activeItems.isEmpty()) {
+
+                Utils.showErrorDialog(
+                    this,
+                    "No active coils found"
+                )
+
+                return@setOnClickListener
+            }
+
+            val dialogView = layoutInflater.inflate(
+                R.layout.dialog_added_coils,
+                null
+            )
+
+            val recyclerView =
+                dialogView.findViewById<RecyclerView>(
+                    R.id.rvAddedCoils
+                )
+
+            recyclerView.layoutManager =
+                LinearLayoutManager(this)
+
+            recyclerView.adapter =
+                AddedCoilAdapter(activeItems)
+
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Already Added Coils")
+                .setView(dialogView)
+                .setPositiveButton("Close", null)
+                .show()
+        }
         gateTransactionViewModel.gateEntryUpdateLiveData.observe(this) { response ->
 
             when (response) {
@@ -73,25 +133,62 @@ class GateEntryTransactionUpdateActivity : AppCompatActivity() {
                 is Resource.Loading -> progress.show()
 
                 is Resource.Success -> {
+
                     progress.dismiss()
 
                     val data = response.data?.firstOrNull()
+
                     data?.let {
 
-                        // ✅ Store values
                         gateEntryNo = it.gateEntryNo
 
-                        // ✅ Bind UI
-                        binding.tvGateEntryNo.text = "Gate Entry No: ${it.gateEntryNo}"
-                        binding.tvTransporter.text = "Transporter: ${it.transporterName}"
-                        binding.tvTransporterNo.text = "Transporter No: ${it.transporterNo}"
-                        binding.tvVehicle.text = "Vehicle: ${it.vehicleNumber}"
-                        binding.tvLrNo.text = "LR No: ${it.lrNumber}"
+                        // Bind UI
+                        binding.tvGateEntryNo.text = "${it.gateEntryNo}"
+                        binding.tvTransporter.text = "${it.transporterName}"
+                        binding.tvTransporterNo.text = "${it.transporterNo}"
+                        binding.tvVehicle.text = "${it.vehicleNumber}"
+                        binding.tvLrNo.text = "${it.lrNumber}"
 
-                        // ✅ Show coil section
                         binding.layoutCoilSection.visibility = View.VISIBLE
 
-                    }}
+                        coilList.clear()
+                        savedCoilList.clear()
+                        gateTransactionItems.clear()
+
+                        it.gateTransactionItem?.forEach { item ->
+
+                            Log.d(
+                                "API_COIL",
+                                "Coil: ${item.coilBatch} | Active: ${item.isActive}"
+                            )
+
+
+                            gateTransactionItems.add(item)
+
+                            if (item.isActive == true) {
+
+                                item.coilBatch?.let { coil ->
+
+                                    savedCoilList.add(coil)
+                                }
+                            }
+                        }
+
+                        Log.d(
+                            "API_COIL",
+                            "Total Active Coils: ${savedCoilList.size}"
+                        )
+                        adapter.notifyDataSetChanged()
+
+
+                        binding.rvCoilList.visibility =
+                            if (coilList.isEmpty()) View.GONE else View.VISIBLE
+
+                        // Show Submit Button
+                        binding.btnFinalSubmit.visibility =
+                            if (coilList.isEmpty()) View.GONE else View.VISIBLE
+                    }
+                }
 
                 is Resource.Error -> {
 
@@ -143,20 +240,40 @@ class GateEntryTransactionUpdateActivity : AppCompatActivity() {
 
             val coil = binding.etCoilNo.text.toString().trim()
 
+            binding.tilCoilNo.error = null
+
             when {
+
                 coil.isEmpty() -> {
-                    binding.etCoilNo.error = "Enter Coil No"
+
+                    binding.tilCoilNo.error =
+                        "Enter Coil Number"
                 }
 
-                coilList.contains(coil) -> {
-                    binding.etCoilNo.error = "Duplicate Coil"
+                savedCoilList.any {
+                    it.equals(coil, ignoreCase = true)
+                } -> {
+
+                    binding.tilCoilNo.error =
+                        "Coil already added in Gate Entry"
+                }
+
+                // Already scanned in current list
+                coilList.any {
+                    it.equals(coil, ignoreCase = true)
+                } -> {
+
+                    binding.tilCoilNo.error =
+                        "Coil already scanned"
                 }
 
                 else -> {
 
                     coilList.add(coil)
 
-                    adapter.notifyDataSetChanged()
+                    adapter.notifyItemInserted(
+                        coilList.size - 1
+                    )
 
                     binding.etCoilNo.text?.clear()
 
@@ -172,30 +289,47 @@ class GateEntryTransactionUpdateActivity : AppCompatActivity() {
         binding.btnFinalSubmit.setOnClickListener {
 
             if (coilList.isEmpty()) {
-                Utils.showErrorDialog(this,"Add at least one coil")
-//                Toast.makeText(this, "Add at least one coil", Toast.LENGTH_SHORT).show()
+
+                Utils.showErrorDialog(
+                    this,
+                    "Please add at least one coil"
+                )
+
                 return@setOnClickListener
             }
-            if (gateEntryNo.isEmpty()) {
-                Utils.showErrorDialog(this,"Gate Entry not loaded")
-//                Toast.makeText(this, "Gate Entry not loaded", Toast.LENGTH_SHORT).show()
+
+            // Prevent duplicate submit
+            val duplicateCoils = coilList.filter { coil ->
+                savedCoilList.any {
+                    it.equals(coil, ignoreCase = true)
+                }
+            }
+
+            if (duplicateCoils.isNotEmpty()) {
+
+                Utils.showErrorDialog(
+                    this,
+                    "These coils are already added:\n${
+                        duplicateCoils.joinToString("\n")
+                    }"
+                )
+
                 return@setOnClickListener
             }
+
             val coilItems = coilList.map {
                 Coils(coilBatch = it)
             }
-            binding.btnFinalSubmit.visibility =
-                if (coilList.isEmpty()) View.GONE else View.VISIBLE
+
             val request = CoilSubmitRequest(
                 gateTransactionItemId = 0,
-                gateTransactionId =gateTransactionId ,
+                gateTransactionId = gateTransactionId,
                 gateEntryNo = gateEntryNo,
                 gateTransactionItems = coilItems
             )
 
             gateTransactionViewModel.saveCoilItem(request)
         }
-
     }
 
 

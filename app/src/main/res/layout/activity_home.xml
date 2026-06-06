@@ -1,436 +1,255 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/bgcolor">
-
-        <!-- Header -->
-        <include
-            android:id="@+id/idLayoutHeader"
-            layout="@layout/action_bar_header_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent" />
-
-<!--        <androidx.recyclerview.widget.RecyclerView-->
-<!--            android:id="@+id/rvSummary"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingStart="16dp"-->
-<!--            android:clipToPadding="false"-->
-<!--            android:overScrollMode="always"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"/>-->
-
-        <!-- Title -->
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="#0E9AB0"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_weight="1"
+        android:scaleType="fitStart"
+        android:src="@drawable/kvisibilitylogo" />
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_circle_blue"
+        android:src="@drawable/ic_person" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp">
         <TextView
-            android:id="@+id/ChooseTxt"
+            android:id="@+id/profileTXt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Choose your services"
-            android:textColor="@color/primaryDark"
-            android:textSize="@dimen/tv_sub_heading"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/idLayoutHeader"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Scroll Area -->
-        <ScrollView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:padding="4dp"
-            app:layout_constraintTop_toBottomOf="@id/ChooseTxt"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            android:text="SuperAdmin"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Operator"
+            android:textColor="#D9D9D9"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/logouticon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/ic_logout"/>
+    </LinearLayout>
+    <!-- Content -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome 👋"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="#0B4D7A"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apollo Logistics Management"
+                android:textColor="#1F3555"
+                android:textSize="14sp"/>
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!-- Row 1 -->
-
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="#D9D9D9"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Services"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#222"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simplifying operations through smart, reliable, and efficient solutions."
+                android:textSize="12sp"
+                android:textColor="#888"/>
+            <!-- Services Grid -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:columnCount="2">
+                <!-- Gate Entry -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardGateEntry"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
                     android:layout_margin="8dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/card2"
-                    app:layout_constraintHorizontal_weight="1"
-
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
                         android:gravity="center"
-                        android:background="@color/secondaryColor">
-
+                        android:orientation="vertical">
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_ge" />
-
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/gate_entry"/>
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
                             android:text="Gate Entry"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
                             android:textStyle="bold"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/tv_text" />
+                            android:layout_marginTop="12dp"/>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
+                </androidx.cardview.widget.CardView>
                 <!-- Quality Check -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardQuality"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
                     android:layout_margin="8dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/card1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
                         android:gravity="center"
-                        android:background="@color/secondaryColor">
-
+                        android:orientation="vertical">
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_qc" />
-
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/quality_chcek"/>
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="QUALITY CHECK"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
+                            android:text="Quality Check"
                             android:textStyle="bold"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/tv_text" />
+                            android:layout_marginTop="12dp"/>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-
-
-                <!-- HR Slitting -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card3"
-                    android:visibility="gone"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                </androidx.cardview.widget.CardView>
+                <!-- Production -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardProduction"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
                     android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/card4"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
                         android:gravity="center"
-                        android:background="@color/secondaryColor">
-
+                        android:orientation="vertical">
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_hrslitting" />
-
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/production"/>
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="HR Slitting"
-                            android:textAlignment="center"
-                            android:textColor="@color/white"
-                            android:textAllCaps="true"
+                            android:text="Production"
                             android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
+                            android:layout_marginTop="12dp"/>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- HR Pickling -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card4"
-                    android:visibility="gone"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                </androidx.cardview.widget.CardView>
+                <!-- Printer -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardPrinter"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
                     android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card2"
-                    app:layout_constraintStart_toEndOf="@id/card3"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="6dp">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
                         android:gravity="center"
-                        android:background="@color/secondaryColor">
-
+                        android:orientation="vertical">
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_pickling" />
-
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_printer"/>
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="HR Pickling"
-                            android:textAlignment="center"
-                            android:textColor="@color/white"
-                            android:textAllCaps="true"
+                            android:text="Printer"
                             android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
+                            android:layout_marginTop="12dp"/>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-
-
-                <!-- Cold Pressing -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card5"
-                    android:layout_width="0dp"
-                    android:visibility="gone"
+                </androidx.cardview.widget.CardView>
+            </GridLayout>
+            <!-- Admin Panel -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAdmin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="#F6EEDC"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card3"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/card6"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_person"/>
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@color/secondaryColor">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_coldpressing" />
-
+                        android:layout_marginStart="12dp">
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="Cold Pressing"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textColor="@color/white"
+                            android:text="Admin Panel"
+                            android:textSize="24sp"
                             android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- GP -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card6"
-                    android:visibility="gone"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card4"
-                    app:layout_constraintStart_toEndOf="@id/card5"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@color/secondaryColor">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_gp" />
-
+                            android:textColor="#8A5A00"/>
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="GP"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
+                            android:text="Settings &amp; User Management"
+                            android:textSize="13sp"/>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- Admin -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card7"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/card8"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@color/secondaryColor">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_dashboard" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="Production Entry"
-                            android:textColor="@color/white"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Print -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card8"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card6"
-                    app:layout_constraintStart_toEndOf="@id/card7"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@color/secondaryColor">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_printer" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="Print"
-                            android:textColor="@color/white"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-                <!-- Production Entry -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card9"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card7"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/card10"
-                    app:layout_constraintHorizontal_weight="1"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="@color/secondaryColor">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/img_admin" />  <!-- add your icon -->
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="Admin"
-                            android:textColor="@color/white"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textStyle="bold"
-                            android:textSize="@dimen/tv_text" />
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card10"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:layout_constraintTop_toBottomOf="@id/card8"
-                    app:layout_constraintStart_toEndOf="@id/card9"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="1"
-                    android:visibility="invisible"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </ScrollView>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_right"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout></layout>

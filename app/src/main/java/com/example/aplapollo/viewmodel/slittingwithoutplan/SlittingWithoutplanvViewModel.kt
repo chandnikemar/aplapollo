@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.Utils
+import com.example.aplapollo.model.ApiCommonResponse
 import com.example.aplapollo.model.Slitting.ApiResponse
+import com.example.aplapollo.model.Slitting.CoilSplitRequest
 import com.example.aplapollo.model.Slitting.InitiateSlittingResponse
 import com.example.aplapollo.model.Slitting.InitiateSlittingWithoutPlanRequest
 import com.example.aplapollo.model.Slitting.StockBarcodeWithoutplanResponse
@@ -88,14 +90,60 @@ class SlittingWithoutplanvViewModel(
     ): Resource<StockBarcodeWithoutplanResponse> {
 
         return if (response.isSuccessful) {
+
             val body = response.body()
+
             if (body?.responseObject != null) {
+
                 Resource.Success(body.responseObject)
+
             } else {
-                Resource.Error(body?.responseMessage ?: "No stock found")
+
+                Resource.Error(
+                    body?.errorMessage
+                        ?: body?.responseMessage
+                        ?: "No stock found"
+                )
             }
+
         } else {
-            Resource.Error("Failed to fetch stock data")
+
+            try {
+
+                val errorBody =
+                    response.errorBody()?.string()
+
+                val errorObject =
+                    JSONObject(errorBody ?: "")
+
+                val backendMessage =
+
+                    errorObject.optString(
+                        "errorMessage"
+                    ).ifEmpty {
+
+                        errorObject.optString(
+                            "responseMessage"
+                        )
+                    }.ifEmpty {
+
+                        errorObject.optString(
+                            "message"
+                        )
+                    }
+
+                Resource.Error(
+                    backendMessage.ifEmpty {
+                        "Failed to fetch stock data"
+                    }
+                )
+
+            } catch (e: Exception) {
+
+                Resource.Error(
+                    e.message ?: "Unknown error"
+                )
+            }
         }
     }
 
@@ -132,26 +180,128 @@ private suspend fun safeApiCallInitiateSlittingWithoutPlan(
         response: Response<InitiateSlittingResponse>
     ): Resource<InitiateSlittingResponse> {
 
-        var errorMessage = "Failed to initiate slitting"
+        return if (response.isSuccessful) {
 
-        if (response.isSuccessful) {
             response.body()?.let {
-                return Resource.Success(it)
+
+                Resource.Success(it)
+
+            } ?: Resource.Error("Empty response from server")
+
+        } else {
+
+            try {
+
+                val errorBody =
+                    response.errorBody()?.string()
+
+                val errorObject =
+                    JSONObject(errorBody ?: "")
+
+                val backendMessage =
+
+                    errorObject.optString(
+                        "errorMessage"
+                    ).ifEmpty {
+
+                        errorObject.optString(
+                            "responseMessage"
+                        )
+                    }.ifEmpty {
+
+                        errorObject.optString(
+                            "message"
+                        )
+                    }
+
+                Resource.Error(
+                    backendMessage.ifEmpty {
+                        "Something went wrong"
+                    }
+                )
+
+            } catch (e: Exception) {
+
+                Resource.Error(
+                    e.message ?: "Unknown error"
+                )
             }
-        } else if (response.errorBody() != null) {
-
-            val errorObject = JSONObject(
-                response.errorBody()!!.charStream().readText()
-            )
-
-            errorMessage = errorObject.optString(
-                Constants.HTTP_ERROR_MESSAGE,
-                errorMessage
-            )
         }
+    }
+    //================
+    val coilSplitLiveData: MutableLiveData<Resource<ApiCommonResponse>> =
+        MutableLiveData()
 
-        return Resource.Error(errorMessage)
+    fun coilSplit(request: CoilSplitRequest) {
+        viewModelScope.launch {
+            safeApiCallCoilSplit(request)
+        }
     }
 
+    private suspend fun safeApiCallCoilSplit(
+        request: CoilSplitRequest
+    ) {
+
+        coilSplitLiveData.postValue(Resource.Loading())
+
+        try {
+
+            if (Utils.hasInternetConnection(getApplication())) {
+
+                val response = aplRepository.coilSplit(request)
+
+                coilSplitLiveData.postValue(
+                    handleCoilSplitResponse(response)
+                )
+
+            } else {
+
+                coilSplitLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+            }
+
+        } catch (t: Throwable) {
+
+            coilSplitLiveData.postValue(
+                Resource.Error(t.message ?: Constants.CONFIG_ERROR)
+            )
+        }
+    }
+
+    private fun handleCoilSplitResponse(
+        response: Response<ApiCommonResponse>
+    ): Resource<ApiCommonResponse> {
+
+        return if (response.isSuccessful) {
+
+            response.body()?.let {
+                Resource.Success(it)
+            } ?: Resource.Error("Empty response from server")
+
+        } else {
+
+            try {
+
+                val errorBody = response.errorBody()?.string()
+                val errorObject = JSONObject(errorBody ?: "")
+
+                val backendMessage =
+                    errorObject.optString("errorMessage")
+                        .ifEmpty { errorObject.optString("responseMessage") }
+                        .ifEmpty { errorObject.optString("message") }
+
+                Resource.Error(
+                    backendMessage.ifEmpty { "Coil split failed" }
+                )
+
+            } catch (e: Exception) {
+
+                Resource.Error(
+                    e.message ?: "Unknown error"
+                )
+            }
+        }
+    }
 
 }

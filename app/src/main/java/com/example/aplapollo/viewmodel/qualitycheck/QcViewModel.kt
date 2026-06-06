@@ -13,6 +13,7 @@ import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchResponse
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionResponse
+import com.example.aplapollo.model.QualityCheck.QcTransactionResponse
 import com.example.aplapollo.repository.APLRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -28,8 +29,71 @@ class QCViewModel(
     val barcodeLiveData = MutableLiveData<Resource<BarcodePrefixResponse>>()
     val qcStatusLiveData = MutableLiveData<Resource<QCStatusSubmissionResponse>>()
     val materialtypeLiveData = MutableLiveData<Resource<MaterialTypeResponse>>()
+    val qcTransactionMutableLiveData =
+        MutableLiveData<Resource<List<QcTransactionResponse>>>()
 
+    fun getAllQcTransaction() = viewModelScope.launch {
+        safeApiCallQcTransaction()
+    }
 
+    private suspend fun safeApiCallQcTransaction() {
+
+        qcTransactionMutableLiveData.postValue(Resource.Loading())
+
+        try {
+
+            if (!Utils.hasInternetConnection(getApplication())) {
+                qcTransactionMutableLiveData.postValue(
+                    Resource.Error(Constants.NO_INTERNET)
+                )
+                return
+            }
+
+            val response = aplRepository.getAllQcTransaction()
+
+            qcTransactionMutableLiveData.postValue(
+                handleQcTransactionResponse(response)
+            )
+
+        } catch (e: Exception) {
+
+            qcTransactionMutableLiveData.postValue(
+                Resource.Error(e.localizedMessage ?: "Something went wrong")
+            )
+        }
+    }
+    private fun handleQcTransactionResponse(
+        response: Response<List<QcTransactionResponse>>
+    ): Resource<List<QcTransactionResponse>> {
+
+        if (response.isSuccessful) {
+
+            response.body()?.let { data ->
+
+                return Resource.Success(data)
+            }
+        }
+
+        return try {
+
+            val errorBody = response.errorBody()?.string()
+
+            val errorMessage = if (!errorBody.isNullOrEmpty()) {
+                JSONObject(errorBody).optString(
+                    "errorMessage",
+                    response.message()
+                )
+            } else {
+                response.message()
+            }
+
+            Resource.Error(errorMessage)
+
+        } catch (e: Exception) {
+
+            Resource.Error(e.localizedMessage ?: "Something went wrong")
+        }
+    }
     /* ----------------------------------------------------------------------
      *                        FETCH QC DATA
      * ---------------------------------------------------------------------- */

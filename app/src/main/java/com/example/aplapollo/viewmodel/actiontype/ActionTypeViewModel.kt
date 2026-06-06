@@ -22,8 +22,7 @@ class ActionTypeViewModel(
     val actionTypeListMutableLiveData =
         MutableLiveData<Resource<List<ActionTypeResponse>>>()
 
-    // ✅ RENAMED (clear function)
-    fun getActionTypes() {
+        fun getActionTypes() {
         viewModelScope.launch {
             safeApiCallGetActionType()
         }

@@ -10,11 +10,17 @@ import com.example.aplapollo.model.CRM.CRMPlanResponse
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.model.CRM.CRMTransactionResponse
 import com.example.aplapollo.model.CRM.OngoingCRMJobResponse
+import com.example.aplapollo.model.GP.BoMComponentResponse
+import com.example.aplapollo.model.GP.GalvanizingTransactionRequest
+import com.example.aplapollo.model.GP.GalvanizingTransactionResponse
+import com.example.aplapollo.model.GP.GpOngoingJobsResponse
+import com.example.aplapollo.model.GSMResponse
 import com.example.aplapollo.model.GateEntry.CoilSubmitRequest
 import com.example.aplapollo.model.GateEntry.GateEntryResponse
 import com.example.aplapollo.model.GateEntry.GateTransactionRequest
 import com.example.aplapollo.model.GateEntry.GateTransactionResponse
 import com.example.aplapollo.model.GateEntry.TransporterResponse
+import com.example.aplapollo.model.GradeResponse
 import com.example.aplapollo.model.LocationPaginationRequest
 import com.example.aplapollo.model.LocationResponse
 import com.example.aplapollo.model.Pickling.PicklingJobInProgressResponse
@@ -27,6 +33,8 @@ import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCFetchResponse
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
 import com.example.aplapollo.model.Slitting.ApiResponse
+import com.example.aplapollo.model.Slitting.ApplicationConfigMaster
+import com.example.aplapollo.model.Slitting.CoilSplitRequest
 import com.example.aplapollo.model.Slitting.HrSlittingCompleteRequest
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanRequest
 import com.example.aplapollo.model.Slitting.HrSlittingItemAgainstPlanResponse
@@ -107,7 +115,10 @@ class APLRepository(private val retrofitInstance: RetrofitInstance) {
             .serviceApi()
             .getAllItemAgainstPlan(request)
 
-
+suspend fun getSlitCoils(
+    request: CoilSplitRequest
+):Response<ApiCommonResponse> = retrofitInstance
+    .serviceApi().getSlitCoil(request)
 suspend fun initiateHrSlitting(
 
     request: InitiateSlittingRequest
@@ -117,19 +128,33 @@ suspend fun initiateHrSlitting(
         .initiateSlitting(request)
 
     suspend fun getOngoingJobs(
-        tenantCode: String,
-        locationId: Int
+        locationId: Int,
+        process: String
     ): Response<List<OngoingJobResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingJobs(tenantCode,locationId)
-
+            .getOngoingJobs(locationId,process)
+    suspend fun coilSplit(
+        request: CoilSplitRequest
+    ) = retrofitInstance.serviceApi().coilSplit(request)
 suspend fun getHrSlittingDetailsById(
     tranId: Int
 ): Response<HrSlittingStatusResponse> =
     retrofitInstance
         .serviceApi()
         .getHrSlittingDetailsById(tranId)
+    suspend fun getAppConfigKey(
+        key: String
+    ): Response<ApplicationConfigMaster> =
+        retrofitInstance
+            .serviceApi()
+            .getConfigKey(key)
+    suspend fun getRegisterConfig(
+        request: ApplicationConfigMaster
+    ): Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getRegisterConfig(request)
 
     suspend fun completeHRSlitting(
 
@@ -151,7 +176,22 @@ suspend fun getHrSlittingDetailsById(
         retrofitInstance
             .serviceApi()
             .initiateSlittingWithoutPlan(request)
-
+    suspend fun getSlittingTransactionDelete(HRSlittingTranId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getSlittingTranDelete(HRSlittingTranId)
+    suspend fun getPicklingTransactionDelete(picklingTranId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getPicklingDelete(picklingTranId)
+    suspend fun getCRMTransactionDelete(crmTranId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getCRMDelete(crmTranId)
+    suspend fun getGPTransactionDelete(galvanizingTranId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getGpDelete(galvanizingTranId)
     suspend fun getLocations(
         request: LocationPaginationRequest
     ): Response<List<LocationResponse>> =
@@ -160,13 +200,33 @@ suspend fun getHrSlittingDetailsById(
             .getLocationsWithPagination(request)
 
     suspend fun getOngoingPicklingJobs(
-        locationId: Int
+        locationId: Int,
+        process: String
 
     ): Response<List<PicklingJobInProgressResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingPicklingJobs(locationId)
+            .getOngoingPicklingJobs(locationId,process)
+    suspend fun getOngoingGpJobs(
+        locationId: Int,
+        process: String
 
+    ): Response<List<GpOngoingJobsResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getOngoingGpJobs(locationId,process)
+    suspend fun getGrades(
+    ): Response<List<GradeResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getGrades()
+    suspend fun getGSM(
+    ): Response<List<GSMResponse>> =
+        retrofitInstance
+            .serviceApi()
+            .getGSMList()
+    suspend fun getAllQcTransaction() =retrofitInstance.serviceApi()
+        .getAllQcTransaction()
     suspend fun getStockBarcodePicklingdata(
         code: String?
     ): Response<ApiResponse<StockBarcodeWithoutplanResponse>> =
@@ -175,12 +235,25 @@ suspend fun getHrSlittingDetailsById(
             .getPicklingBarcodeData(code)
 
     suspend fun processPickling(
-
         request: ProcessPicklingRequest
     ): Response<ApiCommonResponse> =
         retrofitInstance
             .serviceApi()
             .processPickling(request)
+
+    suspend fun initiateGp(
+        request: GalvanizingTransactionRequest
+    ): Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .initiateGP(request)
+    suspend fun getGpDetailByID(
+        galvanizingTranId: Int
+    ): Response<GalvanizingTransactionResponse>{
+        return retrofitInstance
+            .serviceApi()
+            .getGpDetailById(galvanizingTranId)
+    }
     suspend fun getPicklingTransactionById(
         picklingTranId: Int
     ): Response<PicklingTransactionResponse>{
@@ -209,10 +282,35 @@ suspend fun getPicklingAddChild(
         retrofitInstance
             .serviceApi()
             .getPicklingDeleteChild(picklingTransDetailsId)
+    suspend fun getGpAddChild(
+        galvanizingTranId: Int,
+        tenantCode: String
+    ):Response<ApiCommonResponse> =
+
+        retrofitInstance
+            .serviceApi()
+            .getGpAddChild(galvanizingTranId,tenantCode)
+    suspend fun getGpDeleteChild(galvanizingTransactionDetailsId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getGpDeleteChild(galvanizingTransactionDetailsId)
+
     suspend fun getCRMDeleteChild(crmTransDetailsId:Int):Response<ApiCommonResponse> =
         retrofitInstance
             .serviceApi()
-            .getCRmDeleteChild(crmTransDetailsId)
+            .getCRMDeleteChild(crmTransDetailsId)
+    suspend fun getSlittingAddChild(
+        HRSlittingTranId: Int,
+        tenantCode: String
+    ):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getSlittingAddChild(HRSlittingTranId,tenantCode)
+    suspend fun getSlittingDeleteChild(hrSlittingTransDetailsId:Int):Response<ApiCommonResponse> =
+        retrofitInstance
+            .serviceApi()
+            .getSlittingDeleteChild(hrSlittingTransDetailsId)
+
     suspend fun getCRMPlannedList(
 
     ): Response<List<CRMPlanResponse>> =
@@ -221,13 +319,12 @@ suspend fun getPicklingAddChild(
             .getCRMPlannedList()
 
     suspend fun getCRMScan(
-
         barcode: String,
         crmPlanId: Int
     ): Response<HrSlittingscanReponse> =
         retrofitInstance
             .serviceApi()
-            .getCRMScanByBarcode(barcode, crmPlanId )
+            .getCRMScanByBarcode(barcode, crmPlanId)
     suspend fun getCrmPlanById(
 
         crmPlanId: Int
@@ -247,11 +344,11 @@ suspend fun getPicklingAddChild(
 
 
     suspend fun getOngoingCRMJobs(
-        locationId: Int
+        locationId: Int,process:String
     ): Response<List<OngoingCRMJobResponse>> =
         retrofitInstance
             .serviceApi()
-            .getOngoingCRMJobs(locationId)
+            .getOngoingCRMJobs(locationId,process)
 
 
     suspend fun getCrmPlanTranById(
@@ -306,6 +403,10 @@ suspend fun getPicklingAddChild(
     inputCode:String
 ):Response<List<BomResponse>> = retrofitInstance
     .serviceApi().getBomByInputCode(inputCode)
+    suspend fun getGpBomInputCode(
+        inputMaterial:String
+    ):Response<List<BoMComponentResponse>> = retrofitInstance
+        .serviceApi().getGpBomByInputCode(inputMaterial)
     suspend fun getGateEntryList(
     ): Response<List<GateEntryResponse>> =
         retrofitInstance

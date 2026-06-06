@@ -37,12 +37,12 @@ data class HrSlittingCompleteTransactionDetails(
     val IsActive: Boolean,
     val Status: String,
     val Uom: String,
-    val Component: List<ComponentRequest>
+    val Component: List<ComponentRequest?>
 )
 data class ComponentRequest(
     val MaterialCode: String,
     val MaterilDesc:String,
-    val Weight: Double,
+    val Weight: Double?,
     val Uom: String,
 )
 

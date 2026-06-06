@@ -14,7 +14,10 @@ data class GateEntryResponse(
 )
 
 data class GateTransactionItem(
-    val coilNo: String? = null,
-    val weight: Double? = null,
-    val materialCode: String? = null
+    val gateTransactionItemId: Int,
+    val gateTransactionId: Int,
+    val coilBatch: String?,
+    val status: String?,
+    val remarks: String?,
+    val isActive: Boolean?
 )

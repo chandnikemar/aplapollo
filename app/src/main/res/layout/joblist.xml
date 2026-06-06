@@ -22,6 +22,7 @@
             <!-- ================================================= -->
 
             <LinearLayout
+                android:id="@+id/LyOutputBarcode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -56,6 +57,7 @@
                     android:id="@+id/spinnerUnit"
                     android:layout_width="80dp"
                     android:layout_height="38dp"
+
                     android:layout_marginStart="6dp"
                     android:background="@drawable/spinner_bg"
                     android:enabled="false"
@@ -140,6 +142,7 @@
                     android:hint="Weight"
                     android:inputType="numberDecimal"
                     android:maxLines="1"
+
                     android:textSize="14sp"/>
             </LinearLayout>
 

@@ -42,7 +42,8 @@
 
                     binding = DataBindingUtil.setContentView(this, R.layout.activity_gate_entry)
 
-                    binding.idLayoutHeader.tvTitle.text = "Gate Entry Form"
+                    binding.idLayoutHeader.tvTitle.text = "Create Gate Entry"
+                    binding.idLayoutHeader.tvSubtitle.text="Generate a gate entry"
                     binding.idLayoutHeader.ivBack.setOnClickListener {
                         onBackPressedDispatcher.onBackPressed()
                     }
@@ -260,22 +261,95 @@
                             else -> {}
                         }
                     }
-                        binding.btnSubmit.setOnClickListener {
+                    binding.btnSubmit.setOnClickListener {
 
-                            val request = GateTransactionRequest(
-                                GateTransactionId =transactionId,
-                                LocationId = null,
-                                GateEntryType = "Inward",
-                                VehicleNumber = binding.etVehicleNo.text.toString(),
-                                TransporterName = binding.etTransporterName.text.toString(),
-                                TransporterNo = transporterCode,
-                                LRNumber = binding.etLrNo.text.toString(),
-                                GateEntryNo = null
-                            )
+                        val transporterCodeText =
+                            binding.etTransporterCode.text.toString().trim()
 
-                            gateTransactionViewModel.createGateEntry(request)
+                        val transporterName =
+                            binding.etTransporterName.text.toString().trim()
+
+                        val vehicleNo =
+                            binding.etVehicleNo.text.toString().trim()
+
+                        val lrNo =
+                            binding.etLrNo.text.toString().trim()
+
+
+
+                        when {
+
+                            transporterCodeText.isEmpty() -> {
+
+                                binding.etTransporterCode.error =
+                                    "Select Transporter Code"
+
+                                binding.etTransporterCode.requestFocus()
+                            }
+
+                            transporterName.isEmpty() -> {
+
+                                binding.etTransporterName.error =
+                                    "Enter Transporter Name"
+
+                                binding.etTransporterName.requestFocus()
+                            }
+
+                            vehicleNo.isEmpty() -> {
+
+                                binding.etVehicleNo.error =
+                                    "Enter Vehicle Number"
+
+                                binding.etVehicleNo.requestFocus()
+                            }
+
+                            vehicleNo.length < 6 -> {
+
+                                binding.etVehicleNo.error =
+                                    "Enter Valid Vehicle Number"
+
+                                binding.etVehicleNo.requestFocus()
+                            }
+
+                            lrNo.isEmpty() -> {
+
+                                binding.etLrNo.error =
+                                    "Enter LR Number"
+
+                                binding.etLrNo.requestFocus()
+                            }
+
+                            transporterCode.isEmpty() -> {
+
+                                Utils.showErrorDialog(
+                                    this,
+                                    "Please select transporter from list"
+                                )
+                            }
+
+                            else -> {
+
+                                // Clear Errors
+                                binding.etTransporterCode.error = null
+                                binding.etTransporterName.error = null
+                                binding.etVehicleNo.error = null
+                                binding.etLrNo.error = null
+
+                                val request = GateTransactionRequest(
+                                    GateTransactionId = transactionId,
+                                    LocationId = null,
+                                    GateEntryType = "Inward",
+                                    VehicleNumber = vehicleNo,
+                                    TransporterName = transporterName,
+                                    TransporterNo = transporterCode,
+                                    LRNumber = lrNo,
+                                    GateEntryNo = null
+                                )
+
+                                gateTransactionViewModel.createGateEntry(request)
+                            }
                         }
-
+                    }
 
 
                     }

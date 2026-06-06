@@ -93,6 +93,7 @@
                         android:layout_height="wrap_content"
                         android:hint="Mother Barcode"
                         app:boxBackgroundMode="outline"
+                        android:enabled="true"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/guideline35"
                         app:layout_constraintTop_toTopOf="parent"
@@ -113,24 +114,27 @@
                     <!-- Grade -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tilGrade"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
                         android:hint="Grade"
-                        app:hintTextColor="@color/grey"
                         app:boxBackgroundMode="outline"
+                        app:endIconMode="dropdown_menu"
                         app:layout_constraintStart_toEndOf="@id/guideline35"
                         app:layout_constraintEnd_toStartOf="@id/guideline70"
-                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp">
+                        app:layout_constraintTop_toTopOf="@id/tilMotherCoil">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <AutoCompleteTextView
                             android:id="@+id/etGrade"
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            android:padding="12dp"
                             android:textColor="@color/black"
-                            android:padding="8dp"
-                            android:maxLines="1"/>
+                            android:textSize="12sp"/>
+
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Weight -->
@@ -153,11 +157,138 @@
                             android:gravity="center_vertical|end"
                             android:textColor="@color/black"
                             android:padding="4dp"
-                            android:maxLines="1"/>
+                            android:maxLines="1"
+
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:clickable="false"
+                            android:cursorVisible="false"
+                            android:longClickable="false"
+                            android:textIsSelectable="false"
+                            android:inputType="numberDecimal"/>
                     </com.google.android.material.textfield.TextInputLayout>
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- ================= Summary Card ================= -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="#E0E0E0"
+                    app:strokeWidth="1dp">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+                        <!-- Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <!-- Allowance -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Tolerance +-"
+                                    android:textColor="@color/grey"
+                                    android:textSize="11sp"/>
+
+                                <TextView
+                                    android:id="@+id/tvAllowance"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0.00"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/colorAccent"
+                                    android:paddingTop="4dp"/>
+                            </LinearLayout>
+
+                            <!-- Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#E0E0E0"/>
+
+                            <!-- Scrap -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Scrap"
+                                    android:textColor="@color/grey"
+                                    android:textSize="11sp"/>
+
+                                <TextView
+                                    android:id="@+id/tvScrap"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0.00"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="@android:color/holo_red_dark"
+                                    android:paddingTop="4dp"/>
+                            </LinearLayout>
+
+                            <!-- Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="match_parent"
+                                android:background="#E0E0E0"/>
+
+                            <!-- Output -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Output"
+                                    android:textColor="@color/grey"
+                                    android:textSize="11sp"/>
+
+                                <TextView
+                                    android:id="@+id/tvOutput"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0.00"
+                                    android:textStyle="bold"
+                                    android:textSize="14sp"
+                                    android:textColor="@android:color/holo_green_dark"
+                                    android:paddingTop="4dp"/>
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
                 <!-- OUTPUT LIST -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerOutput"
@@ -223,6 +354,7 @@
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_weight="1"
+                        android:visibility="gone"
                         android:text="Print Barcode"
                         android:textAllCaps="false"
                         android:textColor="@android:color/white"

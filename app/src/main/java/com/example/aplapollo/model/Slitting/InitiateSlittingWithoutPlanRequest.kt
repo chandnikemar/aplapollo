@@ -11,6 +11,7 @@ data class InitiateSlittingWithoutPlanRequest(
     val SourceStockId: Int,
     val Status: String?,
     val TenantCode: String,
+    val process:String?,
     val hrSlittingTransactionDetail: List<HRSlittingTransactionDetailRequest>
 )
 data class HRSlittingTransactionDetailRequest(

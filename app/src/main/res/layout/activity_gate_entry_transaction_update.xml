@@ -5,9 +5,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F4F7FC">
+        android:background="#F3F6FB">
 
-        <!-- Header -->
+        <!-- ================= HEADER ================= -->
         <include
             android:id="@+id/idLayoutHeader"
             layout="@layout/action_bar_comman_hedaer_layout"
@@ -17,7 +17,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Main Scroll -->
+        <!-- ================= CONTENT ================= -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -31,173 +31,233 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="12dp">
 
-
-
-                <!-- GATE ENTRY CARD -->
+                <!-- ================= GATE ENTRY CARD ================= -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="5dp"
-                    app:cardElevation="4dp"
-                    app:strokeColor="#D6E4FF"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#D9E7FF"
                     app:strokeWidth="1dp"
                     app:cardBackgroundColor="#EEF4FF">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="18dp">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="14dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Gate Entry Number"
-                            android:textColor="#5B6475"
-                            android:textSize="13sp" />
+                        <!-- Icon -->
+                        <ImageView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/card_green_gradient"
+                            android:padding="9dp"
+                            android:src="@drawable/ic_gate"
+                            app:tint="@android:color/white" />
 
-                        <TextView
-                            android:id="@+id/tvGateEntryNo"
-                            android:layout_width="wrap_content"
+                        <!-- Text -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="A126E00010"
-                            android:textColor="#1A73E8"
-                            android:textSize="26sp"
-                            android:textStyle="bold" />
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Gate Entry Number"
+                                android:textColor="#64748B"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvGateEntryNo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="A126E00010"
+                                android:textColor="#1D4ED8"
+                                android:textSize="20sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- TRANSPORT DETAILS CARD -->
+                <!-- ================= TRANSPORT CARD ================= -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="14dp"
                     app:cardCornerRadius="5dp"
-                    app:cardElevation="3dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#ECECEC">
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="18dp">
+                        android:padding="14dp">
 
+                        <!-- Title -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Transport Information"
+                            android:text="Transport Details"
                             android:textColor="#111827"
-                            android:textSize="19sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="16dp" />
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
-                        <!-- TRANSPORTER -->
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:background="#EEF2F7" />
+
+                        <!-- Transporter -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:paddingVertical="8dp">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_transporter"
+                                app:tint="#2563EB" />
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
                                 android:text="Transporter"
                                 android:textColor="#6B7280"
-                                android:textStyle="bold" />
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvTransporter"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
                                 android:layout_weight="1"
                                 android:gravity="end"
-                                android:text="GEA1001"
+                                android:text="ABC Logistics"
                                 android:textColor="#111827"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- TRANSPORTER CODE -->
+                        <!-- Transporter Code -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:paddingVertical="8dp">
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_code"
+                                app:tint="#7C3AED" />
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
                                 android:text="Transporter Code"
                                 android:textColor="#6B7280"
-                                android:textStyle="bold" />
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvTransporterNo"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
                                 android:layout_weight="1"
                                 android:gravity="end"
                                 android:text="1500101"
                                 android:textColor="#111827"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- VEHICLE -->
+                        <!-- Vehicle -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:paddingVertical="8dp">
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_truck"
+                                app:tint="#16A34A" />
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
                                 android:text="Vehicle No"
                                 android:textColor="#6B7280"
-                                android:textStyle="bold" />
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvVehicle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
                                 android:layout_weight="1"
                                 android:gravity="end"
                                 android:text="MH04XY5678"
                                 android:textColor="#111827"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- LR NO -->
+                        <!-- LR Number -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:paddingVertical="8dp">
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_receipt"
+                                app:tint="#EA580C" />
 
                             <TextView
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
                                 android:text="LR Number"
                                 android:textColor="#6B7280"
-                                android:textStyle="bold" />
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvLrNo"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
                                 android:layout_weight="1"
                                 android:gravity="end"
                                 android:text="7412586368"
                                 android:textColor="#111827"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
@@ -205,43 +265,106 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- ADD COIL CARD -->
+                <!-- ================= COIL SECTION ================= -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/layoutCoilSection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="14dp"
                     android:layout_marginBottom="20dp"
                     app:cardCornerRadius="5dp"
-                    app:cardElevation="3dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#ECECEC">
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E5E7EB"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="18dp">
+                        android:padding="14dp">
 
+                        <!-- Header -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Coil Entry"
+                                    android:textColor="#111827"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Scan or enter coil numbers"
+                                    android:textColor="#6B7280"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <!-- View Existing Coil -->
+                            <LinearLayout
+                                android:id="@+id/btnView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_chip_light"
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="6dp">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_eye"
+                                    app:tint="#2563EB" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="5dp"
+                                    android:text="View Added"
+                                    android:textColor="#2563EB"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Duplicate Error -->
                         <TextView
+                            android:id="@+id/tvDuplicateError"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Add Coil"
-                            android:textColor="#111827"
-                            android:textSize="19sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="14dp" />
+                            android:layout_marginTop="10dp"
+                            android:text="Coil already added"
+                            android:textColor="@android:color/holo_red_dark"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
 
                         <!-- Coil Input -->
                         <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilCoilNo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Enter Coil Number"
+                            android:layout_marginTop="12dp"
+                            android:hint="Enter or Scan Coil Number"
                             app:boxBackgroundMode="outline"
-                            app:boxCornerRadiusTopStart="2dp"
-                            app:boxCornerRadiusTopEnd="2dp"
-                            app:boxCornerRadiusBottomStart="2dp"
-                            app:boxCornerRadiusBottomEnd="2dp">
+                            app:boxCornerRadiusBottomEnd="10dp"
+                            app:boxCornerRadiusBottomStart="10dp"
+                            app:boxCornerRadiusTopEnd="10dp"
+                            app:boxCornerRadiusTopStart="10dp">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etCoilNo"
@@ -250,46 +373,53 @@
                                 android:inputType="text"
                                 android:padding="14dp"
                                 android:textColor="#111827"
-                                android:textSize="15sp" />
+                                android:textSize="14sp" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- Add Coil Button -->
+                        <!-- Add Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnAddCoil"
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
-                            android:layout_marginTop="16dp"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="14dp"
                             android:text="Add Coil"
                             android:textAllCaps="false"
-                            android:textSize="16sp"
+                            android:textSize="15sp"
                             android:textStyle="bold"
-                            app:backgroundTint="#1A73E8"
-                            app:cornerRadius="5dp" />
+                            app:backgroundTint="#2563EB"
+                            app:cornerRadius="10dp"
+                            app:icon="@drawable/ic_add"
+                            app:iconGravity="textStart"
+                            app:iconPadding="8dp" />
 
-                        <!-- RecyclerView -->
+                        <!-- Added Coil List -->
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rvCoilList"
                             android:layout_width="match_parent"
-                            android:layout_height="250dp"
-                            android:layout_marginTop="18dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
                             android:clipToPadding="false"
                             android:nestedScrollingEnabled="false"
-                            android:paddingBottom="8dp" />
+                            android:paddingBottom="4dp" />
 
-                        <!-- Submit Button -->
+                        <!-- Submit -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnFinalSubmit"
                             android:layout_width="match_parent"
-                            android:layout_height="54dp"
-                            android:layout_marginTop="18dp"
+                            android:layout_height="52dp"
+                            android:layout_marginTop="16dp"
                             android:text="Submit All Coils"
                             android:textAllCaps="false"
-                            android:textSize="16sp"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
                             android:textStyle="bold"
-                            app:backgroundTint="#16A34A"
-                            app:cornerRadius="5dp" />
-
+                            android:backgroundTint="#16A34A"
+                            app:cornerRadius="10dp"
+                            app:icon="@drawable/ic_check"
+                            app:iconGravity="textStart"
+                            app:iconPadding="8dp"
+                            app:iconTint="@null" />
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>

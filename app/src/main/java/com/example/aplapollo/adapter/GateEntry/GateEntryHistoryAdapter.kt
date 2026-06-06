@@ -46,18 +46,29 @@ class GateEntryHistoryAdapter(
     }
 
     // ================= UPDATE =================
+    // ================= UPDATE =================
     fun updateList(newList: List<GateEntryResponse>) {
+
         list.clear()
-        list.addAll(newList)
+
+        // ✅ Latest Added Item on Top
+        list.addAll(
+            newList.sortedByDescending {
+                it.gateTransactionId
+            }
+        )
+
         notifyDataSetChanged()
     }
 
     // ================= OPTIONAL =================
     fun addItem(item: GateEntryResponse) {
-        list.add(0, item) // add on top
+
+        // ✅ Add at Top
+        list.add(0, item)
+
         notifyItemInserted(0)
     }
-
     fun clearList() {
         list.clear()
         notifyDataSetChanged()

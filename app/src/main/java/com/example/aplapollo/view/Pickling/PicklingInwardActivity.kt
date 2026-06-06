@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.aplapollo.api.RetrofitInstance
@@ -14,17 +13,21 @@ import com.example.aplapollo.helper.Constants.LocationId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
+import com.example.aplapollo.view.BaseScanActivity
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModel
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModelfactory
+import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanViewModelfactory
+import com.example.aplapollo.viewmodel.slittingwithoutplan.SlittingWithoutplanvViewModel
 import com.example.apolloapl.R
 import com.example.apolloapl.databinding.ActivityPicklingInwardBinding
 import es.dmoral.toasty.Toasty
 
-class PicklingInwardActivity : AppCompatActivity() {
+class PicklingInwardActivity : BaseScanActivity() {
     private lateinit var binding:ActivityPicklingInwardBinding
     private lateinit var progress: ProgressDialog
     private lateinit var session: SessionManager
     private  lateinit var  picklingViewModel: PicklingViewModel
+    private lateinit var slittingWithoutplanvViewModel: SlittingWithoutplanvViewModel
     private var baseUrl: String = ""
     private var userName: String? = ""
     private var token: String? = ""
@@ -39,10 +42,40 @@ class PicklingInwardActivity : AppCompatActivity() {
     private var transactionId:Int=0
     private var selectedProcessName: String = ""
     private var selectedMachineName: String = ""
+    override fun onBarcodeScanned(barcode: String) {
+
+        runOnUiThread {
+
+            Log.d("SCAN_DEBUG", "Scanned Barcode = $barcode")
+
+            // Show scanned value in EditText
+            binding.commanInputRow.inputField.setText(barcode)
+
+            // Move cursor to end
+            binding.commanInputRow.inputField.setSelection(barcode.length)
+
+            // Save barcode
+            scannedBarcode = barcode
+
+            // Call API automatically
+
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_inward)
-        binding.idLayoutHeader.tvTitle.text = ""
+        binding.commanInputRow.inputField.apply {
+
+            requestFocus()
+
+            isFocusable = true
+            isFocusableInTouchMode = true
+
+            post {
+                requestFocus()
+
+            }
+        }
         supportActionBar?.hide()
         progress = ProgressDialog(this)
         progress.setMessage("Please Wait...")
@@ -52,6 +85,8 @@ class PicklingInwardActivity : AppCompatActivity() {
         userDetail = session.getUserDetails()
         val viewModelProviderFactoryPickling = PicklingViewModelfactory(application, retrofitInstance)
         picklingViewModel = ViewModelProvider(this, viewModelProviderFactoryPickling)[PicklingViewModel::class.java]
+        val viewModelProviderFactory = SlittingWithoutplanViewModelfactory(application, retrofitInstance)
+        slittingWithoutplanvViewModel = ViewModelProvider(this, viewModelProviderFactory)[SlittingWithoutplanvViewModel::class.java]
         binding.idLayoutHeader.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed()}
             if (userDetail!!.isEmpty()) {
             Toasty.error(this, "User details are missing.", Toasty.LENGTH_SHORT).show()
@@ -76,12 +111,12 @@ class PicklingInwardActivity : AppCompatActivity() {
         Log.d("Tanent_Code","Tenant Code= $locationId")
         selectedProcessName = intent.getStringExtra("PROCESS_NAME") ?: ""
         selectedMachineName = intent.getStringExtra("MACHINE_NAME") ?: ""
-        binding.idLayoutHeader.tvTitle.text = selectedProcessName+"INWARD"
+        binding.idLayoutHeader.tvTitle.text = "$selectedProcessName Planning"
+        binding.idLayoutHeader.tvSubtitle.text="Generate production plans from scanned coils"
         binding.layoutBatchDetails.visibility = View.GONE
+            slittingWithoutplanvViewModel.stockByBarcodeLiveData.observe(this) { resource ->
 
-        picklingViewModel.picklingBarcodeLiveData.observe(this) { result ->
-
-            when (result) {
+            when (resource) {
 
                 is Resource.Loading -> {
                     progress.show()
@@ -91,10 +126,10 @@ class PicklingInwardActivity : AppCompatActivity() {
 
 
                     progress.dismiss()
-                    val data = result.data?.responseObject
+                    val data = resource.data ?: return@observe
                     Log.d("BARCODE", data.toString())
                     binding.layoutBatchDetails.visibility = View.VISIBLE
-
+                    binding.layoutActionButtons.visibility=View.VISIBLE
                     binding.inPicklingBatch.tvItemCode.text =
                         data?.materialCode ?: ""
 
@@ -116,7 +151,7 @@ class PicklingInwardActivity : AppCompatActivity() {
                     scannedBarcode = data?.barcode
                     tenantCode=data?.tenantCode
                     transactionId=data?.transactionId?:0
-                    Toasty.success(this, "Stock fetched successfully").show()
+
                 }
 
                 is Resource.Error -> {
@@ -124,7 +159,7 @@ class PicklingInwardActivity : AppCompatActivity() {
 
                     Toasty.error(
                         this,
-                        result.message ?: "Invalid barcode",
+                        resource.message ?: "Invalid barcode",
                         Toasty.LENGTH_SHORT
                     ).show()
 
@@ -178,8 +213,8 @@ class PicklingInwardActivity : AppCompatActivity() {
                 Toasty.warning(this, "Please scan barcode").show()
                 return@setOnClickListener
             }
-            picklingViewModel
-                .fetchPicklingBarcodeData( barcode)
+            slittingWithoutplanvViewModel
+                .getStockByBatchOrBarcode( barcode)
         }
         binding.commanInputRow.btnClear.setOnClickListener {
 
@@ -194,9 +229,9 @@ class PicklingInwardActivity : AppCompatActivity() {
             sourceStockId = 0
             transactionId = 0
 
-            Toasty.info(this, "Input cleared").show()
+//            Toasty.info(this, "Input cleared").show()
         }
-        binding.btnbClear.setOnClickListener {
+        binding.btncClears.setOnClickListener {
 
             // Clear input field also (optional but recommended)
             binding.commanInputRow.inputField.setText("")
@@ -217,9 +252,9 @@ class PicklingInwardActivity : AppCompatActivity() {
             sourceStockId = 0
             transactionId = 0
 
-            Toasty.info(this, "Data cleared").show()
+
         }
-       binding.btnSave.setOnClickListener {
+       binding.btncSaves.setOnClickListener {
            if (locationId == 0) {
                Toasty.warning(this, "Location is missing").show()
                return@setOnClickListener
@@ -236,14 +271,15 @@ class PicklingInwardActivity : AppCompatActivity() {
            }
 
             val request = ProcessPicklingRequest(
-                picklingTranId = transactionId,
+                picklingTranId = 0,
                 tenantCode =tenantCode,
                 locationId = locationId,
                 sourceStockId = sourceStockId,
                 jobNumber = "",
-                status = "",
+                status = "InProgress",
                 remarks = "Pickling Proccess",
                 isDivided = false,
+                process = selectedProcessName,
                 IsActive =true,
 
             )

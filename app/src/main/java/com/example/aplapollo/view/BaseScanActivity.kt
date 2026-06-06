@@ -1,8 +1,8 @@
 package com.example.aplapollo.view
 
-
-
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,8 +10,29 @@ import androidx.appcompat.app.AppCompatActivity
 abstract class BaseScanActivity : AppCompatActivity() {
 
     private val scanBuffer = StringBuilder()
-    private var lastKeyTime = 0L
-    private val SCAN_TIMEOUT = 300L   // ms
+
+    private var lastScanTime = 0L
+
+    private val scanHandler =
+        Handler(Looper.getMainLooper())
+
+    private val scanRunnable = Runnable {
+
+        if (scanBuffer.isNotEmpty()) {
+
+            val barcode =
+                scanBuffer.toString().trim()
+
+            Log.d(
+                "BASE_SCANNER",
+                "Scanned Barcode = $barcode"
+            )
+
+            onBarcodeScanned(barcode)
+
+            scanBuffer.clear()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,41 +42,65 @@ abstract class BaseScanActivity : AppCompatActivity() {
 
         if (event.action == KeyEvent.ACTION_DOWN) {
 
-            val now = System.currentTimeMillis()
+            val currentTime =
+                System.currentTimeMillis()
 
-            // Reset if delay is too big (manual typing)
-            if (now - lastKeyTime > SCAN_TIMEOUT) {
+            // Reset if manual typing delay
+            if (currentTime - lastScanTime > 1000) {
                 scanBuffer.clear()
             }
 
-            lastKeyTime = now
+            lastScanTime = currentTime
 
-            val char = event.unicodeChar.toChar()
+            when (event.keyCode) {
 
-            if (char.code > 0) {
-                scanBuffer.append(char)
-            }
+                KeyEvent.KEYCODE_ENTER -> {
 
-            // Scanner usually sends ENTER at end
-            if (event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    scanHandler.removeCallbacks(scanRunnable)
 
-                val barcode = scanBuffer.toString().trim()
-                scanBuffer.clear()
+                    val barcode =
+                        scanBuffer.toString().trim()
 
-                if (barcode.isNotEmpty()) {
-                    Log.d("BASE_SCANNER", "Scanned: $barcode")
-                    onBarcodeScanned(barcode)
+                    if (barcode.isNotEmpty()) {
+
+                        Log.d(
+                            "BASE_SCANNER",
+                            "ENTER Barcode = $barcode"
+                        )
+
+                        onBarcodeScanned(barcode)
+                    }
+
+                    scanBuffer.clear()
+
+                    return true
                 }
 
-                return true
+                else -> {
+
+                    val pressedKey =
+                        event.unicodeChar
+
+                    if (pressedKey != 0) {
+
+                        scanBuffer.append(
+                            pressedKey.toChar()
+                        )
+
+                        // Auto detect scan completion
+                        scanHandler.removeCallbacks(scanRunnable)
+
+                        scanHandler.postDelayed(
+                            scanRunnable,
+                            200
+                        )
+                    }
+                }
             }
         }
 
         return super.dispatchKeyEvent(event)
     }
 
-    /**
-     * Child activity must implement this
-     */
     abstract fun onBarcodeScanned(barcode: String)
 }
