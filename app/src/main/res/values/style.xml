@@ -32,7 +32,7 @@
     </style>
         <style name="ShapeAppearanceOverlay.MyTextInput" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">12dp</item>
+        <item name="cornerSize">2dp</item>
     </style>
     <style name="GridItem">
         <item name="android:layout_width">0dp</item>

@@ -29,6 +29,7 @@
     import com.example.apolloapl.R
     import com.example.apolloapl.databinding.ActivitySlittingplan3Binding
     import com.google.android.material.button.MaterialButton
+    import com.google.android.material.dialog.MaterialAlertDialogBuilder
     import es.dmoral.toasty.Toasty
 
     class Slittingplan3Activity : BaseScanActivity() {
@@ -55,6 +56,7 @@
         private var selectedProcessName: String = ""
         private var selectedMachineName: String = ""
         private var isEnteringWidth = false
+        private var splitBarcode: String? = null
         override fun onBarcodeScanned(barcode: String) {
 
             // Ignore scanner while entering width
@@ -222,27 +224,28 @@
                             "${stock.grade}"
 
                         binding.inCommanBatch.tvWidth.text =
-                            "${stock.width}"
-
+                            "%.3f".format(stock?.width.toString().toDoubleOrNull() ?: 0.0)
                         binding.inCommanBatch.tvThickness.text =
-                            "${stock.thickness}"
+                            "%.2f".format(stock?.thickness.toString().toDoubleOrNull() ?: 0.0)
 
                         binding.inCommanBatch.tvWeight.text =
-                            "${stock.weight} "
+                            "%.3f".format(stock?.weight.toString().toDoubleOrNull() ?: 0.0)
 
                         sourceStockId = stock.stockId
                         scannedBarcode = stock.barcode
                         tenantCode=stock.tenantCode
                         transactionId=stock.transactionId?:0
                         maxAllowedWidth = stock.width ?: 0.0
+//                        splitBarcode = stock.barcode
 
                         Toasty.success(this, "Stock fetched successfully").show()
                     }
 
                     is Resource.Error -> {
                         progress.dismiss()
+                        showErrorDialog(this,resource.message ?: "Error",)
                         Log.e("SLITTING_PLAN_3", "Error = ${resource.message}")
-                        Toasty.error(this, resource.message ?: "Error").show()
+//                        Toasty.error(this, resource.message ?: "Error").show()
                     }
 
                     else -> {}
@@ -261,18 +264,15 @@
                         is Resource.Success -> {
                             progress.dismiss()
 
-                            Toasty.success(
-                                this,
-                                "Slitting initiated successfully"
-                            ).show()
-                            Log.d("SLITTING_WO_PLAN_API", """
-                    API Success
-                    Response = ${resource.data}
-                """.trimIndent())
+                            val response = resource.data
 
-                            finish() // or navigate
+
+                            val barcode = binding.commanInputRow.inputField.text.toString().trim()
+
+                            slittingWithoutplanvViewModel
+                                .getStockByBatchOrBarcode(barcode)
+                            finish()
                         }
-
                         is Resource.Error -> {
                             progress.dismiss()
 
@@ -303,21 +303,20 @@
 
                         Log.d("PRINT_SUCCESS", resource.data.toString())
 
-                        // OPTIONAL:
-                        // Call physical printer here
 
-                        // finish()
                     }
 
                     is Resource.Error -> {
 
                         progress.dismiss()
+                        showErrorDialog(this,resource.message ?: "Print failed",)
+//                            Toasty.LENGTH_SHORT)
 
-                        Toasty.error(
-                            this,
-                            resource.message ?: "Print failed",
-                            Toasty.LENGTH_SHORT
-                        ).show()
+//                        Toasty.error(
+//                            this,
+//                            resource.message ?: "Print failed",
+//                            Toasty.LENGTH_SHORT
+//                        ).show()
 
                         Log.e("PRINT_ERROR", resource.message ?: "")
                     }
@@ -335,14 +334,17 @@
                     is Resource.Success -> {
                         progress.dismiss()
                         showPrintDialog()
+                        splitBarcode = result.data?.responseObject.toString()
+
+                        Log.d("SPLIT_BARCODE", "Generated Barcode = $splitBarcode")
                         Toasty.success(
                             this,
                             result.data?.responseMessage ?: "Coil split successful"
                         ).show()
 
-                        val barcode = binding.commanInputRow.inputField.text.toString().trim()
+                        val splitBarcode = binding.commanInputRow.inputField.text.toString().trim()
                         slittingWithoutplanvViewModel
-                            .getStockByBatchOrBarcode(barcode)
+                            .getStockByBatchOrBarcode(splitBarcode)
                     }
 
                     is Resource.Error -> {
@@ -398,20 +400,18 @@
                     HRSlittingPlanId = 0,
                     LocationId = locationId,
                     SourceStockId = sourceStockId,
-
                     Barcode = scannedBarcode,
-
                     CompletedBy = "",
                     CompletedDate = "",
                     Status = "",
-process=selectedProcessName,
+                    process=selectedProcessName,
                     Remarks = "Slitting without plan",
 
                     hrSlittingTransactionDetail = buildTransactionDetails(transactionId)
                 )
 
                 slittingWithoutplanvViewModel
-                    .initiateSlittingWithoutPlan( request)
+                    .initiateSlittingWithoutPlan(request)
             }
 //            binding.btncClears.setOnClickListener {
 //
@@ -606,28 +606,36 @@ process=selectedProcessName,
         @SuppressLint("NewApi")
         private fun showPrintDialog() {
 
-            com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            MaterialAlertDialogBuilder(this)
                 .setTitle("Print Label")
                 .setMessage("Do you want to print the split coil label?")
                 .setPositiveButton("Print") { _, _ ->
-                    val printRequestList = listOf(
 
+                    if (splitBarcode.isNullOrEmpty()) {
+
+                        Toasty.error(
+                            this,
+                            "Split barcode not found"
+                        ).show()
+
+                        return@setPositiveButton
+                    }
+
+                    val printRequestList = listOf(
                         PrintLabelBarcodeRequest(
-                            barcode = "barcode",
+                            barcode = splitBarcode!!,
                             locationId = locationId,
                             createdDate = Utils.getCurrentDateTimeISO(),
                             createdBy = userName ?: ""
                         )
                     )
 
-                    Log.d("PRINT_REQUEST", printRequestList.toString())
+                    Log.d(
+                        "PRINT_REQUEST",
+                        "Printing Barcode = $splitBarcode"
+                    )
 
                     printlabelViewModel.printLabelBarcode(printRequestList)
-
-                    Toasty.success(
-                        this,
-                        "Printing Started"
-                    ).show()
                 }
                 .setNegativeButton("Skip", null)
                 .show()

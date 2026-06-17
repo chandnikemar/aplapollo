@@ -30,7 +30,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="24dp">
@@ -38,13 +38,13 @@
                 <!-- Main Logo with shadow -->
                 <ImageView
                     android:id="@+id/loginLogo"
-                    android:layout_width="160dp"
-                    android:layout_height="160dp"
+                    android:layout_width="166dp"
+                    android:layout_height="166dp"
                     android:layout_marginTop="16dp"
                     android:contentDescription="@string/app_name"
                     android:elevation="8dp"
                     android:scaleType="centerInside"
-                    android:background="@drawable/circle_shadow"
+
                     android:padding="16dp"
                     android:src="@drawable/apolloicon"
                     app:layout_constraintTop_toTopOf="parent"

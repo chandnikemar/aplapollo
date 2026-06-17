@@ -25,7 +25,6 @@ import com.example.aplapollo.model.QualityCheck.QCFetchData
 import com.example.aplapollo.model.QualityCheck.QCFetchRequest
 import com.example.aplapollo.model.QualityCheck.QCStatusSubmissionRequest
 import com.example.aplapollo.viewmodel.printlabel.PrintlabelViewModel
-
 import com.example.aplapollo.viewmodel.printlabel.QcprintlabelViewModelFactory
 import com.example.aplapollo.viewmodel.qualitycheck.QCViewModel
 import com.example.aplapollo.viewmodel.qualitycheck.QcViewModelFactory
@@ -36,7 +35,6 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import es.dmoral.toasty.Toasty
-
 
 class QualityCheckActivity : AppCompatActivity() {
     private lateinit var binding: ActivityQualityCheckBinding
@@ -57,6 +55,7 @@ class QualityCheckActivity : AppCompatActivity() {
     private var scanBuffer = StringBuilder()
     private var lastKeyTime = 0L
     private val SCAN_TIMEOUT = 300L
+    private var coilBatchNumber:String? =""
 
 
 
@@ -157,10 +156,13 @@ class QualityCheckActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     hideProgressBar()
 
-                    val data = response.data
+                    val data = response.data  ?: return@observe
+
 
                     if (data?.statusCode == 200 && data.responseObject != null) {
+                        coilBatchNumber = data.responseObject.coilBatchNumber ?: ""
 
+                        Log.d("COIL_BATCH", coilBatchNumber!!)
                         binding.layoutEmpty.visibility = View.GONE
                         binding.layoutQcContainer.visibility = View.VISIBLE
 
@@ -410,12 +412,16 @@ class QualityCheckActivity : AppCompatActivity() {
                 materialTypeId = 0,
                 materialCode= binding.column2RowMaterialCode.text.toString(),
                 barcode = "",
+                coilBatchNumber=coilBatchNumber,
                 supplierName = binding.column2Row2.text.toString(),
                 supplierBatchNo = binding.column2Row1.text.toString(),
                 grade = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
                     ?: "A",
                 netWeight = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
-                thickness = binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
+                thickness = String.format(
+                    "%.2f",
+                    binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0
+                ).toDouble(),
                 length = 0.0,
                 width = binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 grnNo = binding.column2Row8.text.toString(),
@@ -469,12 +475,16 @@ class QualityCheckActivity : AppCompatActivity() {
                 materialTypeId = selectedMaterialTypeId,
                 materialCode = binding.column2RowMaterialCode.text.toString(),
                 barcode = "", // No barcode for reject
+                coilBatchNumber=coilBatchNumber,
                 supplierName = binding.column2Row2.text.toString(),
                 supplierBatchNo = binding.column2Row1.text.toString(),
                 grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
                     ?: "A",
                 netWeight = binding.column2Row3.text.toString().toDoubleOrNull() ?: 0.0,
-                thickness = binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
+                thickness = String.format(
+                    "%.2f",
+                    binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0
+                ).toDouble(),
                 length=0.0,
                 width = binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 grnNo = binding.column2Row8.text.toString(),
@@ -520,12 +530,17 @@ class QualityCheckActivity : AppCompatActivity() {
 
             val request = PrintLabelRequest(
                 SupplierName  =  binding.column2Row2.text.toString(),
+                CoilBatchNumber=coilBatchNumber,
                 BarCode  = binding.barcodeText.text.toString(),
+
                 SupplierBatchNo  = binding.column2Row1.text.toString(),
                 MaterialCode  =  binding.column2RowMaterialCode.text.toString(),
                 Grade  = binding.column2Row4.text.toString().trim().takeIf { it.isNotEmpty() && it.lowercase() != "null" }
                     ?: "A",
-                Thickness  =  binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0,
+                Thickness = String.format(
+                    "%.2f",
+                    binding.column2Row5.text.toString().toDoubleOrNull() ?: 0.0
+                ).toDouble(),
                 Width  =  binding.column2Row6.text.toString().toDoubleOrNull() ?: 0.0,
                 GRNNumber  = binding.column2Row8.text.toString(),
                 GRNDate  = binding.column2Row9.text.toString(),
@@ -675,10 +690,10 @@ class QualityCheckActivity : AppCompatActivity() {
             column2Row1.text = data.supplierBatchNo ?: "--"
             column2Row4.text = data.grade ?: "--"
             column2RowMaterialCode.text = data.materialCode ?: "--"
-            column2Row5.text = data.thickness?.toString() ?: "--"
-            column2Row6.text = data.width?.toString() ?: "--"
+            column2Row5.text = (if(data.thickness != null) String.format("%.2f", data.thickness) else "--").toString()
+            column2Row6.text = (if (data.width != null) String.format("%.2f",data.width)else "--").toString()
 
-            column2Row3.text = data.netWeightKg?.toString() ?: "--"
+            column2Row3.text = if (data.netWeightKg != null) String.format("%.3f",data.netWeightKg)else "--"
             column2Row8.text = data.grnNumber?.toString() ?: "--"
             column2Row9.text = data.grnDate?.substringBefore("T") ?: "--"
         }

@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.provider.Settings
 import android.text.Html
 import androidx.appcompat.app.AlertDialog
+import com.example.aplapollo.helper.Constants.KEY_PRINTER_MAC
 import com.example.aplapollo.view.LoginActivity
 import com.google.android.gms.maps.model.LatLng
 
@@ -101,11 +102,11 @@ class SessionManager(context: Context) {
 //        context.getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
 
     fun savePrinterMac(mac: String) {
-        sharedPrefer.edit().putString("PRINTER_MAC", mac).apply()
+        sharedPrefer.edit().putString(KEY_PRINTER_MAC, mac).apply()
     }
 
     fun getPrinterMac(): String? {
-        return sharedPrefer.getString("PRINTER_MAC", null)
+        return sharedPrefer.getString(KEY_PRINTER_MAC, null)
     }
     /**
      * Call this method anywhere in the project to Get the stored session data
@@ -199,6 +200,7 @@ class SessionManager(context: Context) {
         val serverIp = sharedPrefer.getString(KEY_SERVER_IP, null)
         val http = sharedPrefer.getString(KEY_HTTP, null)
         val port = sharedPrefer.getString(KEY_PORT, null)
+        val printerMac = sharedPrefer.getString(KEY_PRINTER_MAC, null)
 
         editor.clear()
 
@@ -206,7 +208,7 @@ class SessionManager(context: Context) {
         editor.putString(KEY_SERVER_IP, serverIp)
         editor.putString(KEY_HTTP, http)
         editor.putString(KEY_PORT, port)
-
+        editor.putString(KEY_PRINTER_MAC, printerMac)
         editor.putBoolean(KEY_ISLOGGEDIN, false)
         editor.commit()
     }
@@ -305,6 +307,7 @@ class SessionManager(context: Context) {
         const val USER_COORDINATES = "coordinates"
         const val KEY_HTTP = "http"
         const val KEY_PORT = "port"
+        const val KEY_MAC_ADDRESS ="PRINTER_MAC"
 
 
     }

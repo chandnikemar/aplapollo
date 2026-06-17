@@ -41,7 +41,7 @@ object Constants {
     const val KEY_IS_LOGGED_IN = "loggedIn"
     const val KEY_Refresh_Token = "refreshToken"
     const val KEY_COORDINATE = "location_coordinates"
-    const val KEY_PRINTER_MAC = "KEY_PRINTER_MAC"
+    const val KEY_PRINTER_MAC = "PRINTER_MAC"
     const val KEY_DEVICE_WIFI_MAC = "KEY_DEVICE_WIFI_MAC"
     private const val PRINTER_MAC = "AB:3F:A4:CF:89:AD"
     const val SESSION_EXPIRED = "SESSION_EXPIRED"

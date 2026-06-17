@@ -6,6 +6,7 @@ data class QcTransactionResponse(
     val materialTypeId: Int?,
     val materialCode: String?,
     val barcode: String?,
+    val CoilBatchNumber:String?,
     val supplierName: String?,
     val supplierBatchNo: String?,
     val grade: String?,

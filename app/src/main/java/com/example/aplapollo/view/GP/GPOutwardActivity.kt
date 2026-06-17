@@ -22,7 +22,6 @@ import com.example.aplapollo.model.GP.GalvanizingComponentRequest
 import com.example.aplapollo.model.GP.GalvanizingTransactionDetailRequest
 import com.example.aplapollo.model.GP.GalvanizingTransactionRequest
 import com.example.aplapollo.model.GP.GalvanizingTransactionResponse
-import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.viewmodel.GP.GpViewModel
 import com.example.aplapollo.viewmodel.GP.GpViewModelFactory
 import com.example.aplapollo.viewmodel.bommaster.BomInputCodeViewModelfactory
@@ -127,88 +126,88 @@ class GPOutwardActivity : AppCompatActivity() {
         binding.etTemper.setAdapter(temperAdapter)
         printlabelViewModel.getGrades()
         printlabelViewModel.getGSM()
-        binding.btnPrintBarcode.setOnClickListener {
-
-            val updatedList =
-                adapterGp.getUpdatedList()
-
-
-
-            if (updatedList.isEmpty()) {
-
-                Toasty.error(
-                    this,
-                    "No data available for printing",
-                    Toasty.LENGTH_SHORT
-                ).show()
-
-                return@setOnClickListener
-            }
-
-
-
-            val printRequestList =
-                mutableListOf<PrintLabelBarcodeRequest>()
-
-            updatedList.forEach { item ->
-
-                item.galvanizingTransactionDetails?.forEach { detail ->
-
-                    val barcode =
-                        detail.barcode?.trim()
-
-                    // CHECK BARCODE EMPTY
-                    if (barcode.isNullOrEmpty()) {
-
-                        Toasty.error(
-                            this,
-                            "Barcode missing",
-                            Toasty.LENGTH_SHORT
-                        ).show()
-
-                        return@forEach
-                    }
-
-                    printRequestList.add(
-
-                        PrintLabelBarcodeRequest(
-
-                            barcode = barcode,
-
-                            locationId = locationId,
-
-                            createdDate =
-                            Utils.getCurrentDateTimeISO(),
-
-                            createdBy =
-                            session.getUserDetails()["userName"]
-                                .toString()
-                        )
-                    )
-                }
-            }
-
-
-          if (printRequestList.isEmpty()) {
-
-                Toasty.error(
-                    this,
-                    "No barcode found for printing",
-                    Toasty.LENGTH_SHORT
-                ).show()
-
-                return@setOnClickListener
-            }
-
-            Log.d(
-                "PRINT_REQUEST",
-                printRequestList.toString()
-            )
-
-
-            printlabelViewModel
-                .printLabelBarcode(printRequestList)
-        }
+//        binding.btnPrintBarcode.setOnClickListener {
+//
+//            val updatedList =
+//                adapterGp.getUpdatedList()
+//
+//
+//
+//            if (updatedList.isEmpty()) {
+//
+//                Toasty.error(
+//                    this,
+//                    "No data available for printing",
+//                    Toasty.LENGTH_SHORT
+//                ).show()
+//
+//                return@setOnClickListener
+//            }
+//
+//
+//
+//            val printRequestList =
+//                mutableListOf<PrintLabelBarcodeRequest>()
+//
+//            updatedList.forEach { item ->
+//
+//                item.galvanizingTransactionDetails?.forEach { detail ->
+//
+//                    val barcode =
+//                        detail.barcode?.trim()
+//
+//                    // CHECK BARCODE EMPTY
+//                    if (barcode.isNullOrEmpty()) {
+//
+//                        Toasty.error(
+//                            this,
+//                            "Barcode missing",
+//                            Toasty.LENGTH_SHORT
+//                        ).show()
+//
+//                        return@forEach
+//                    }
+//
+//                    printRequestList.add(
+//
+//                        PrintLabelBarcodeRequest(
+//
+//                            barcode = barcode,
+//
+//                            locationId = locationId,
+//
+//                            createdDate =
+//                            Utils.getCurrentDateTimeISO(),
+//
+//                            createdBy =
+//                            session.getUserDetails()["userName"]
+//                                .toString()
+//                        )
+//                    )
+//                }
+//            }
+//
+//
+//          if (printRequestList.isEmpty()) {
+//
+//                Toasty.error(
+//                    this,
+//                    "No barcode found for printing",
+//                    Toasty.LENGTH_SHORT
+//                ).show()
+//
+//                return@setOnClickListener
+//            }
+//
+//            Log.d(
+//                "PRINT_REQUEST",
+//                printRequestList.toString()
+//            )
+//
+//
+//            printlabelViewModel
+//                .printLabelBarcode(printRequestList)
+//        }
 
 
     }
@@ -376,9 +375,7 @@ class GPOutwardActivity : AppCompatActivity() {
                     zincMaterailCode =
                         response.zincMaterialCode ?: ""
 
-                    // =====================================================
-                    // UI
-                    // =====================================================
+
 
                     binding.textInputMaterial.text =
                         "$inputMaterialCode / $zincMaterailCode"
@@ -626,6 +623,7 @@ class GPOutwardActivity : AppCompatActivity() {
                         this,
                         res.data ?: "Saved Successfully"
                     ).show()
+                    finish()
                 }
 
                 is Resource.Error -> {

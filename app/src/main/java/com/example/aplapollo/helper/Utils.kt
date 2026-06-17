@@ -84,6 +84,7 @@ object Utils {
         return pref.getInt(key, defValue)
     }
 
+
     fun setSharedPrefsLong(context: Context, key: String?, value: Long) {
         val pref = context.getSharedPreferences(Constants.SHARED_PREF, Context.MODE_PRIVATE)
         val editor = pref.edit()
@@ -199,7 +200,7 @@ object Utils {
             .show()
     }
     val todayDate = SimpleDateFormat(
-        "dd-MM-yyyy",
+        "yyyy-MM-dd",
         Locale.getDefault()
     ).format(Date())
     @RequiresApi(Build.VERSION_CODES.O)

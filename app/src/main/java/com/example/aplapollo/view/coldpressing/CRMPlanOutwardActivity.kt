@@ -13,6 +13,7 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Constants.LocationId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
+import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.CRM.CRMTransactionRequest
 import com.example.aplapollo.view.BaseScanActivity
 import com.example.aplapollo.viewmodel.crm.CRMViewModel
@@ -182,7 +183,7 @@ private var headerTittleCRCA:String=""
                     Log.d("CRM_WithoutPLAN_3", "Stock = $stock")
 
                     binding.layoutBatchDetails.visibility = View.VISIBLE
-binding.layoutActionButtons.visibility=View.VISIBLE
+                    binding.layoutActionButtons.visibility = View.VISIBLE
                     binding.inCRMBatch.tvItemCode.text =
                         "${stock.materialCode}"
 
@@ -193,29 +194,27 @@ binding.layoutActionButtons.visibility=View.VISIBLE
                         "${stock.grade}"
 
                     binding.inCRMBatch.tvWidth.text =
-                        "${stock.width}"
-
+                        "%.3f".format(stock?.width.toString().toDoubleOrNull() ?: 0.0)
                     binding.inCRMBatch.tvThickness.text =
-                        "${stock.thickness}"
+                        "%.2f".format(stock?.thickness.toString().toDoubleOrNull() ?: 0.0)
+
 
                     binding.inCRMBatch.tvWeight.text =
-                        "${stock.weight}"
+                        "%.3f".format(stock?.weight.toString().toDoubleOrNull() ?: 0.0)
                     sourceStockId = stock.stockId
                     scannedBarcode = stock.barcode
-                    tenantCode=stock.tenantCode
-                    transactionId=stock.transactionId?:0
+                    tenantCode = stock.tenantCode
+                    transactionId = stock.transactionId ?: 0
                     maxAllowedWidth = stock.width ?: 0.0
-                    weight=stock.weight?:0.0
-                    coilThickness = stock.thickness ?: 0.0
-
-
-                                   }
+                    weight = stock.weight ?: 0.0
+                    coilThickness = stock.thickness?:0.0
+                }
 
                 is Resource.Error -> {
                     progress.dismiss()
-
-                    Log.e("SLITTING_PLAN_3", "Error = ${resource.message}")
-                    Toasty.error(this, resource.message ?: "Error").show()
+                    Utils.showErrorDialog(this, resource.message ?: "Error",)
+//                    Log.e("SLITTING_PLAN_3", "Error = ${resource.message}")
+//                    Toasty.error(this, resource.message ?: "Error").show()
                 }
 
                 else -> {}
@@ -318,7 +317,7 @@ binding.layoutActionButtons.visibility=View.VISIBLE
         binding.commanInputRow.btnClear.setOnClickListener {
 
             binding.commanInputRow.inputField.text?.clear()
-            binding.layoutBatchDetails.removeAllViews()
+//            binding.layoutBatchDetails.removeAllViews()
 //            binding.etDesiredThickness.text?.clear()
 
             // Hide batch details
@@ -341,14 +340,12 @@ binding.layoutActionButtons.visibility=View.VISIBLE
         binding.btncClears.setOnClickListener {
 
             binding.commanInputRow.inputField.text?.clear()
-            binding.layoutBatchDetails.removeAllViews()
-//            binding.etDesiredThickness.text?.clear()
+
 
             // Hide batch details
             binding.layoutBatchDetails.visibility = View.GONE
 
-//            // Remove all dynamic weight rows
-//            binding.layoutWeightContainer.removeAllViews()
+
 
             // Reset variables
             sourceStockId = 0

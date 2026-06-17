@@ -20,6 +20,7 @@ import com.example.aplapollo.helper.Constants.BarcodeValue
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
 import com.example.aplapollo.helper.Utils
+import com.example.aplapollo.model.GP.GpOngoingJobsResponse
 import com.example.aplapollo.model.PrintLabelBarcodeRequest
 import com.example.aplapollo.viewmodel.GP.GpViewModel
 import com.example.aplapollo.viewmodel.GP.GpViewModelFactory
@@ -49,6 +50,9 @@ class GPActivity : AppCompatActivity() {
     private lateinit var ongoingJobAdapter: OngoingGpAdapter
     private var selectedProcessName: String = ""
     private var selectedMachineName: String = ""
+    private var pendingDeleteJob: GpOngoingJobsResponse? = null
+    private var pendingDeleteId = -1
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SuspiciousIndentation")
@@ -107,18 +111,19 @@ class GPActivity : AppCompatActivity() {
         ongoingJobAdapter = OngoingGpAdapter(
 
             mutableListOf(),
-
-
-
             onDeleteClick = { selectedJob ->
-
+                pendingDeleteId = selectedJob.galvanizingTranId
+                Log.d(
+                    "DELETE_CLICK",
+                    "Selected ID = $pendingDeleteId"
+                )
                 AlertDialog.Builder(this)
                     .setTitle("Delete")
                     .setMessage("Are you sure want to delete?")
                     .setPositiveButton("Yes") { _, _ ->
 
                 gpViewModel.fetchGpDelete(
-                    selectedJob.galvanizingTranId
+                 pendingDeleteId
                 )
                     }
                     .setNegativeButton("No") { dialog, _ ->
@@ -231,29 +236,31 @@ class GPActivity : AppCompatActivity() {
             when (resource) {
                 is Resource.Loading -> progress.show()
                 is Resource.Success -> {
+
                     progress.dismiss()
 
                     val jobs = resource.data ?: emptyList()
 
-                    if (jobs.isEmpty()) {
-//                        Toasty.info(this, "No ongoing jobs found").show()
-                        ongoingJobAdapter.updateList(emptyList())
-                    } else {
-                        ongoingJobAdapter.updateList(jobs)
-                        Log.d("ONGOING_JOBS", "Jobs size = ${jobs.size}")
-
+                    Log.d("GP_REFRESH", "Jobs Count = ${jobs.size}")
+                    jobs.forEach {
+                        Log.d(
+                            "REFRESH_DATA",
+                            "TranId=${it.galvanizingTranId}, Barcode=${it.barcode}"
+                        )
                     }
+                    ongoingJobAdapter.updateList(jobs)
+
+                    binding.tvCoilCount.text = jobs.size.toString()
+
                     if (jobs.isEmpty()) {
 
                         binding.layoutEmptyState.visibility = View.VISIBLE
                         binding.rvOngoingJobs.visibility = View.GONE
-                        binding.tvCoilCount.text = "0"
 
                     } else {
 
                         binding.layoutEmptyState.visibility = View.GONE
                         binding.rvOngoingJobs.visibility = View.VISIBLE
-                        binding.tvCoilCount.text = jobs.size.toString()
                     }
                 }
                 is Resource.Error -> {
@@ -308,7 +315,7 @@ class GPActivity : AppCompatActivity() {
                 else -> {}
             }
         }
-        gpViewModel.gpDeleteChildLiveData.observe(this) {
+        gpViewModel.gpDeleteLiveData.observe(this) {
 
             when (it) {
 
@@ -321,13 +328,24 @@ class GPActivity : AppCompatActivity() {
 
                     progress.dismiss()
 
+                    ongoingJobAdapter.removeItem(pendingDeleteId)
+
+                    binding.tvCoilCount.text =
+                        ongoingJobAdapter.itemCount.toString()
+
+                    if (ongoingJobAdapter.itemCount == 0) {
+                        binding.layoutEmptyState.visibility = View.VISIBLE
+                        binding.rvOngoingJobs.visibility = View.GONE
+                    }
+
                     Toasty.success(
                         this,
                         it.data?.responseMessage ?: "Deleted"
                     ).show()
 
                     gpViewModel.getOngoingGpJobs(
-                        locationId,selectedProcessName
+                        locationId,
+                        selectedProcessName
                     )
                 }
 

@@ -11,6 +11,7 @@ import com.example.aplapollo.api.RetrofitInstance
 import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
+import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.GP.GalvanizingTransactionRequest
 import com.example.aplapollo.view.BaseScanActivity
 import com.example.aplapollo.viewmodel.GP.GpViewModel
@@ -178,13 +179,12 @@ class GPInwardActivity : BaseScanActivity() {
                         "${data?.supplierBatchNo ?: "-"}"
 
                     binding.inCommanBatch.tvWidth.text =
-                        "${data?.width ?: 0}"
+                        "%.3f".format(data?.width.toString().toDoubleOrNull() ?: 0.0)
 
                     binding.inCommanBatch.tvThickness.text =
-                        "${data?.thickness ?: 0}"
-
+                        "%.2f".format(data?.thickness.toString().toDoubleOrNull() ?: 0.0)
                     binding.inCommanBatch.tvWeight.text =
-                        "${data?.weight ?: 0}"
+                        "%.3f".format(data?.weight.toString().toDoubleOrNull() ?: 0.0)
                     sourceStockId = data?.stockId!!
                     scannedBarcode = data?.barcode
                     tenantCode=data?.tenantCode
@@ -194,12 +194,12 @@ class GPInwardActivity : BaseScanActivity() {
 
                 is Resource.Error -> {
                     progress.dismiss()
-
-                    Toasty.error(
-                        this,
-                        result.message ?: "Invalid barcode",
-                        Toasty.LENGTH_SHORT
-                    ).show()
+                    Utils.showErrorDialog(this, result.message ?: "Error",)
+//                    Toasty.error(
+//                        this,
+//                        result.message ?: "Invalid barcode",
+//                        Toasty.LENGTH_SHORT
+//                    ).show()
 
                 }
 

@@ -1,5 +1,6 @@
 package com.example.aplapollo.view.Pickling
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import com.example.aplapollo.helper.Constants
 import com.example.aplapollo.helper.Constants.LocationId
 import com.example.aplapollo.helper.Resource
 import com.example.aplapollo.helper.SessionManager
+import com.example.aplapollo.helper.Utils
 import com.example.aplapollo.model.Pickling.ProcessPicklingRequest
 import com.example.aplapollo.view.BaseScanActivity
 import com.example.aplapollo.viewmodel.Pickling.PicklingViewModel
@@ -61,6 +63,7 @@ class PicklingInwardActivity : BaseScanActivity() {
 
         }
     }
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pickling_inward)
@@ -140,28 +143,27 @@ class PicklingInwardActivity : BaseScanActivity() {
                         "${data?.supplierBatchNo ?: "-"}"
 
                     binding.inPicklingBatch.tvWidth.text =
-                        "${data?.width ?: 0}"
+                        "%.3f".format(data?.width.toString().toDoubleOrNull() ?: 0.0)
 
                     binding.inPicklingBatch.tvThickness.text =
-                        "${data?.thickness ?: 0}"
+                        "%.2f".format(data?.thickness.toString().toDoubleOrNull() ?: 0.0)
 
                     binding.inPicklingBatch.tvWeight.text =
-                        "${data?.weight ?: 0}"
+                        "%.3f".format(data?.weight.toString().toDoubleOrNull() ?: 0.0)
+
                     sourceStockId = data?.stockId!!
                     scannedBarcode = data?.barcode
                     tenantCode=data?.tenantCode
                     transactionId=data?.transactionId?:0
-
                 }
-
                 is Resource.Error -> {
                     progress.dismiss()
-
-                    Toasty.error(
-                        this,
-                        resource.message ?: "Invalid barcode",
-                        Toasty.LENGTH_SHORT
-                    ).show()
+                    Utils.showErrorDialog(this, resource.message ?: "Error",)
+//                    Toasty.error(
+//                        this,
+//                        resource.message ?: "Invalid barcode",
+//                        Toasty.LENGTH_SHORT
+//                    ).show()
 
                 }
 

@@ -18,7 +18,7 @@
         <item name="colorSecondaryContainer">@color/secondaryLight</item>
 
         <!-- ================= STATUS BAR ================= -->
-        <item name="android:statusBarColor">@color/primaryDark</item>
+        <item name="android:statusBarColor">@color/statusBarColor</item>
 
         <!-- ================= APP BACKGROUND ================= -->
         <item name="android:windowBackground">@color/bgcolor</item>

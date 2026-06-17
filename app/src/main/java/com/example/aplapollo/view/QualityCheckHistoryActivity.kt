@@ -98,14 +98,14 @@ class QualityCheckHistoryActivity : AppCompatActivity() {
         }
         loadQcHistory()
         qcHistoryAdapter = QcHistoryAdapter { selectedQc ->
-
             val request = PrintLabelRequest(
                 SupplierName = selectedQc.supplierName ?: "",
                 BarCode = selectedQc.barcode ?: "",
+                CoilBatchNumber=selectedQc.CoilBatchNumber ?:"",
                 SupplierBatchNo = selectedQc.supplierBatchNo ?: "",
                 MaterialCode = selectedQc.materialCode ?: "",
                 Grade = selectedQc.grade ?: "",
-                Thickness = selectedQc.thickness ?: 0.0,
+                Thickness = selectedQc.thickness ?: 0.00,
                 Width = selectedQc.width ?: 0.0,
                 GRNNumber = selectedQc.grnNo ?: "",
                 GRNDate = selectedQc.grnDate ?: "",
@@ -166,6 +166,8 @@ class QualityCheckHistoryActivity : AppCompatActivity() {
                         Toasty.LENGTH_SHORT
                     ).show()
                 }
+
+                else -> {}
             }
         }
         qcPrintLabelViewModel.qcPrintMutableLiveData.observe(this) { result ->
@@ -215,6 +217,10 @@ class QualityCheckHistoryActivity : AppCompatActivity() {
             }
         }
 
+    }
+    override fun onResume() {
+        super.onResume()
+        loadQcHistory()
     }
     private fun loadQcHistory() {
 

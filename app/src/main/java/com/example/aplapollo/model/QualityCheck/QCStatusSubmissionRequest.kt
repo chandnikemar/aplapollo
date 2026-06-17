@@ -6,6 +6,7 @@ data class QCStatusSubmissionRequest(
     val materialTypeId: Int = 0,
     val materialCode: String,
     val barcode: String,
+    val coilBatchNumber: String?,
     val supplierName: String,
     val supplierBatchNo: String,
     val grade: String,

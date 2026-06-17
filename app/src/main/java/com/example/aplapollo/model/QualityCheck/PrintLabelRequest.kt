@@ -2,6 +2,7 @@ package com.example.aplapollo.model.QualityCheck
 
 data class PrintLabelRequest(
     val ZplContent: String? = null,
+    val CoilBatchNumber:String?,
     val SupplierName: String,
     val BarCode: String,
     val SupplierBatchNo: String,

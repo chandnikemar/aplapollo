@@ -154,10 +154,10 @@ private suspend fun safeApiCallBarcodePrintLabel(
 
         return if (response.isSuccessful && body != null) {
 
-            if (body.statusCode == 200) {
+            if (body.statusCode == 200 || body.statusCode == 201) {
                 Resource.Success(body)
             } else {
-                body.errorMessage?.let { Resource.Error(it) }
+                Resource.Error(body.errorMessage ?: body.responseMessage ?: "Unknown Error")
             }
 
         } else {
